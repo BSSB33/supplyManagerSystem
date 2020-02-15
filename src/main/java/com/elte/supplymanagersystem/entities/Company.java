@@ -29,12 +29,7 @@ public class Company {
     @OneToMany(mappedBy = "company")
     @JsonIgnore
     private List<User> managers;
-
-    //@ManyToMany(mappedBy = "company") //to be implemented in the other class to
-    //@JsonIgnore
-    //private List<User> partners;
-
-
+    
     @OneToMany(mappedBy = "buyer")
     @JsonIgnore
     private List<Order> purchases;

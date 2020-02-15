@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface CompanyRepository extends CrudRepository<Company, Integer> {
-    Optional<Company> findByCompanyName(String companyName);
+    Optional<Company> findByName(String name);
 }
 

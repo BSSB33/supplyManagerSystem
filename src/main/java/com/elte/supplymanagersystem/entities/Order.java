@@ -37,7 +37,7 @@ public class Order {
     private User sellerManager;
 
 
-    @Column //Should appear only when giving an offer
+    @Column //Should appear only when giving an offer (frontend)
     private Double price;
 
     @Column(nullable = false)

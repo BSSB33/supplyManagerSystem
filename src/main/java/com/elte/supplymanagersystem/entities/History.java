@@ -20,7 +20,7 @@ public class History {
 
     @ManyToOne
     @JoinColumn
-    private Company order;
+    private Order order;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

@@ -1,7 +1,7 @@
 insert into company_table (name) values ('TelnetWork Kft.');
 insert into company_table (name) values ('BAV Zrt.');
 insert into company_table (name) values ('TopTrade Kft.');
-insert into company_table (name) values ('ELTE');
+insert into company_table (name) values ('ELTE-Soft Kft.');
 
 insert into user_table (username, password, enabled, role, workplace_id) values ('Gabor', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_ADMIN', 4);
 insert into user_table (username, password, enabled, role, workplace_id) values ('Balazs', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 1);

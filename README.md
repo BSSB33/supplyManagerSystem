@@ -1,7 +1,7 @@
 # SupplyManagerSystem - SMS
 A Projekt az ELTE IK PTI BSc képzéshez készült szakdolgozat keretein belül jött létre.
 
-### Hallgató: Vitrai Gábor - ABIOWE
+### Hallgató: Vitrai Gábor
 
 ### Témavezető: Dr. Szendrei Rudolf
 ## A szakdolgozat címe: Vállalati ügyviteli rendszer fejlesztése Spring segítségével

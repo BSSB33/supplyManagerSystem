@@ -1,13 +1,16 @@
 package com.elte.supplymanagersystem.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@Table(name="ORDER_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,21 +30,23 @@ public class Order {
     @Column(nullable = false)
     private Status status;
 
-    @Column
-    private History history;
-
+    @OneToMany(mappedBy="order")
+    @JsonIgnore
+    private List<History> history;
 
     @ManyToOne
     @JoinColumn
     private Company buyer;
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn
     private User buyerManager;
 
     @ManyToOne
     @JoinColumn
     private Company seller;
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn
     private User sellerManager;
 }

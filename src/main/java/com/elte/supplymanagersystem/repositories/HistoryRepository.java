@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface HistoryRepository extends CrudRepository<History, Integer> {
-    Optional<History> findHistoryType(String historyType);
+    //Optional<History> findHistoryType(History.HistoryType historyType);
 }

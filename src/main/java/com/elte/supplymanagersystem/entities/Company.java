@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name="COMPANY_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,18 +24,19 @@ public class Company {
     @Column(nullable = false)
     private String name;
 
-    @Column
-    private User director;
-
-    @OneToMany(mappedBy = "company")
+    @OneToMany(targetEntity=User.class, mappedBy="workplace")
     @JsonIgnore
     private List<User> managers;
+
+    @OneToOne
+    @JoinColumn
+    private User director;
     
-    @OneToMany(mappedBy = "buyer")
+    @OneToMany(targetEntity=Order.class, mappedBy="buyer")
     @JsonIgnore
     private List<Order> purchases;
 
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(targetEntity=Order.class, mappedBy="seller")
     @JsonIgnore
     private List<Order> sales;
 

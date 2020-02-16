@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
+@Table(name="HISTORY_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,14 +18,18 @@ public class History {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne
+    @JoinColumn
+    private Company order;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private historyType historyType;
+    private HistoryType historyType;
 
     @Column
     private String note;
 
-    public enum historyType{
+    public enum HistoryType {
         PHONE_CALL, EMAIL_SENT, MADE_AND_OFFER, INTERESTED
     }
 }

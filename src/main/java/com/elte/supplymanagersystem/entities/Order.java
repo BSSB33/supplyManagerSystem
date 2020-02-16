@@ -21,6 +21,15 @@ public class Order {
     @Column(nullable = false)
     private String productName;
 
+    @Column //Should appear only when giving an offer (frontend)
+    private Double price;
+
+    @Column(nullable = false)
+    private Status status;
+
+    @Column
+    private History history;
+
 
     @ManyToOne
     @JoinColumn
@@ -35,16 +44,4 @@ public class Order {
 
     @Column(nullable = false)
     private User sellerManager;
-
-
-    @Column //Should appear only when giving an offer (frontend)
-    private Double price;
-
-    @Column(nullable = false)
-    private Status status;
-
-    @Column
-    private History history;
-
-
 }

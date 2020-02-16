@@ -27,6 +27,10 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
+    @ManyToOne
+    @JoinColumn
+    private Company company;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -34,9 +38,5 @@ public class User {
     public enum Role {
         ROLE_MANAGER, ROLE_DIRECTOR, ROLE_ADMIN
     }
-
-    @ManyToOne
-    @JoinColumn
-    private Company company;
 
 }

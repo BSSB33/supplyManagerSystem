@@ -18,6 +18,7 @@ public class History {
     private Integer id;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private historyType historyType;
 
     @Column

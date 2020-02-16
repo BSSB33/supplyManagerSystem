@@ -31,6 +31,7 @@ public class User {
     private boolean enabled;
 
     @OneToOne(mappedBy = "director", optional = true)
+    @JoinColumn
     private Company company;
 
     @OneToMany(mappedBy="buyerManager")

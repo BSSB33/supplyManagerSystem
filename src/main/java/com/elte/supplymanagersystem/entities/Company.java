@@ -29,7 +29,7 @@ public class Company {
     private List<User> managers;
 
     @OneToOne
-    @JoinColumn
+    @JsonIgnore
     private User director;
     
     @OneToMany(targetEntity=Order.class, mappedBy="buyer")

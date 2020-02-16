@@ -37,7 +37,7 @@ insert into history_table (history_type, note, order_id) values ('PHONE_CALL', '
 
 insert into history_table (history_type, note, order_id) values ('EMAIL_SENT', 'I sent out the price and the details of the product.', 2);
 insert into history_table (history_type, note, order_id) values ('EMAIL_SENT', 'They Accepted your offer.', 2);
-insert into history_table (history_type, note, order_id) values ('SHIPPING_STARTED', 'I started Shipping', 2);
+insert into history_table (history_type, note, order_id) values ('STARTED_SHIPPING', 'I started Shipping', 2);
 
 insert into history_table (history_type, note, order_id) values ('PAID', 'They paid the price of the product (Dell Display)', 3);
 insert into history_table (history_type, note, order_id) values ('PHONE_CALL', 'Everything went smoothly, we delivered the product', 3);

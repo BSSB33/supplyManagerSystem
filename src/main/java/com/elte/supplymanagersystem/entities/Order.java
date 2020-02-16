@@ -28,6 +28,7 @@ public class Order {
     private Double price;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @OneToMany(mappedBy="order")

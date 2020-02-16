@@ -17,8 +17,6 @@ import java.util.List;
 @EqualsAndHashCode
 public class User {
 
-    //TODO Nem lehet saját típusú oszlopom?
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -50,4 +50,6 @@ public class Order {
     @ManyToOne
     @JoinColumn
     private User sellerManager;
+
+    //TODO Add ManyToMany relations too
 }

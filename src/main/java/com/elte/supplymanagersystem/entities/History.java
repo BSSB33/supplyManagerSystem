@@ -28,4 +28,6 @@ public class History {
 
     @Column
     private String note;
+
+    //TODO add User, who added note
 }

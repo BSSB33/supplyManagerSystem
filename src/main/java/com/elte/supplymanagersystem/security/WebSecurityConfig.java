@@ -34,10 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(getBasicAuthEntryPoint())
                 .and()
                 .headers()
-                .frameOptions().disable()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+                .frameOptions().disable();
+                //.and()
+                //.sessionManagement()
+                //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
                     //TODO Might be the issue with the persisted data in the troubleshooter
     }
     @Autowired

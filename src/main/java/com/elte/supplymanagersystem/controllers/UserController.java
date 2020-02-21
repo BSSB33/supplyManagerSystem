@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @CrossOrigin
@@ -31,18 +32,25 @@ public class UserController {
 
     //FindAll
     @GetMapping("") //Admin only + Register
-    public ResponseEntity getAll(Authentication auth) {
-        Optional<User> user = userRepository.findByUsername(auth.getName());
-        if(user.isPresent()){
+    public ResponseEntity<Iterable<User>> getAll(Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        if(loggedInUser.isPresent()){
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
-            if(user.get().getRole() == Role.ROLE_ADMIN){
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+            System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+            //System.out.println(loggedInUser.get().getCompany());
+            if(loggedInUser.get().getRole() == Role.ROLE_ADMIN){
+
                 return ResponseEntity.ok(userRepository.findAll());
             }
-            else {
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-                return ResponseEntity.notFound().build(); //TODO check whether wrongly denies access?
-            }
+            /*else if(loggedInUser.get().getRole() == Role.ROLE_DIRECTOR){
+
+                ArrayList<User> employees = new ArrayList<>();
+                for (User user : userRepository.findAll()){
+                    if(user.getCompany().getId() == loggedInUser.get().getCompany().getId()) employees.add(user);
+                }
+                return ResponseEntity.ok(employees);
+            }*/
+            else return ResponseEntity.notFound().build();
         }
         else {
             return ResponseEntity.notFound().build();

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +34,14 @@ public class UserController {
     public ResponseEntity getAll(Authentication auth) {
         Optional<User> user = userRepository.findByUsername(auth.getName());
         if(user.isPresent()){
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
             if(user.get().getRole() == Role.ROLE_ADMIN){
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
                 return ResponseEntity.ok(userRepository.findAll());
             }
             else {
-                return new ResponseEntity(HttpStatus.UNAUTHORIZED); //TODO check whether wrongly denies acces?
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+                return ResponseEntity.notFound().build(); //TODO check whether wrongly denies access?
             }
         }
         else {

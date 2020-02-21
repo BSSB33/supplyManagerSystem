@@ -30,4 +30,7 @@ public class CompanyController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //TODO company ordereket csak az a manager/Director/admin kérlhet le aki a cégnél dolgozik/főnök a cégnél
+    //a menager csak azokat az ordereket kérheti le/módosThatja/törölheti amikben a cég vagy vevő vagy eladó
 }

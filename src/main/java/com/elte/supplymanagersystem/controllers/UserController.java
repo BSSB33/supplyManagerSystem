@@ -33,15 +33,17 @@ public class UserController {
     public ResponseEntity<Iterable<User>> getAll(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         if (loggedInUser.isPresent()) {
-            UserDetails userDetails = (UserDetails) auth.getPrincipal();
-            System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-            if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
-                return ResponseEntity.ok(userRepository.findAll());
-            else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR) //Alkalmazottakat lekérdezheti
-                //SOLUTION: fetch = FetchType.EAGER solved it in -> private List<User> managers;
-                return ResponseEntity.ok(loggedInUser.get().getCompany().getManagers());
-            else if (loggedInUser.get().getRole() == Role.ROLE_MANAGER) //Munkatársakat lekérdezheti
-                return ResponseEntity.ok(loggedInUser.get().getWorkplace().getManagers());
+            if (loggedInUser.get().isEnabled()){
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
+                    return ResponseEntity.ok(userRepository.findAll());
+                else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR) //Alkalmazottakat lekérdezheti
+                    //SOLUTION: fetch = FetchType.EAGER solved it in -> private List<User> managers;
+                    return ResponseEntity.ok(loggedInUser.get().getCompany().getManagers());
+                else if (loggedInUser.get().getRole() == Role.ROLE_MANAGER) //Munkatársakat lekérdezheti
+                    return ResponseEntity.ok(loggedInUser.get().getWorkplace().getManagers());
+            }
         }
         return ResponseEntity.badRequest().build();
     }
@@ -52,26 +54,28 @@ public class UserController {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         Optional<User> userToGet = userRepository.findById(id);
         if (loggedInUser.isPresent()) { //If login successful
-            UserDetails userDetails = (UserDetails) auth.getPrincipal();
-            System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+            if (loggedInUser.get().isEnabled()){
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
 
-            if (userToGet.isPresent()) { //If exists
-                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
-                    return ResponseEntity.ok(userToGet.get());
-                else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-
-                    if(loggedInUser.get().isColleague(userToGet.get())){ //Ha munkatárs
-                        //TODO LEKÉRHETI AMUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
+                if (userToGet.isPresent()) { //If exists
+                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
                         return ResponseEntity.ok(userToGet.get());
+                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+
+                        if(loggedInUser.get().isColleague(userToGet.get())){ //Ha munkatárs
+                            //TODO LEKÉRHETI A MUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
+                            return ResponseEntity.ok(userToGet.get());
+                        }
                     }
-                }
-            } else return ResponseEntity.notFound().build();
+                } else return ResponseEntity.notFound().build();
+            }
         }
         return ResponseEntity.badRequest().build(); //UNAUTHORIZED
     }
 
     //Save
-    @PostMapping("")
+    @PostMapping("") //TODO same name not allowed
     public ResponseEntity<User> post(@RequestBody User User) {
         User userToSave = userRepository.save(User);
         return ResponseEntity.ok(userToSave);

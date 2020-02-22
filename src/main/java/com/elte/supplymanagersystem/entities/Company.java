@@ -24,7 +24,7 @@ public class Company {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(targetEntity=User.class, mappedBy="workplace")
+    @OneToMany(targetEntity=User.class, mappedBy="workplace", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<User> managers;
 

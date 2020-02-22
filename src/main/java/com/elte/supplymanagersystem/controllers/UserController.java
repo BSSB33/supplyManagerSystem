@@ -2,9 +2,9 @@ package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.Role;
 import com.elte.supplymanagersystem.entities.User;
+import com.elte.supplymanagersystem.repositories.CompanyRepository;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;
-import com.sun.tools.sjavac.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,33 +33,20 @@ public class UserController {
     private AuthenticatedUser authenticatedUser;
 
     //FindAll
-    @GetMapping("") //Admin only + Register
+    @GetMapping("") //Admin only
     public ResponseEntity<Iterable<User>> getAll(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         if(loggedInUser.isPresent()){
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
             System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
             //System.out.println(loggedInUser.get().getCompany());
-            if(loggedInUser.get().getRole() == Role.ROLE_ADMIN){
-
+            if(loggedInUser.get().getRole() == Role.ROLE_ADMIN)
                 return ResponseEntity.ok(userRepository.findAll());
-            }
-            else if(loggedInUser.get().getRole() == Role.ROLE_DIRECTOR){
-
-                ArrayList<User> employees = new ArrayList<>();
-                userRepository.findAll().forEach(user -> {
-                        System.out.println(user.getCompany().getName() + " - " + loggedInUser.get().getCompany().getName() + " " + user.getCompany().getId().equals(loggedInUser.get().getCompany().getId()));
-                    }
-                );
-                //return ResponseEntity.ok(employees);
-                return ResponseEntity.notFound().build();
-
-            }
+            else if(loggedInUser.get().getRole() == Role.ROLE_DIRECTOR)
+                return ResponseEntity.ok(loggedInUser.get().getCompany().getManagers());
             else return ResponseEntity.notFound().build();
         }
-        else {
-            return ResponseEntity.notFound().build();
-        }
+        else return ResponseEntity.notFound().build();
     }
 
     //Find

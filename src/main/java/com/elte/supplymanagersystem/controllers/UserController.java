@@ -2,20 +2,16 @@ package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.Role;
 import com.elte.supplymanagersystem.entities.User;
-import com.elte.supplymanagersystem.repositories.CompanyRepository;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @CrossOrigin
@@ -36,28 +32,42 @@ public class UserController {
     @GetMapping("") //Admin only
     public ResponseEntity<Iterable<User>> getAll(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        if(loggedInUser.isPresent()){
+        if (loggedInUser.isPresent()) {
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
             System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-            //System.out.println(loggedInUser.get().getCompany());
-            if(loggedInUser.get().getRole() == Role.ROLE_ADMIN)
+            if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
                 return ResponseEntity.ok(userRepository.findAll());
-            else if(loggedInUser.get().getRole() == Role.ROLE_DIRECTOR)
+            else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR) //Alkalmazottakat lekérdezheti
+                //SOLUTION: fetch = FetchType.EAGER solved it in -> private List<User> managers;
                 return ResponseEntity.ok(loggedInUser.get().getCompany().getManagers());
-            else return ResponseEntity.notFound().build();
+            else if (loggedInUser.get().getRole() == Role.ROLE_MANAGER) //Munkatársakat lekérdezheti
+                return ResponseEntity.ok(loggedInUser.get().getWorkplace().getManagers());
         }
-        else return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().build();
     }
 
     //Find
     @GetMapping("/{id}")
-    public ResponseEntity<User> get(@PathVariable @Min(0) Integer id) {
+    public ResponseEntity<User> get(@PathVariable @Min(0) Integer id, Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         Optional<User> userToGet = userRepository.findById(id);
-        if (userToGet.isPresent()) {
-            return ResponseEntity.ok(userToGet.get());
-        } else {
-            return ResponseEntity.notFound().build();
+        if (loggedInUser.isPresent()) { //If login successful
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+            if (userToGet.isPresent()) { //If exists
+                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
+                    return ResponseEntity.ok(userToGet.get());
+                else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+
+                    if(loggedInUser.get().isColleague(userToGet.get())){ //Ha munkatárs
+                        //TODO LEKÉRHETI AMUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
+                        return ResponseEntity.ok(userToGet.get());
+                    }
+                }
+            } else return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.badRequest().build(); //UNAUTHORIZED
     }
 
     //Save

@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -49,4 +50,13 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    /**
+     * //Checks is the two users are colleagues or not
+     * @param otherUser possible colleague
+     * @return true/false
+     */
+    public boolean isColleague(User otherUser){
+        return this.workplace.getId().equals(otherUser.workplace.getId());
+    }
 }

@@ -1,6 +1,7 @@
 package com.elte.supplymanagersystem.repositories;
 
 import com.elte.supplymanagersystem.entities.Company;
+import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import org.springframework.data.repository.CrudRepository;
@@ -22,6 +23,6 @@ public interface OrderRepository extends CrudRepository<Order, Integer> {
     @Query("SELECT o FROM Order o WHERE o.buyer = :workplace")
     List<Order> findPurchasesByWorkplace(@Param("workplace") Company workplace);
 
-    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace")
+    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace") //TODO Check if OR woks fine -> examples
     List<Order> findAllOrderByWorkplace(@Param("workplace") Company workplace);
 }

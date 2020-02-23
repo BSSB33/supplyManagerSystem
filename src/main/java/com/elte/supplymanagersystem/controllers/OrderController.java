@@ -1,9 +1,7 @@
 package com.elte.supplymanagersystem.controllers;
 
-import com.elte.supplymanagersystem.entities.Company;
-import com.elte.supplymanagersystem.entities.Order;
-import com.elte.supplymanagersystem.entities.Role;
-import com.elte.supplymanagersystem.entities.User;
+import com.elte.supplymanagersystem.entities.*;
+import com.elte.supplymanagersystem.repositories.HistoryRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +25,9 @@ public class OrderController {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
 
     /**
      * Only ADMINS have the right to get all the Orders
@@ -65,7 +67,7 @@ public class OrderController {
      * @param auth Authentication parameter for Security in order to get the User who logged in
      * @return Returns Orders based on ROLES
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") //TODO ASAP!!! SZAR többet ad vissza
     public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         Optional<Order> orderToGet = orderRepository.findById(id);
@@ -78,8 +80,46 @@ public class OrderController {
                     if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
                         return ResponseEntity.ok(orderToGet.get());
                     else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-                        List<Order> currentCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
-                        return ResponseEntity.ok(currentCompany);
+                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace()); //jó elemek vannak benne valszeg
+                        System.out.println(ordersOfCompany);
+                        System.out.println("-");
+                        System.out.println(orderToGet);
+                        if(ordersOfCompany.contains(orderToGet.get())) //TODO itt a hiba, valamiért nem tartalmazza
+                            return ResponseEntity.ok(orderToGet.get());
+                        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                    }
+                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                }
+                else return ResponseEntity.notFound().build();
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/{id}/histories")
+    public ResponseEntity getHistoriesByOrderId(@PathVariable Integer id, Authentication auth){
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        Optional<Order> orderToGet = orderRepository.findById(id);
+        if (loggedInUser.isPresent()) { //If login successful
+            if (loggedInUser.get().isEnabled()){
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+                if (orderToGet.isPresent()) { //If exists
+                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
+                        //List<History> historiesOfOrder = historyRepository.findHistoriesByOrder(orderToGet.get());
+                        return ResponseEntity.ok(orderToGet.get().getHistory());
+                    }
+
+                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
+                        if(ordersOfCompany.contains(orderToGet.get())){ //TODO Valamiért hamis
+                            List<History> historiesOfOrder = historyRepository.findHistoriesByOrder(orderToGet.get());
+                            //TODO visszaadja a teljes ordert is, why?
+                            return ResponseEntity.ok(historiesOfOrder);
+                        }
+                        else return new ResponseEntity(HttpStatus.CONFLICT);
                     }
                     else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                 }

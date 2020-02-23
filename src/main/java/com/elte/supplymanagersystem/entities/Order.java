@@ -31,7 +31,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy="order")
+    @OneToMany(mappedBy="order", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<History> history;
 

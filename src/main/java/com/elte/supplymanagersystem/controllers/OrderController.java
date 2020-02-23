@@ -27,6 +27,15 @@ public class OrderController {
     @Autowired
     private OrderRepository orderRepository;
 
+    /**
+     * Only ADMINS have the right to get all the Orders
+     * ADMIN - ALL Order
+     * ELSE - UNAUTHORIZED
+     * DISABLED USER - FORBIDDEN
+     * NON EXISTING USER LOGGED IN - BAD REQUEST
+     * @param auth Authentication parameter for Security in order to get the User who logged in
+     * @return Returns Orders based on ROLES
+     */
     @GetMapping("")
     public ResponseEntity getAll(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
@@ -44,6 +53,18 @@ public class OrderController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * ADMIN - All Orders
+     * DIRECTOR - Get orders if issued by, or for the company the user works at
+     * MANAGER - Get orders if issued by, or for the company the user works at
+     * ELSE - UNAUTHORIZED
+     * ID NOT FOUND - NOT FOUND
+     * DISABLED USER - FORBIDDEN
+     * NON EXISTING USER LOGGED IN - BAD REQUEST
+     * @param id ID of Order to return
+     * @param auth Authentication parameter for Security in order to get the User who logged in
+     * @return Returns Orders based on ROLES
+     */
     @GetMapping("/{id}")
     public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
@@ -69,6 +90,17 @@ public class OrderController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
+     * DIRECTOR - Get orders if issued by, or for the company the user works at
+     * MANAGER - Get orders if issued by, or for the company the user works at
+     * ELSE - UNAUTHORIZED
+     * ID NOT FOUND - NOT FOUND
+     * DISABLED USER - FORBIDDEN
+     * NON EXISTING USER LOGGED IN - BAD REQUEST
+     * @param auth Authentication parameter for Security in order to get the User who logged in
+     * @return Returns Orders where the user's company is a seller
+     */
     @GetMapping("/sales")
     public ResponseEntity getSales(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
@@ -90,6 +122,17 @@ public class OrderController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
+     * DIRECTOR - Get orders if issued by, or for the company the user works at
+     * MANAGER - Get orders if issued by, or for the company the user works at
+     * ELSE - UNAUTHORIZED
+     * ID NOT FOUND - NOT FOUND
+     * DISABLED USER - FORBIDDEN
+     * NON EXISTING USER LOGGED IN - BAD REQUEST
+     * @param auth Authentication parameter for Security in order to get the User who logged in
+     * @return Returns Orders where the user's company is a buyer
+     */
     @GetMapping("/purchases")
     public ResponseEntity getPurchases(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());

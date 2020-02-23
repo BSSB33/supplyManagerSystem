@@ -2,12 +2,18 @@ package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.Order;
-import com.elte.supplymanagersystem.repositories.CompanyRepository;
+import com.elte.supplymanagersystem.entities.Role;
+import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
+import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin
@@ -16,11 +22,26 @@ import java.util.Optional;
 public class OrderController {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @GetMapping("")
-    public ResponseEntity<Iterable<Order>> getAll() {
-        return ResponseEntity.ok(orderRepository.findAll());
+    public ResponseEntity getAll(Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        if (loggedInUser.isPresent()) {
+            if (loggedInUser.get().isEnabled()) {
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
+                    return ResponseEntity.ok(orderRepository.findAll());
+                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/{id}")
@@ -31,6 +52,20 @@ public class OrderController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/sales")
+    public ResponseEntity getSales(Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.get().getCompany());
+        return ResponseEntity.ok(currentCompany);
+    }
+
+    @GetMapping("/purchases")
+    public ResponseEntity getPurchases(Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.get().getCompany());
+        return ResponseEntity.ok(currentCompany);
     }
 
 }

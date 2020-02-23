@@ -45,13 +45,28 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> get(@PathVariable Integer id) {
-        Optional<Order> label = orderRepository.findById(id);
-        if (label.isPresent()) {
-            return ResponseEntity.ok(label.get());
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+        Optional<Order> orderToGet = orderRepository.findById(id);
+        if (loggedInUser.isPresent()) { //If login successful
+            if (loggedInUser.get().isEnabled()){
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+                if (orderToGet.isPresent()) { //If exists
+                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
+                        return ResponseEntity.ok(orderToGet.get());
+                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+                        List<Order> currentCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
+                        return ResponseEntity.ok(currentCompany);
+                    }
+                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                }
+                else return ResponseEntity.notFound().build();
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/sales")
@@ -63,7 +78,7 @@ public class OrderController {
                 Role roleOfUser = loggedInUser.get().getRole();
                 System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
 
-                //TODO Admin should be able to get everyone's sales
+                //TODO Admin should be able to get everyone's sales CompanyController->Orders Get("CompanyOrders/{name}")
                 if(roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER){
                     List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.get().getWorkplace());
                     return ResponseEntity.ok(currentCompany);
@@ -84,7 +99,6 @@ public class OrderController {
                 Role roleOfUser = loggedInUser.get().getRole();
                 System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
 
-                //TODO Admin should be able to get everyone's purchases
                 if(roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER){
                     List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.get().getWorkplace());
                     return ResponseEntity.ok(currentCompany);

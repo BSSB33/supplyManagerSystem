@@ -16,9 +16,12 @@ import java.util.Optional;
 public interface OrderRepository extends CrudRepository<Order, Integer> {
     Optional<Order> findByProductName(String productName);
 
-    @Query("SELECT o FROM Order o WHERE o.seller = :company")
-    List<Order> findSalesByWorkplace(@Param("company") Company company);
+    @Query("SELECT o FROM Order o WHERE o.seller = :workplace")
+    List<Order> findSalesByWorkplace(@Param("workplace") Company workplace);
 
-    @Query("SELECT o FROM Order o WHERE o.buyer = :company")
-    List<Order> findPurchasesByWorkplace(@Param("company") Company company);
+    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace")
+    List<Order> findPurchasesByWorkplace(@Param("workplace") Company workplace);
+
+    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace")
+    List<Order> findAllOrderByWorkplace(@Param("workplace") Company workplace);
 }

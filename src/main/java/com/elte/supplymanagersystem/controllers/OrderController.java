@@ -57,15 +57,43 @@ public class OrderController {
     @GetMapping("/sales")
     public ResponseEntity getSales(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.get().getCompany());
-        return ResponseEntity.ok(currentCompany);
+        if (loggedInUser.isPresent()) {
+            if (loggedInUser.get().isEnabled()) {
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                Role roleOfUser = loggedInUser.get().getRole();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+                //TODO Admin should be able to get everyone's sales
+                if(roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER){
+                    List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.get().getWorkplace());
+                    return ResponseEntity.ok(currentCompany);
+                }
+                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/purchases")
     public ResponseEntity getPurchases(Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.get().getCompany());
-        return ResponseEntity.ok(currentCompany);
+        if (loggedInUser.isPresent()) {
+            if (loggedInUser.get().isEnabled()) {
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                Role roleOfUser = loggedInUser.get().getRole();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+
+                //TODO Admin should be able to get everyone's purchases
+                if(roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER){
+                    List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.get().getWorkplace());
+                    return ResponseEntity.ok(currentCompany);
+                }
+                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
 }

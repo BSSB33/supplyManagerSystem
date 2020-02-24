@@ -89,14 +89,34 @@ public class UserController {
 
     //Save or Update
     @PutMapping("/{id}")
-    public ResponseEntity<User> put(@RequestBody User User, @PathVariable Integer id) {
+    public ResponseEntity put(@RequestBody User user, @PathVariable Integer id, Authentication auth) {
+        //TODO 24 MEGÍRNI MOST!
+        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         Optional<User> otherUser = userRepository.findById(id);
-        if (otherUser.isPresent()) {
-            User.setId(id);
-            return ResponseEntity.ok(userRepository.save(User));
-        } else {
-            return ResponseEntity.notFound().build();
+        if (loggedInUser.isPresent()) { //If login successful
+            if (loggedInUser.get().isEnabled()){
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+                user.setId(id);
+                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
+                    //Settable Role (any)
+                    return ResponseEntity.ok(userRepository.save(user));
+                }
+                else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR) {
+                    if(user.getRole() == Role.ROLE_MANAGER){
+                        return ResponseEntity.ok(userRepository.save(user));
+                    }
+                    else return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+                else if(loggedInUser.get().getRole() == Role.ROLE_MANAGER){
+                    return ResponseEntity.ok(userRepository.save(loggedInUser.get()));
+                }
+                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
+        //TODO implemetn this branch and pother POST/PPUT Methods
+        return ResponseEntity.badRequest().build();
     }
 
     //Delete

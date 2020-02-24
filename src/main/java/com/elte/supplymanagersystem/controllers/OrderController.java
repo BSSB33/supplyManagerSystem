@@ -63,7 +63,7 @@ public class OrderController {
      * @param auth Authentication parameter for Security in order to get the User who logged in
      * @return Returns Orders based on ROLES
      */
-    @GetMapping("/{id}") //TODO ASAP!!! SZAR többet ad vissza
+    @GetMapping("/{id}")
     public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
         Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
         Optional<Order> orderToGet = orderRepository.findById(id);

@@ -1,7 +1,7 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.*;
-import com.elte.supplymanagersystem.repositories.HistoryRepository;
+import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

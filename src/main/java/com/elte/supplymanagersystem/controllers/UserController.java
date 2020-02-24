@@ -1,6 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
-import com.elte.supplymanagersystem.entities.Role;
+import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;

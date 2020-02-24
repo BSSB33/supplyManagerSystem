@@ -11,9 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -25,9 +24,6 @@ public class OrderController {
 
     @Autowired
     private OrderRepository orderRepository;
-
-    @Autowired
-    private HistoryRepository historyRepository;
 
     /**
      * Only ADMINS have the right to get all the Orders
@@ -80,12 +76,11 @@ public class OrderController {
                     if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
                         return ResponseEntity.ok(orderToGet.get());
                     else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace()); //jó elemek vannak benne valszeg
-                        System.out.println(ordersOfCompany);
-                        System.out.println("-");
-                        System.out.println(orderToGet);
-                        if(ordersOfCompany.contains(orderToGet.get())) //TODO itt a hiba, valamiért nem tartalmazza
-                            return ResponseEntity.ok(orderToGet.get());
+                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
+                        Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+                        if(map.get(orderToGet.get().getId()) != null){
+                            return ResponseEntity.ok(map.get(orderToGet.get().getId()));
+                        }
                         else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                     }
                     else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -108,18 +103,15 @@ public class OrderController {
 
                 if (orderToGet.isPresent()) { //If exists
                     if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
-                        //List<History> historiesOfOrder = historyRepository.findHistoriesByOrder(orderToGet.get());
                         return ResponseEntity.ok(orderToGet.get().getHistory());
                     }
-
                     else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
                         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
-                        if(ordersOfCompany.contains(orderToGet.get())){ //TODO Valamiért hamis
-                            List<History> historiesOfOrder = historyRepository.findHistoriesByOrder(orderToGet.get());
-                            //TODO visszaadja a teljes ordert is, why?
-                            return ResponseEntity.ok(historiesOfOrder);
+                        Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+                        if(map.get(orderToGet.get().getId()) != null){
+                            return ResponseEntity.ok(map.get(orderToGet.get().getId()).getHistory());
                         }
-                        else return new ResponseEntity(HttpStatus.CONFLICT);
+                        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                     }
                     else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                 }

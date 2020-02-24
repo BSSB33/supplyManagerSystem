@@ -23,6 +23,6 @@ public interface OrderRepository extends CrudRepository<Order, Integer> {
     @Query("SELECT o FROM Order o WHERE o.buyer = :workplace")
     List<Order> findPurchasesByWorkplace(@Param("workplace") Company workplace);
 
-    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace") //TODO Check if OR woks fine -> examples
+    @Query("SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace") //TODO 24 Check if OR woks fine -> examples
     List<Order> findAllOrderByWorkplace(@Param("workplace") Company workplace);
 }

@@ -14,8 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface HistoryRepository extends CrudRepository<History, Integer> {
-    //TODO Optional<History> findHistoryType(History.HistoryType historyType);
 
     @Query("SELECT h FROM History h WHERE h.order = :order")
-    List<History> findHistoriesByOrder(@Param("order") Order order/*, @Param("workplace") Company workplace*/);
+    List<History> findHistoriesByOrder(@Param("order") Order order);
 }

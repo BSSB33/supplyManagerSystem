@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,6 +21,7 @@ public class History {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private Order order;
 
     @Column(nullable = false)

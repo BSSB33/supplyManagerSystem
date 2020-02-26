@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin
@@ -35,13 +37,13 @@ public class UserController {
     public ResponseEntity getAll(Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName()); //TODO Consultation: Baj ha public?
         if(loggedInUser != null){ //If valid
-            if(userService.userHasAdminRole(loggedInUser)){
+            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
                 return ResponseEntity.ok(userService.getAll());
             }
-            else if(userService.userHasDirectorRole(loggedInUser)){
+            else if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
                 return ResponseEntity.ok(userService.getEmployeesOfUser(loggedInUser));
             }
-            else if(userService.userHasManagerRole(loggedInUser)){
+            else if(userService.userHasRole(loggedInUser, Role.ROLE_MANAGER)){
                 return ResponseEntity.ok(userService.getColleaguesOfUser(loggedInUser));
             }
             else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -54,21 +56,22 @@ public class UserController {
     public ResponseEntity get(@PathVariable @Min(0) Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if(loggedInUser != null){ //If valid
-            if(userService.userHasAdminRole(loggedInUser))
+            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userService.findById(id));
-            else if(userService.userHasDirectorOrManagerRole(loggedInUser)){
+            else if(userService.userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)) )){
                 User userToGet = userService.findById(id);
                 if(userToGet != null){
                     if(loggedInUser.isColleague(userToGet)){ //Ha munkatárs
                         //TODO LEKÉRHETI A MUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
                         return ResponseEntity.ok(userToGet);
                     }
+                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                 }
                 else return ResponseEntity.notFound().build();
             }
             else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(HttpStatus.FORBIDDEN);
+        else return new ResponseEntity(HttpStatus.CONFLICT);
     }
 
 //    //Save

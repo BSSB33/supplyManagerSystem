@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -24,8 +25,7 @@ public class UserService {
 
     public User findById(Integer id){
         Optional<User> userToGet = userRepository.findById(id);
-        if(userToGet.isPresent()) return userToGet.get();
-        return null;
+        return userToGet.orElse(null);
     }
 
     public Iterable<User> getEmployeesOfUser(User user){
@@ -44,33 +44,17 @@ public class UserService {
         Optional<User> loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser.isPresent() && loggedInUser.get().isEnabled()) {
             User user = loggedInUser.get();
-            System.out.println("User has authorities: " + user.getUsername() + " " + user.getRole());
+            System.out.println("User has authorities: " + user.getUsername() + " [" + user.getRole() + "]");
             return user;
         }
         return null; //throws FORBIDDEN
     }
 
-    public boolean userHasAdminRole(User user) {
-        return (user.getRole() == Role.ROLE_ADMIN);
+    public boolean userHasRole(User user, Role role){
+        return user.getRole() == role;
     }
 
-    public boolean userHasDirectorRole(User user) {
-        return (user.getRole() == Role.ROLE_DIRECTOR);
-    }
-
-    public boolean userHasManagerRole(User user) {
-        return (user.getRole() == Role.ROLE_MANAGER);
-    }
-
-    public boolean userHasAdminOrManagerRole(User user) {
-        return (user.getRole() == Role.ROLE_DIRECTOR || user.getRole() == Role.ROLE_MANAGER);
-    }
-
-    public boolean userHasDirectorOrManagerRole(User user) {
-        return (user.getRole() == Role.ROLE_DIRECTOR || user.getRole() == Role.ROLE_MANAGER);
-    }
-
-    public boolean userHasRole(User user) {
-        return (user.getRole() == Role.ROLE_ADMIN || user.getRole() == Role.ROLE_DIRECTOR || user.getRole() == Role.ROLE_MANAGER);
+    public boolean userHasRole(User user, ArrayList<Role> roles){
+        return roles.contains(user.getRole());
     }
 }

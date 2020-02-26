@@ -49,33 +49,27 @@ public class UserController {
         else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    //Find
-//    @GetMapping("/{id}")
-//    public ResponseEntity get(@PathVariable @Min(0) Integer id, Authentication auth) {
-//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-//        Optional<User> userToGet = userRepository.findById(id);
-//        if (loggedInUser.isPresent()) { //If login successful
-//            if (loggedInUser.get().isEnabled()){
-//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-//
-//                if (userToGet.isPresent()) { //If exists
-//                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN)
-//                        return ResponseEntity.ok(userToGet.get());
-//                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-//                        if(loggedInUser.get().isColleague(userToGet.get())){ //Ha munkatárs
-//                            //TODO LEKÉRHETI A MUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
-//                            return ResponseEntity.ok(userToGet.get());
-//                        }
-//                    }
-//                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-//                }
-//                else return ResponseEntity.notFound().build();
-//            }
-//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-//        }
-//        return ResponseEntity.badRequest().build();
-//    }
+    //Find
+    @GetMapping("/{id}")
+    public ResponseEntity get(@PathVariable @Min(0) Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if(loggedInUser != null){ //If valid
+            if(userService.userHasAdminRole(loggedInUser))
+                return ResponseEntity.ok(userService.findById(id));
+            else if(userService.userHasDirectorOrManagerRole(loggedInUser)){
+                User userToGet = userService.findById(id);
+                if(userToGet != null){
+                    if(loggedInUser.isColleague(userToGet)){ //Ha munkatárs
+                        //TODO LEKÉRHETI A MUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
+                        return ResponseEntity.ok(userToGet);
+                    }
+                }
+                else return ResponseEntity.notFound().build();
+            }
+            else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
 
 //    //Save
 //    @PostMapping("") //TODO same name not allowed

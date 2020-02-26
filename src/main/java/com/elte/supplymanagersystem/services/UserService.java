@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -21,12 +22,22 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User findById(Integer id){
+        Optional<User> userToGet = userRepository.findById(id);
+        if(userToGet.isPresent()) return userToGet.get();
+        return null;
+    }
+
     public Iterable<User> getEmployeesOfUser(User user){
-        return userRepository.findByUsername(user.getUsername()).get().getCompany().getManagers();
+        Optional<User> userToGet = userRepository.findByUsername(user.getUsername());
+        if(userToGet.isPresent()) return userToGet.get().getCompany().getManagers();
+        return null;
     }
 
     public Iterable<User> getColleaguesOfUser(User user){
-        return userRepository.findByUsername(user.getUsername()).get().getCompany().getManagers();
+        Optional<User> userToGet = userRepository.findByUsername(user.getUsername());
+        if(userToGet.isPresent()) return userToGet.get().getWorkplace().getManagers();
+        return null;
     }
 
     public User getValidUser(String username) {
@@ -52,6 +63,10 @@ public class UserService {
     }
 
     public boolean userHasAdminOrManagerRole(User user) {
+        return (user.getRole() == Role.ROLE_DIRECTOR || user.getRole() == Role.ROLE_MANAGER);
+    }
+
+    public boolean userHasDirectorOrManagerRole(User user) {
         return (user.getRole() == Role.ROLE_DIRECTOR || user.getRole() == Role.ROLE_MANAGER);
     }
 

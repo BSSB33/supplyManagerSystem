@@ -52,7 +52,7 @@ public class User {
     private Role role;
 
     /**
-     * //Checks is the two users are colleagues or not
+     * Checks if the two users are colleagues or not
      * @param otherUser possible colleague
      * @return true/false
      */

@@ -25,48 +25,48 @@ public class CompanyController {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @GetMapping("")
-    public ResponseEntity getAll(Authentication auth) {
-        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        if (loggedInUser.isPresent()) {
-            if (loggedInUser.get().isEnabled()) {
-                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-                Role roleOfUser = loggedInUser.get().getRole();
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+//    @GetMapping("")
+//    public ResponseEntity getAll(Authentication auth) {
+//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+//        if (loggedInUser.isPresent()) {
+//            if (loggedInUser.get().isEnabled()) {
+//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+//                Role roleOfUser = loggedInUser.get().getRole();
+//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+//
+//                if (roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER) //Mindenkit lekérdezhet
+//                    return ResponseEntity.ok(companyRepository.findAll());
+//                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//            }
+//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+//        }
+//        return ResponseEntity.badRequest().build();
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+//        Optional<Company> companyToGet = companyRepository.findById(id);
+//        if (loggedInUser.isPresent()) {
+//            if (loggedInUser.get().isEnabled()) {
+//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+//                Role roleOfUser = loggedInUser.get().getRole();
+//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+//
+//                if(companyToGet.isPresent()){
+//                    if (roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER) //Mindenkit lekérdezhet
+//                        return ResponseEntity.ok(companyToGet.get());
+//                }
+//                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//            }
+//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+//        }
+//        return ResponseEntity.badRequest().build();
+//    }
 
-                if (roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER) //Mindenkit lekérdezhet
-                    return ResponseEntity.ok(companyRepository.findAll());
-                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            }
-            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
-        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        Optional<Company> companyToGet = companyRepository.findById(id);
-        if (loggedInUser.isPresent()) {
-            if (loggedInUser.get().isEnabled()) {
-                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-                Role roleOfUser = loggedInUser.get().getRole();
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-
-                if(companyToGet.isPresent()){
-                    if (roleOfUser == Role.ROLE_ADMIN || roleOfUser == Role.ROLE_DIRECTOR || roleOfUser == Role.ROLE_MANAGER) //Mindenkit lekérdezhet
-                        return ResponseEntity.ok(companyToGet.get());
-                }
-                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            }
-            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    //Save or Update
-    @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody Company company, @PathVariable Integer id, Authentication auth) {
-        return ResponseEntity.ok(companyRepository.save(company));
-    }
+//    //Save or Update
+//    @PutMapping("/{id}")
+//    public ResponseEntity put(@RequestBody Company company, @PathVariable Integer id, Authentication auth) {
+//        return ResponseEntity.ok(companyRepository.save(company));
+//    }
 }

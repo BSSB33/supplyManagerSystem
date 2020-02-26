@@ -30,17 +30,11 @@ public class UserController {
     private AuthenticatedUser authenticatedUser;
 
     //FindAll
-    @GetMapping("") //Admin only
+    @GetMapping("")
     public ResponseEntity getAll(Authentication auth) {
-        User loggedInUser = userService.getValidUser(auth.getName()); //TODO Consultation: Baj ha public?
+        User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) { //If valid
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                return ResponseEntity.ok(userService.getAll());
-            } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                return ResponseEntity.ok(userService.getEmployeesOfUser(loggedInUser));
-            } else if (userService.userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
-                return ResponseEntity.ok(userService.getColleaguesOfUser(loggedInUser));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return userService.getAll(loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -49,16 +43,7 @@ public class UserController {
     public ResponseEntity get(@PathVariable @Min(0) Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) { //If valid
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
-                return ResponseEntity.ok(userService.findById(id));
-            else if (userService.userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
-                User userToGet = userService.findById(id);
-                if (userToGet != null) {
-                    if (loggedInUser.isColleague(userToGet)) {
-                        return ResponseEntity.ok(userToGet);
-                    } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-                } else return ResponseEntity.notFound().build();
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return userService.getById(loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -74,17 +59,7 @@ public class UserController {
     public ResponseEntity put(@RequestBody User user, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            user.setId(id);
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                return ResponseEntity.ok(userService.saveUser(user));
-            } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                if ((userService.userHasRole(user, Role.ROLE_MANAGER) && user.getWorkplace() == loggedInUser.getCompany())
-                        || user.getId().equals(loggedInUser.getId())) {
-                    return ResponseEntity.ok(userService.saveUser(user));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else if (userService.userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
-                return ResponseEntity.ok(userService.saveUser(loggedInUser));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return userService.putById(user, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 //

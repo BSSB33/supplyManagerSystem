@@ -35,51 +35,51 @@ public class HistoryController {
     @Autowired
     private HistoryRepository historyRepository;
 
-    @GetMapping("")
-    public ResponseEntity getAll(Authentication auth) {
-        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        if (loggedInUser.isPresent()) {
-            if (loggedInUser.get().isEnabled()) {
-                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-
-                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
-                    return ResponseEntity.ok(historyRepository.findAll());
-                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            }
-            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
-        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-        Optional<History> historyToGet = historyRepository.findById(id);
-        if (loggedInUser.isPresent()) { //If login successful
-            if (loggedInUser.get().isEnabled()){
-                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-
-                if (historyToGet.isPresent()) { //If exists
-                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
-                        return ResponseEntity.ok(historyToGet.get());
-                    }
-                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
-                        Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
-                        if(map.get(historyToGet.get().getId()) != null){
-                            return ResponseEntity.ok(map.get(historyToGet.get().getId()).getHistory());
-                        }
-                        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-                    }
-                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-                }
-                else return ResponseEntity.notFound().build();
-            }
-            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-        return ResponseEntity.badRequest().build();
-    }
+//    @GetMapping("")
+//    public ResponseEntity getAll(Authentication auth) {
+//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+//        if (loggedInUser.isPresent()) {
+//            if (loggedInUser.get().isEnabled()) {
+//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+//
+//                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
+//                    return ResponseEntity.ok(historyRepository.findAll());
+//                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//            }
+//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+//        }
+//        return ResponseEntity.badRequest().build();
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
+//        Optional<History> historyToGet = historyRepository.findById(id);
+//        if (loggedInUser.isPresent()) { //If login successful
+//            if (loggedInUser.get().isEnabled()){
+//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
+//
+//                if (historyToGet.isPresent()) { //If exists
+//                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
+//                        return ResponseEntity.ok(historyToGet.get());
+//                    }
+//                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+//                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
+//                        Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+//                        if(map.get(historyToGet.get().getId()) != null){
+//                            return ResponseEntity.ok(map.get(historyToGet.get().getId()).getHistory());
+//                        }
+//                        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//                    }
+//                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//                }
+//                else return ResponseEntity.notFound().build();
+//            }
+//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+//        }
+//        return ResponseEntity.badRequest().build();
+//    }
 
 }

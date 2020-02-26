@@ -63,4 +63,10 @@ public class CompanyController {
         }
         return ResponseEntity.badRequest().build();
     }
+
+    //Save or Update
+    @PutMapping("/{id}")
+    public ResponseEntity put(@RequestBody Company company, @PathVariable Integer id, Authentication auth) {
+        return ResponseEntity.ok(companyRepository.save(company));
+    }
 }

@@ -21,10 +21,10 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
-    @OneToMany(targetEntity=User.class, mappedBy="workplace", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity=User.class, mappedBy="workplace", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<User> managers;
 
@@ -32,12 +32,11 @@ public class Company {
     @JsonIgnore
     private User director;
     
-    @OneToMany(targetEntity=Order.class, mappedBy="buyer")
+    @OneToMany(targetEntity=Order.class, mappedBy="buyer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> purchases;
 
-    @OneToMany(targetEntity=Order.class, mappedBy="seller")
+    @OneToMany(targetEntity=Order.class, mappedBy="seller", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> sales;
-
 }

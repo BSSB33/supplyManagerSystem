@@ -31,15 +31,15 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
-    @OneToOne(mappedBy = "director", optional = true)
+    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL)
     @JoinColumn
     private Company company;
 
-    @OneToMany(mappedBy="buyerManager")
+    @OneToMany(mappedBy="buyerManager", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> buyerManager;
 
-    @OneToMany(mappedBy="sellerManager")
+    @OneToMany(mappedBy="sellerManager", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> sellerManager;
 

@@ -40,6 +40,10 @@ public class UserService {
         return null;
     }
 
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
+
     public User getValidUser(String username) {
         Optional<User> loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser.isPresent() && loggedInUser.get().isEnabled()) {

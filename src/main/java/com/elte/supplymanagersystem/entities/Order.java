@@ -32,7 +32,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy="order", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<History> history;
 

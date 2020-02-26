@@ -54,8 +54,7 @@ public class UserController {
             else if (userService.userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
                 User userToGet = userService.findById(id);
                 if (userToGet != null) {
-                    if (loggedInUser.isColleague(userToGet)) { //Ha munkatárs
-                        //TODO LEKÉRHETI A MUNKATÁRSAIT, DE NEM KÓDOSÍTHATJA ŐKET -> PUT
+                    if (loggedInUser.isColleague(userToGet)) {
                         return ResponseEntity.ok(userToGet);
                     } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                 } else return ResponseEntity.notFound().build();

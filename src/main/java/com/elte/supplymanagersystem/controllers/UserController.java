@@ -40,20 +40,13 @@ public class UserController {
 
     //Find
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable @Min(0) Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable @Min(1) Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) { //If valid
             return userService.getById(loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-    //    //Save
-//    @PostMapping("") //TODO same name not allowed
-//    public ResponseEntity<User> post(@RequestBody User User) {
-//        User userToSave = userRepository.save(User);
-//        return ResponseEntity.ok(userToSave);
-//    }
-//
     //Save or Update
     @PutMapping("/{id}")
     public ResponseEntity put(@RequestBody User user, @PathVariable Integer id, Authentication auth) {
@@ -62,18 +55,15 @@ public class UserController {
             return userService.putById(user, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
-//
-//    //Delete
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity delete(@PathVariable Integer id) {
-//        Optional<User> otherUser = userRepository.findById(id);
-//        if (otherUser.isPresent()) {
-//            userRepository.deleteById(id);
-//            return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+
+    //Delete
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return userService.deleteById(id, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
 //
 //    @PostMapping("register")
 //    public ResponseEntity<User> register(@RequestBody User user) {
@@ -83,14 +73,14 @@ public class UserController {
 //        }
 //        user.setPassword(passwordEncoder.encode(user.getPassword()));
 //        user.setEnabled(true);
-//        user.setRole(Role.ROLE_USER); //TODO nem lehet default
+//        user.setRole(user.getRole()); //TODO nem lehet default
 //        return ResponseEntity.ok(userRepository.save(user));
 //    }
-//
-//    @PostMapping("login")
-//    public ResponseEntity login() {
-//        return ResponseEntity.ok(authenticatedUser.getUser());
-//    }
+
+    @PostMapping("login")
+    public ResponseEntity login() {
+        return ResponseEntity.ok(authenticatedUser.getUser());
+    }
 
 
 }

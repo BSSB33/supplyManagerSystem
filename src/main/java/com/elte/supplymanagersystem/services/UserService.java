@@ -32,22 +32,17 @@ public class UserService {
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-    public User findById(Integer id) {
-        Optional<User> userToGet = userRepository.findById(id);
-        return userToGet.orElse(null);
-    }
-
     public ResponseEntity getById(User loggedInUser, Integer id){
-        if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
-            return ResponseEntity.ok(findById(id));
-        else if (userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
-            User userToGet = findById(id);
-            if (userToGet != null) {
-                if (loggedInUser.isColleague(userToGet)) {
+        Optional<User> userToGet = userRepository.findById(id);
+        if(userToGet.isPresent()){
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
+                return ResponseEntity.ok(userToGet);
+            else if (userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
+                if (loggedInUser.isColleague(userToGet.get())) {
                     return ResponseEntity.ok(userToGet);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return ResponseEntity.notFound().build();
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
     }
 
     public ResponseEntity putById(User userToSave, User loggedInUser, Integer id){
@@ -55,10 +50,13 @@ public class UserService {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(saveUser(userToSave));
         } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-            if ((userHasRole(userToSave, Role.ROLE_MANAGER) && userToSave.getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
+            Optional<User> user = userRepository.findById(userToSave.getId());
+            if(user.isPresent()){
+                if ((userHasRole(userToSave, Role.ROLE_MANAGER) && user.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
                     || userToSave.getId().equals(loggedInUser.getId())) {
-                return ResponseEntity.ok(saveUser(userToSave));
-            } else return new ResponseEntity(HttpStatus.CONFLICT);
+                    return ResponseEntity.ok(saveUser(userToSave));
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return ResponseEntity.notFound().build();
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToSave.getId().equals(loggedInUser.getId())) {
             return ResponseEntity.ok(saveUser(userToSave));
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -76,9 +74,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public ResponseEntity deleteById(Integer id, User loggedInUser){
+        Optional<User> userToDelete = userRepository.findById(id);
+        if(userToDelete.isPresent()){
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                userRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            } else if(userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if(userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())){
+                    userRepository.deleteById(id);
+                    return ResponseEntity.ok().build();
+                } return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
     public User getValidUser(String username) {
         User loggedInUser = userRepository.findByUsername(username);
-        if(loggedInUser != null){ //TODO find more nullpointer unchecked
+        if(loggedInUser != null){ //TODO TESTS find more nullpointer unchecked
             if (loggedInUser.isEnabled()) {
                 System.out.println("User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
                 return loggedInUser;

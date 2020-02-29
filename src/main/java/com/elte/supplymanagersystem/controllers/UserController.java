@@ -26,7 +26,7 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity getAll(Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) { //If valid
+        if (loggedInUser != null) {
             return userService.getAll(loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -35,16 +35,16 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity get(@PathVariable @Min(1) Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) { //If valid
+        if (loggedInUser != null) {
             return userService.getById(loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-    //GetUnassignedDirectorsByCompany
+    //Get Unassigned Directors
     @GetMapping("/freeDirectors")
     public ResponseEntity getUnassignedDirectors(Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) { //If valid
+        if (loggedInUser != null) {
             return userService.getUnassignedDirectors(loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }

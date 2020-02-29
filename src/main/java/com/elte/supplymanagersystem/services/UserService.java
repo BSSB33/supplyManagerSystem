@@ -23,13 +23,9 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public Iterable<User> findAll() {
-        return userRepository.findAll();
-    }
-
     public ResponseEntity getAll(User loggedInUser) {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(findAll());
+            return ResponseEntity.ok(userRepository.findAll());
         } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
             return ResponseEntity.ok(getEmployeesOfUser(loggedInUser));
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
@@ -42,7 +38,7 @@ public class UserService {
         if(userToGet.isPresent()){
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
-            else if (userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
+            else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
                 if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);

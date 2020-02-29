@@ -2,7 +2,7 @@ package com.elte.supplymanagersystem.services;
 
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
-import com.elte.supplymanagersystem.exceptions.RegisterException;
+import com.elte.supplymanagersystem.exceptions.RegistrationException;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,6 +50,12 @@ public class UserService {
         } else return ResponseEntity.notFound().build();
     }
 
+    public ResponseEntity getUnassignedDirectors(User loggedInUser){
+        if(userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+            return ResponseEntity.ok(userRepository.findUnassignedDirectors());
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
     public ResponseEntity putById(User userToSave, User loggedInUser, Integer id){
         userToSave.setId(id);
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -78,13 +84,8 @@ public class UserService {
             if(userHasRole(loggedInUser, Role.ROLE_ADMIN)){
                 if(userHasRole(userToRegister, Role.ROLE_DIRECTOR)){
                     userToRegister.setRole(Role.ROLE_DIRECTOR);
-                    userToRegister.setWorkplace(userToRegister.getCompany());
+                    userToRegister.setWorkplace(null);
                 }
-                if(userToRegister.getRole() == null || userToRegister.getWorkplace() == null) { //Shouldn't happen
-                    userToRegister.setRole(Role.ROLE_MANAGER);
-                    userToRegister.setWorkplace(loggedInUser.getCompany());
-                }
-                userToRegister.setRole(userToRegister.getRole());
                 return ResponseEntity.ok(userRepository.save(userToRegister));
             }
             else if(userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
@@ -101,7 +102,7 @@ public class UserService {
         if (userHasRole(director, Role.ROLE_DIRECTOR) && director.getCompany() != null && director.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getCompany().getManagers();
         }
-        else throw new RegisterException("Director must have a Company - Possibly Frontend error");
+        else return new ArrayList<>();
     }
 
     public Iterable<User> getColleaguesOfUser(User user) {
@@ -109,7 +110,7 @@ public class UserService {
         if(employee.getWorkplace() != null){
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
         }
-        else throw new RegisterException("Managers must have a Workplace - Possibly Frontend error");
+        else return new ArrayList<>();
     }
 
     public User saveUser(User user) {

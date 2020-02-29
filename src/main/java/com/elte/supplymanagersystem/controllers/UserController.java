@@ -40,6 +40,15 @@ public class UserController {
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
+    //GetUnassignedDirectorsByCompany
+    @GetMapping("/freeDirectors")
+    public ResponseEntity getUnassignedDirectors(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) { //If valid
+            return userService.getUnassignedDirectors(loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
     //Save or Update
     @PutMapping("/{id}")
     public ResponseEntity put(@RequestBody User user, @PathVariable Integer id, Authentication auth) {

@@ -34,7 +34,7 @@ public class UserService {
             return ResponseEntity.ok(getEmployeesOfUser(loggedInUser));
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
             return ResponseEntity.ok(getColleaguesOfUser(loggedInUser));
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity getById(User loggedInUser, Integer id){
@@ -75,8 +75,24 @@ public class UserService {
         else {
             userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
             userToRegister.setEnabled(true);
-            userToRegister.setRole(userToRegister.getRole()); //nem lehet default
-            return ResponseEntity.ok(userRepository.save(userToRegister));
+            if(userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+                if(userHasRole(userToRegister, Role.ROLE_DIRECTOR)){
+                    userToRegister.setRole(Role.ROLE_DIRECTOR);
+                    userToRegister.setWorkplace(userToRegister.getCompany());
+                }
+                if(userToRegister.getRole() == null || userToRegister.getWorkplace() == null) { //Shouldn't happen
+                    userToRegister.setRole(Role.ROLE_MANAGER);
+                    userToRegister.setWorkplace(loggedInUser.getCompany());
+                }
+                userToRegister.setRole(userToRegister.getRole());
+                return ResponseEntity.ok(userRepository.save(userToRegister));
+            }
+            else if(userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
+                userToRegister.setRole(Role.ROLE_MANAGER);
+                userToRegister.setWorkplace(loggedInUser.getCompany());
+                return ResponseEntity.ok(userRepository.save(userToRegister));
+            }
+            else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
 

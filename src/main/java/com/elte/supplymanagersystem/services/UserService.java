@@ -2,10 +2,12 @@ package com.elte.supplymanagersystem.services;
 
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
+import com.elte.supplymanagersystem.exceptions.RegisterException;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public Iterable<User> findAll() {
         return userRepository.findAll();
@@ -38,7 +43,7 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, new ArrayList<>(List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR)))) {
-                if (loggedInUser.isColleague(userToGet.get())) {
+                if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -62,12 +67,33 @@ public class UserService {
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
+    public ResponseEntity registerUser(User userToRegister, User loggedInUser){ //Auth, have to have workplace, DIRECTORS have to have companies
+        Optional<User> otherUser = Optional.ofNullable(userRepository.findByUsername(userToRegister.getUsername()));
+        if (otherUser.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        else {
+            userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
+            userToRegister.setEnabled(true);
+            userToRegister.setRole(userToRegister.getRole()); //nem lehet default
+            return ResponseEntity.ok(userRepository.save(userToRegister));
+        }
+    }
+
     public Iterable<User> getEmployeesOfUser(User user) {
-        return userRepository.findByUsername(user.getUsername()).getCompany().getManagers();
+        User director = userRepository.findByUsername(user.getUsername());
+        if (userHasRole(director, Role.ROLE_DIRECTOR) && director.getCompany() != null && director.getWorkplace() != null) {
+            return userRepository.findByUsername(user.getUsername()).getCompany().getManagers();
+        }
+        else throw new RegisterException("Director must have a Company - Possibly Frontend error");
     }
 
     public Iterable<User> getColleaguesOfUser(User user) {
-        return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
+        User employee = userRepository.findByUsername(user.getUsername());
+        if(employee.getWorkplace() != null){
+            return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
+        }
+        else throw new RegisterException("Managers must have a Workplace - Possibly Frontend error");
     }
 
     public User saveUser(User user) {

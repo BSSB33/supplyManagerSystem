@@ -59,17 +59,17 @@ public class UserService {
     public ResponseEntity putById(User userToSave, User loggedInUser, Integer id){
         userToSave.setId(id);
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(saveUser(userToSave));
+            return ResponseEntity.ok(userRepository.save(userToSave));
         } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
             Optional<User> user = userRepository.findById(userToSave.getId());
             if(user.isPresent()){
                 if ((userHasRole(userToSave, Role.ROLE_MANAGER) && user.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
                     || userToSave.getId().equals(loggedInUser.getId())) {
-                    return ResponseEntity.ok(saveUser(userToSave));
+                    return ResponseEntity.ok(userRepository.save(userToSave));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return ResponseEntity.notFound().build();
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToSave.getId().equals(loggedInUser.getId())) {
-            return ResponseEntity.ok(saveUser(userToSave));
+            return ResponseEntity.ok(userRepository.save(userToSave));
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
@@ -111,10 +111,6 @@ public class UserService {
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
         }
         else return new ArrayList<>();
-    }
-
-    public User saveUser(User user) {
-        return userRepository.save(user);
     }
 
     public ResponseEntity deleteById(Integer id, User loggedInUser){

@@ -43,9 +43,38 @@ public class CompanyController {
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    //Save or Update
-//    @PutMapping("/{id}")
-//    public ResponseEntity put(@RequestBody Company company, @PathVariable Integer id, Authentication auth) {
-//        return ResponseEntity.ok(companyRepository.save(company));
-//    }
+    @GetMapping("/mycompany")
+    public ResponseEntity getCompanyOfLoggedInUser( Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.getCompanyOfLoggedInUser(loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    //Update
+    @PutMapping("/{id}")
+    public ResponseEntity put(@RequestBody Company company, @PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.putById(company, loggedInUser, id);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    //Add
+    @PostMapping("")
+    public ResponseEntity post(@RequestBody Company company, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.addCompany(company, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    //Delete
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.deleteById(id, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
 }

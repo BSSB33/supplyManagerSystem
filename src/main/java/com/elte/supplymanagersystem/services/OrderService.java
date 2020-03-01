@@ -5,6 +5,7 @@ import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
+
+    final static Logger logger = Logger.getLogger(OrderService.class);
 
     @Autowired
     private UserService userService;
@@ -89,7 +92,10 @@ public class OrderService {
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToUpdate.getId()) != null) {
-                    return ResponseEntity.ok(orderRepository.save(map.get(orderToUpdate.getId())));
+
+                    //System.out.println(orderRepository.save(map.get(orderToUpdate.getId())).getPrice());
+                    //logger.debug(orderRepository.save(map.get(orderToUpdate.getId())));
+                    return ResponseEntity.ok(orderRepository.save(orderToUpdate));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();

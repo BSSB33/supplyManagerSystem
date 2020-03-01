@@ -24,24 +24,61 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     public ResponseEntity getAll(User loggedInUser) {
-        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(orderRepository.findAll());
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity getById(User loggedInUser, Integer id) {
         Optional<Order> orderToGet = orderRepository.findById(id);
-        if (orderToGet.isPresent()) { //If exists
+        if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderToGet.get());
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
+                //TODO van szebb megoldás?
                 Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {
+        //TODO addCreator and timestamp + listByCreatorCompany
+        Optional<Order> orderToGet = orderRepository.findById(id);
+        if (orderToGet.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                return ResponseEntity.ok(orderToGet.get().getHistory());
+            } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+                List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
+                Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+                if (map.get(orderToGet.get().getId()) != null) {
+                    return ResponseEntity.ok(map.get(orderToGet.get().getId()).getHistory());
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity getSalesByUser(User loggedInUser){
+        if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+            if(loggedInUser.getWorkplace() != null){
+                List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace());
+                return ResponseEntity.ok(currentCompany);
+            } else return ResponseEntity.badRequest().build();
+        }
+        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    public ResponseEntity getPurchasesByUser(User loggedInUser){
+        if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+            if(loggedInUser.getWorkplace() != null){
+                List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
+                return ResponseEntity.ok(currentCompany);
+            } else return ResponseEntity.badRequest().build();
+        }
+        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
 }

@@ -32,7 +32,7 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
-    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn
     private Company company;
 

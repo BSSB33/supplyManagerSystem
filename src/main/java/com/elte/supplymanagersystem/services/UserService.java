@@ -56,7 +56,7 @@ public class UserService {
         userToSave.setId(id);
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.save(userToSave));
-        } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+        } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //TODO cant update company because of OneToOne
             Optional<User> user = userRepository.findById(userToSave.getId());
             if(user.isPresent()){
                 if ((userHasRole(userToSave, Role.ROLE_MANAGER) && user.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
@@ -126,7 +126,7 @@ public class UserService {
 
     public User getValidUser(String username) {
         User loggedInUser = userRepository.findByUsername(username);
-        if(loggedInUser != null){ //TODO TESTS find more nullpointer unchecked
+        if(loggedInUser != null){
             if (loggedInUser.isEnabled()) {
                 System.out.println("User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
                 return loggedInUser;

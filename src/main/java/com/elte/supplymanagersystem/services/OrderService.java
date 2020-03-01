@@ -5,6 +5,7 @@ import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
+import org.apache.el.util.ReflectionUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,10 +93,40 @@ public class OrderService {
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToUpdate.getId()) != null) {
-
-                    //System.out.println(orderRepository.save(map.get(orderToUpdate.getId())).getPrice());
-                    //logger.debug(orderRepository.save(map.get(orderToUpdate.getId())));
                     return ResponseEntity.ok(orderRepository.save(orderToUpdate));
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    //Add
+    public ResponseEntity addOrder(Order orderToSave, User loggedInUser){
+        Optional<Order> otherOrder = orderRepository.findByProductName(orderToSave.getProductName());
+        if (otherOrder.isPresent())
+            return ResponseEntity.badRequest().build();
+        else {
+            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+                return ResponseEntity.ok(orderRepository.save(orderToSave));
+            else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+                if(orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())){
+                    return ResponseEntity.ok(orderRepository.save(new Order(orderToSave)));
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    //Remove
+    public ResponseEntity deleteById(Integer id, User loggedInUser){
+        Optional<Order> orderToDelete = orderRepository.findById(id);
+        if (orderToDelete.isPresent()){
+            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+                orderRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            } else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+                Map<Integer, Order> map = getMap(loggedInUser);
+                if (map.get(orderToDelete.get().getId()) != null) {
+                    orderRepository.deleteById(id);
+                    return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();

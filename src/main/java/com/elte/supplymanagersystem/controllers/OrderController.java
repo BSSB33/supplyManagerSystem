@@ -119,21 +119,21 @@ public class OrderController {
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    //Add
-//    @PostMapping("")
-//    public ResponseEntity post(@RequestBody Order order, Authentication auth) {
-//        User loggedInUser = userService.getValidUser(auth.getName());
-//        if (loggedInUser != null) {
-//            return orderService.addOrder(order, loggedInUser);
-//        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-//    }
-//
-//    //Delete
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
-//        User loggedInUser = userService.getValidUser(auth.getName());
-//        if (loggedInUser != null) {
-//            return orderService.deleteById(id, loggedInUser);
-//        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-//    }
+    //Add
+    @PostMapping("")
+    public ResponseEntity post(@RequestBody Order order, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return orderService.addOrder(order, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    //Delete
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return orderService.deleteById(id, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
 }

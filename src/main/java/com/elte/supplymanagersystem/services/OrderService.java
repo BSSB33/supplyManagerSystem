@@ -59,7 +59,9 @@ public class OrderService {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     ArrayList<History> authorizedHistories = new ArrayList<>();
-                    orderToGet.get().getHistory().stream().filter(history -> history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
+                    orderToGet.get().getHistory().stream().filter(history ->
+                            history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
+                            forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);

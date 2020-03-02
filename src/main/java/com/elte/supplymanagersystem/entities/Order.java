@@ -18,17 +18,6 @@ import java.util.List;
 @EqualsAndHashCode
 public class Order {
 
-    public Order(Order order) {
-        order.productName = productName;
-        order.price = price;
-        order.status = status;
-        order.history = history;
-        order.buyer = buyer;
-        order.buyerManager = buyerManager;
-        order.seller = seller;
-        order.sellerManager = sellerManager;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

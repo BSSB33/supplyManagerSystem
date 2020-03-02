@@ -1,25 +1,16 @@
 package com.elte.supplymanagersystem.controllers;
 
-import com.elte.supplymanagersystem.entities.Company;
-import com.elte.supplymanagersystem.entities.History;
-import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
-import com.elte.supplymanagersystem.enums.Role;
-import com.elte.supplymanagersystem.repositories.CompanyRepository;
-import com.elte.supplymanagersystem.repositories.HistoryRepository;
-import com.elte.supplymanagersystem.repositories.OrderRepository;
-import com.elte.supplymanagersystem.repositories.UserRepository;
+import com.elte.supplymanagersystem.services.HistoryService;
+import com.elte.supplymanagersystem.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
 @RestController
@@ -27,30 +18,18 @@ import java.util.stream.Collectors;
 public class HistoryController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private OrderRepository orderRepository;
+    private HistoryService historyService;
 
-    @Autowired
-    private HistoryRepository historyRepository;
-
-//    @GetMapping("")
-//    public ResponseEntity getAll(Authentication auth) {
-//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-//        if (loggedInUser.isPresent()) {
-//            if (loggedInUser.get().isEnabled()) {
-//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-//
-//                if (loggedInUser.get().getRole() == Role.ROLE_ADMIN) //Mindenkit lekérdezhet
-//                    return ResponseEntity.ok(historyRepository.findAll());
-//                else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-//            }
-//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
-//        }
-//        return ResponseEntity.badRequest().build();
-//    }
+    @GetMapping("")
+    public ResponseEntity getAll(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return historyService.getAll(loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
 //
 //    @GetMapping("/{id}")
 //    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {

@@ -107,7 +107,7 @@ public class OrderService {
                 return ResponseEntity.ok(orderRepository.save(orderToSave));
             else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
                 if(orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())){
-                    return ResponseEntity.ok(orderRepository.save(new Order(orderToSave)));
+                    return ResponseEntity.ok(orderRepository.save(orderToSave)); //TODO bug
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }

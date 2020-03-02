@@ -49,13 +49,16 @@ public class CompanyService {
         if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
             return ResponseEntity.ok(companyRepository.save(companyToUpdate));
         } else if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
-            if( loggedInUser.getCompany().getId().equals(companyToUpdate.getId()) ){
-                Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
-                if(originalDirector.isPresent()){
-                    companyToUpdate.setDirector(originalDirector.get().getDirector());
-                    return ResponseEntity.ok(companyRepository.save(companyToUpdate));
-                } else return ResponseEntity.ok(companyRepository.save(companyToUpdate));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            Optional<Company> company = companyRepository.findById(companyToUpdate.getId());
+            if(company.isPresent()){
+                if( loggedInUser.getCompany().getId().equals(companyToUpdate.getId()) ){
+                    Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
+                    if(originalDirector.isPresent()){
+                        companyToUpdate.setDirector(originalDirector.get().getDirector());
+                        return ResponseEntity.ok(companyRepository.save(companyToUpdate));
+                    } else return ResponseEntity.ok(companyRepository.save(companyToUpdate));
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.notFound().build();
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 

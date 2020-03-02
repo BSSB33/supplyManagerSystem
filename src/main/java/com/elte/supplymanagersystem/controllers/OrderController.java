@@ -1,20 +1,14 @@
 package com.elte.supplymanagersystem.controllers;
 
-import com.elte.supplymanagersystem.entities.*;
-import com.elte.supplymanagersystem.enums.Role;
-import com.elte.supplymanagersystem.repositories.OrderRepository;
-import com.elte.supplymanagersystem.repositories.UserRepository;
+import com.elte.supplymanagersystem.entities.Order;
+import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.OrderService;
 import com.elte.supplymanagersystem.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -27,7 +21,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-//    /**
+    //    /**
 //     * Only ADMINS have the right to get all the Orders
 //     * ADMIN - ALL Order
 //     * ELSE - UNAUTHORIZED
@@ -44,7 +38,7 @@ public class OrderController {
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    /**
+    //    /**
 //     * ADMIN - All Orders
 //     * DIRECTOR - Get orders if issued by, or for the company the user works at
 //     * MANAGER - Get orders if issued by, or for the company the user works at
@@ -65,14 +59,14 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/histories")
-    public ResponseEntity getHistoriesByOrderId(@PathVariable Integer id, Authentication auth){
+    public ResponseEntity getHistoriesByOrderId(@PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    /**
+    //    /**
 //     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
 //     * DIRECTOR - Get orders if issued by, or for the company the user works at
 //     * MANAGER - Get orders if issued by, or for the company the user works at
@@ -91,7 +85,7 @@ public class OrderController {
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-//    /**
+    //    /**
 //     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
 //     * DIRECTOR - Get orders if issued by, or for the company the user works at
 //     * MANAGER - Get orders if issued by, or for the company the user works at

@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="ORDER_TABLE")
+@Table(name = "ORDER_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,7 +43,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy="order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<History> history;
 

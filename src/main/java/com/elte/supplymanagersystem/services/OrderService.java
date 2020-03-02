@@ -1,11 +1,9 @@
 package com.elte.supplymanagersystem.services;
 
-import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
-import org.apache.el.util.ReflectionUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

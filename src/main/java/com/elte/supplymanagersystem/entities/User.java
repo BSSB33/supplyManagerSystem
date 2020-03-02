@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="USER_TABLE")
+@Table(name = "USER_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,11 +36,11 @@ public class User {
     @JoinColumn
     private Company company;
 
-    @OneToMany(mappedBy="buyerManager", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "buyerManager", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> buyerManager;
 
-    @OneToMany(mappedBy="sellerManager", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sellerManager", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> sellerManager;
 
@@ -54,10 +54,11 @@ public class User {
 
     /**
      * Checks if the two users are colleagues or not
+     *
      * @param otherUser possible colleague
      * @return true/false
      */
-    public boolean isColleague(User otherUser){
+    public boolean isColleague(User otherUser) {
         return this.workplace.getId().equals(otherUser.workplace.getId());
     }
 }

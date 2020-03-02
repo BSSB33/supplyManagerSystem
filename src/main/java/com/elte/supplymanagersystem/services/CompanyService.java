@@ -7,10 +7,8 @@ import com.elte.supplymanagersystem.repositories.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +29,7 @@ public class CompanyService {
 
     public ResponseEntity getById(User loggedInUser, Integer id) {
         Optional<Company> companyToGet = companyRepository.findById(id);
-        if(companyToGet.isPresent()) {
+        if (companyToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
                 return ResponseEntity.ok(companyToGet.get());
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -44,16 +42,16 @@ public class CompanyService {
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity putById(Company companyToUpdate, User loggedInUser, Integer id){
+    public ResponseEntity putById(Company companyToUpdate, User loggedInUser, Integer id) {
         companyToUpdate.setId(id);
-        if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(companyRepository.save(companyToUpdate));
-        } else if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
+        } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
             Optional<Company> company = companyRepository.findById(companyToUpdate.getId());
-            if(company.isPresent()){
-                if( loggedInUser.getCompany().getId().equals(companyToUpdate.getId()) ){
+            if (company.isPresent()) {
+                if (loggedInUser.getCompany().getId().equals(companyToUpdate.getId())) {
                     Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
-                    if(originalDirector.isPresent()){
+                    if (originalDirector.isPresent()) {
                         companyToUpdate.setDirector(originalDirector.get().getDirector());
                         return ResponseEntity.ok(companyRepository.save(companyToUpdate));
                     } else return ResponseEntity.ok(companyRepository.save(companyToUpdate));
@@ -63,26 +61,25 @@ public class CompanyService {
     }
 
     //Add
-    public ResponseEntity addCompany(Company companyToSave, User loggedInUser){
+    public ResponseEntity addCompany(Company companyToSave, User loggedInUser) {
         Optional<Company> otherCompany = companyRepository.findByName(companyToSave.getName());
         if (otherCompany.isPresent())
             return ResponseEntity.badRequest().build();
         else {
-            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(companyRepository.save(companyToSave));
             else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
 
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser){
+    public ResponseEntity deleteById(Integer id, User loggedInUser) {
         Optional<Company> companyToDelete = companyRepository.findById(id);
-        if (companyToDelete.isPresent()){
-            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+        if (companyToDelete.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 companyRepository.deleteById(id);
                 return ResponseEntity.ok().build();
-            }
-            else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
     }
 }

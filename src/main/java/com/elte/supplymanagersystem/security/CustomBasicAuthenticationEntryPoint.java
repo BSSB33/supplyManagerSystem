@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 
-public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint{
+public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
     //Beginning
     @Override
     public void commence(final HttpServletRequest request,

@@ -1,20 +1,14 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.Company;
-import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.entities.User;
-import com.elte.supplymanagersystem.repositories.CompanyRepository;
-import com.elte.supplymanagersystem.repositories.UserRepository;
 import com.elte.supplymanagersystem.services.CompanyService;
 import com.elte.supplymanagersystem.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -44,7 +38,7 @@ public class CompanyController {
     }
 
     @GetMapping("/mycompany")
-    public ResponseEntity getCompanyOfLoggedInUser( Authentication auth) {
+    public ResponseEntity getCompanyOfLoggedInUser(Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getCompanyOfLoggedInUser(loggedInUser);

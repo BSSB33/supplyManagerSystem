@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name="HISTORY_TABLE")
+@Table(name = "HISTORY_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

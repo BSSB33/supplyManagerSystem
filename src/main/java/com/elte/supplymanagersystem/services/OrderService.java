@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,7 +58,9 @@ public class OrderService {
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
-                    return ResponseEntity.ok(map.get(orderToGet.get().getId()).getHistory());
+                    ArrayList<History> authorizedHistories = new ArrayList<>();
+                    orderToGet.get().getHistory().stream().filter(history -> history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
+                    return ResponseEntity.ok(authorizedHistories);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();

@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -30,35 +27,25 @@ public class HistoryController {
             return historyService.getAll(loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
-//        Optional<User> loggedInUser = userRepository.findByUsername(auth.getName());
-//        Optional<History> historyToGet = historyRepository.findById(id);
-//        if (loggedInUser.isPresent()) { //If login successful
-//            if (loggedInUser.get().isEnabled()){
-//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-//                System.out.println("User has authorities: " + userDetails.getUsername() + " " + userDetails.getAuthorities());
-//
-//                if (historyToGet.isPresent()) { //If exists
-//                    if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
-//                        return ResponseEntity.ok(historyToGet.get());
-//                    }
-//                    else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
-//                        List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
-//                        Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
-//                        if(map.get(historyToGet.get().getId()) != null){
-//                            return ResponseEntity.ok(map.get(historyToGet.get().getId()).getHistory());
-//                        }
-//                        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-//                    }
-//                    else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-//                }
-//                else return ResponseEntity.notFound().build();
-//            }
-//            else return new ResponseEntity(HttpStatus.FORBIDDEN);
+
+    @GetMapping("/{id}")
+    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return historyService.getById(loggedInUser, id);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+//        if (loggedInUser.get().getRole() == Role.ROLE_ADMIN){
+//            return ResponseEntity.ok(historyToGet.get());
 //        }
-//        return ResponseEntity.badRequest().build();
-//    }
+//        else if (loggedInUser.get().getRole() == Role.ROLE_DIRECTOR || loggedInUser.get().getRole() == Role.ROLE_MANAGER) {
+//            List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.get().getWorkplace());
+//            Map<Integer, Order> map = ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+//            if(map.get(historyToGet.get().getId()) != null){
+//                return ResponseEntity.ok(map.get(historyToGet.get().getId()).getHistory());
+//            }
+//            else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//        }
+//        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
 
 }

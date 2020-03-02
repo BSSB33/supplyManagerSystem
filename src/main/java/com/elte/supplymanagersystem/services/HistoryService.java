@@ -32,10 +32,5 @@ public class HistoryService {
         else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity getHistoriesOfOrderByUser(User loggedInUser, Integer id) {
-        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
-            return ResponseEntity.ok(historyRepository.findAll());
-        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-    }
 
 }

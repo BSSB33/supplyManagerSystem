@@ -22,6 +22,10 @@ public class History {
 
     @ManyToOne
     @JoinColumn
+    private User creator;
+
+    @ManyToOne
+    @JoinColumn
     @JsonIgnore
     private Order order;
 

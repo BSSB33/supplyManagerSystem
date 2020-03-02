@@ -52,6 +52,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<History> histories;
+
     /**
      * Checks if the two users are colleagues or not
      *

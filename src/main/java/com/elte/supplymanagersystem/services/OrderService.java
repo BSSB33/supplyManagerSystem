@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
@@ -137,8 +138,12 @@ public class OrderService {
     }
 
 
-    private Map<Integer, Order> getMap(User loggedInUser) {
+    public Map<Integer, Order> getMap(User loggedInUser) {
         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
         return ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+    }
+
+    public List<Order> getAllOrderByWorkplace(Company company){
+        return orderRepository.findAllOrderByWorkplace(company);
     }
 }

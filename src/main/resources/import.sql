@@ -35,10 +35,12 @@ insert into history_table (history_type, note, order_id, creator_id) values ('EM
 insert into history_table (history_type, note, order_id, creator_id) values ('MADE_AND_OFFER', 'I made an offer for the Intel Core I5 processor', 1, 5);
 insert into history_table (history_type, note, order_id, creator_id) values ('PHONE_CALL', 'I talked with the manager, they will probably accept our offer', 1, 5);
 insert into history_table (history_type, note, order_id, creator_id) values ('NOTE', 'We are planning to accept the offer', 1, 6);
+insert into history_table (history_type, note, order_id, creator_id) values ('NOTE', 'Stuff', 1, 6);
 
 insert into history_table (history_type, note, order_id, creator_id) values ('EMAIL_SENT', 'I sent out the price and the details of the product.', 2, 5);
 insert into history_table (history_type, note, order_id, creator_id) values ('EMAIL_SENT', 'They Accepted your offer.', 2, 5);
 insert into history_table (history_type, note, order_id, creator_id) values ('STARTED_SHIPPING', 'I ordered Shipping', 2, 5);
+insert into history_table (history_type, note, order_id, creator_id) values ('SHIPPED', 'Success', 2, 6);
 
 insert into history_table (history_type, note, order_id, creator_id) values ('PAID', 'They paid the price of the product (Dell Display)', 3, 2);
 insert into history_table (history_type, note, order_id, creator_id) values ('PHONE_CALL', 'Everything went smoothly, we have delivered the product', 3, 2);

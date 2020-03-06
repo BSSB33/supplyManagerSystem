@@ -41,13 +41,18 @@ public class OrderService {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderToGet.get());
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                //TODO van szebb megoldás?
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
+    }
+
+    public Order getOrderOfHistory(Integer idOfHistory){
+        Optional<Order> orderToGet = orderRepository.findById(idOfHistory);
+        if(orderToGet.isPresent()) return orderToGet.get();
+        else return null;
     }
 
     public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {

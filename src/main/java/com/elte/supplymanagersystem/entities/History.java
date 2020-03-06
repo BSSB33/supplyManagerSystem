@@ -26,7 +26,7 @@ public class History {
 
     @ManyToOne
     @JoinColumn
-    @JsonIgnore
+    //@JsonIgnore
     private Order order;
 
     @Column(nullable = false)

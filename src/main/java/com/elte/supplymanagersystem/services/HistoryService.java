@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,18 +64,47 @@ public class HistoryService {
         } else return ResponseEntity.notFound().build();
     }
 
-
     public ResponseEntity putById(History historyToUpdate, User loggedInUser, Integer id){
         historyToUpdate.setId(id);
-        Optional<History> historyToCheck = historyRepository.findById(id);
+        Optional<History> historyToCheck = historyRepository.findById(historyToUpdate.getId());
         if (historyToCheck.isPresent()) {
             Order orderToGet = historyToUpdate.getOrder();
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(historyRepository.save(historyToUpdate));
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 if(checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToUpdate)) {
-                    logger.error(orderToGet.getId());
-                    return ResponseEntity.ok(historyToUpdate);
+                    return ResponseEntity.ok(historyRepository.save(historyToUpdate));
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    //Add: Similar histories are allowed
+    public ResponseEntity addHistory(History historyToSave, User loggedInUser) {
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+            return ResponseEntity.ok(historyRepository.save(historyToSave));
+        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            historyToSave.setCreator(loggedInUser);
+            Order orderToGet = historyToSave.getOrder();
+            if(checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToSave)) {
+                return ResponseEntity.ok(historyRepository.save(historyToSave));
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    //Remove
+    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+        Optional<History> historyToDelete = historyRepository.findById(id);
+        if (historyToDelete.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                historyRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            }
+            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+                Order orderToGet = historyToDelete.get().getOrder();
+                if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToDelete.get())) {
+                    historyRepository.deleteById(id); //TODO Doesn't work
+                    return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
@@ -81,7 +112,7 @@ public class HistoryService {
 
     private boolean checkIfAuthorisedForHistory(User loggedInUser, Order orderToGet, History historyToGet){
         Map<Integer, Order> map = orderService.getMap(loggedInUser);
-        if(map.get(orderToGet.getId()) != null) { //TODO: NulL ?= orderToGet.getId()
+        if(map.get(orderToGet.getId()) != null) {
             return historyToGet.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId());
         } else return false;
     }

@@ -1,5 +1,7 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.entities.Company;
+import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,13 +41,18 @@ public class OrderService {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderToGet.get());
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                //TODO van szebb megoldás?
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
+    }
+
+    public Order getOrderOfHistory(Integer idOfHistory){
+        Optional<Order> orderToGet = orderRepository.findById(idOfHistory);
+        if(orderToGet.isPresent()) return orderToGet.get();
+        else return null;
     }
 
     public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {
@@ -56,7 +64,11 @@ public class OrderService {
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
-                    return ResponseEntity.ok(map.get(orderToGet.get().getId()).getHistory());
+                    ArrayList<History> authorizedHistories = new ArrayList<>();
+                    orderToGet.get().getHistory().stream().filter(history ->
+                            history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
+                            forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
+                    return ResponseEntity.ok(authorizedHistories);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
@@ -107,7 +119,7 @@ public class OrderService {
                 return ResponseEntity.ok(orderRepository.save(orderToSave));
             else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
                 if(orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())){
-                    return ResponseEntity.ok(orderRepository.save(new Order(orderToSave)));
+                    return ResponseEntity.ok(orderRepository.save(orderToSave)); //TODO bug
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
@@ -131,8 +143,12 @@ public class OrderService {
     }
 
 
-    private Map<Integer, Order> getMap(User loggedInUser) {
+    public Map<Integer, Order> getMap(User loggedInUser) {
         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
         return ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
+    }
+
+    public List<Order> getAllOrderByWorkplace(Company company){
+        return orderRepository.findAllOrderByWorkplace(company);
     }
 }

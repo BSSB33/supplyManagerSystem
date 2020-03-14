@@ -137,4 +137,8 @@ public class UserService {
     public boolean userHasRole(User user, List<Role> roles) {
         return roles.contains(user.getRole());
     }
+
+    public Integer size(){
+        return userRepository.findAll().size();
+    }
 }

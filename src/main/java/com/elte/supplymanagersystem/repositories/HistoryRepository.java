@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository interface for Histories - < Type, ID >
+ */
 @Repository
 public interface HistoryRepository extends JpaRepository<History, Integer> {
 

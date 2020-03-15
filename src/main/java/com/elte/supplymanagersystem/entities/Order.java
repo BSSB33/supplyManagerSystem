@@ -10,6 +10,16 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+
+/**
+ * Orders are the main blocks of the system.
+ * Directors and Managers can give offers for Different Companies.
+ * An offer can contain a Product name, the price of the product.
+ * Additional tools for tracking the Status of the Order
+ * Status: Can be switched to different states, like: ORDERED, UNDER_SHIPPING
+ * Users can log the Histories of each order, like: Phone calls, or mails, or offers.
+ * Every order can have a company and a manager assigned from both the seller and buyer end.
+ */
 @Entity
 @Table(name = "ORDER_TABLE")
 @Data

@@ -55,7 +55,7 @@ public class CompanyController {
     }
 
     //Add
-    @PostMapping("")
+    @PostMapping("register")
     public ResponseEntity post(@RequestBody Company company, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {

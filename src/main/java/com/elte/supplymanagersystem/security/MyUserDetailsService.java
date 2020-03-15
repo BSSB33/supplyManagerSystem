@@ -22,6 +22,11 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     private AuthenticatedUser authenticatedUser;
 
+    /**
+     * Loads and Returns the LoggedInUser by Username
+     * @param username User Logged in
+     * @return Authorized user
+     */
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {

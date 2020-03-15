@@ -9,6 +9,13 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Companies have a Unique name.
+ * Companies can be registered by Admin only.
+ * Companies can trade between each other. (registration required)
+ * Every Company have a director, and can have more employees.
+ * Orders are assigned to companies too.
+ */
 @Entity
 @Table(name="COMPANY_TABLE")
 @Data

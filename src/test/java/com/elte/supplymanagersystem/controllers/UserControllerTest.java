@@ -30,7 +30,7 @@ class UserControllerTest {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private TestUtils testUtils = new TestUtils();
-
+    //TODO make these separate Tests
     @Test
     public void testGetAllEndpointWithDifferentUsers() throws IOException, JSONException {
         CloseableHttpResponse adminGetRequest = testUtils.sendGetRequest("users", "Gabor:password");

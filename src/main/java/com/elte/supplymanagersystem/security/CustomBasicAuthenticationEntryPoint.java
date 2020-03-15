@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
+/**
+ * Simple Authentication Entry Point
+ */
 public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
     //Beginning
     @Override

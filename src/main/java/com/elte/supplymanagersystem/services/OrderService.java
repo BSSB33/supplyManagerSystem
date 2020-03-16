@@ -29,12 +29,31 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    /**
+     * Only ADMINS have the right to get all the Orders
+     * ADMIN -> ALL Order
+     * MANAGER, DIRECTOR -> UNAUTHORIZED
+     * @param loggedInUser Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns A ResponseEntity with All the Orders based on the Role of the User who logged in.
+     */
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(orderRepository.findAll());
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
+//    /**
+//     * ADMIN - All Orders
+//     * DIRECTOR - Get orders if issued by, or for the company the user works at
+//     * MANAGER - Get orders if issued by, or for the company the user works at
+//     * ELSE - UNAUTHORIZED
+//     * ID NOT FOUND - NOT FOUND
+//     * DISABLED USER - FORBIDDEN
+//     * NON EXISTING USER LOGGED IN - BAD REQUEST
+//     * @param id ID of Order to return
+//     * @param auth Authentication parameter for Security in order to get the User who logged in
+//     * @return Returns Orders based on ROLES
+//     */
     public ResponseEntity getById(User loggedInUser, Integer id) {
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
@@ -74,6 +93,17 @@ public class OrderService {
         } else return ResponseEntity.notFound().build();
     }
 
+    //    /**
+//     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
+//     * DIRECTOR - Get orders if issued by, or for the company the user works at
+//     * MANAGER - Get orders if issued by, or for the company the user works at
+//     * ELSE - UNAUTHORIZED
+//     * ID NOT FOUND - NOT FOUND
+//     * DISABLED USER - FORBIDDEN
+//     * NON EXISTING USER LOGGED IN - BAD REQUEST
+//     * @param auth Authentication parameter for Security in order to get the User who logged in
+//     * @return Returns Orders where the user's company is a seller
+//     */
     public ResponseEntity getSalesByUser(User loggedInUser){
         if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
             if(loggedInUser.getWorkplace() != null){
@@ -84,6 +114,17 @@ public class OrderService {
         else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
+    //    /**
+//     * ADMIN - Get orders if issued by, or for the company the user works at (even admins)
+//     * DIRECTOR - Get orders if issued by, or for the company the user works at
+//     * MANAGER - Get orders if issued by, or for the company the user works at
+//     * ELSE - UNAUTHORIZED
+//     * ID NOT FOUND - NOT FOUND
+//     * DISABLED USER - FORBIDDEN
+//     * NON EXISTING USER LOGGED IN - BAD REQUEST
+//     * @param auth Authentication parameter for Security in order to get the User who logged in
+//     * @return Returns Orders where the user's company is a buyer
+//     */
     public ResponseEntity getPurchasesByUser(User loggedInUser){
         if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
             if(loggedInUser.getWorkplace() != null){

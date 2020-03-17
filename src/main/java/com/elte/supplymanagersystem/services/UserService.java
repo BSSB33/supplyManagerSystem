@@ -58,7 +58,11 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
+                if(loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null){ // Doesn't work anywhere
+                    if(loggedInUser.getId().equals(id)){
+                        return ResponseEntity.ok(loggedInUser);
+                    } else return new ResponseEntity(HttpStatus.CONFLICT);
+                } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);

@@ -22,6 +22,16 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Returns All the Users in the Database depending on the Role of the User.
+     * ADMIN: Can get ALL the Users.
+     * DIRECTOR: Can get only the Employees of his company.
+     * MANAGER: Can get only his Colleagues.
+     * ELSE: UNAUTHORIZED
+     *
+     * @param loggedInUser The user who logged in.
+     * @return Returns a ResponseEntity with the list of Users.
+     */
     public ResponseEntity getAll(User loggedInUser) {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findAll());
@@ -32,6 +42,16 @@ public class UserService {
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Returns the User with the Requested ID.
+     * ADMIN: Can get ALL the Users.
+     * DIRECTOR, MANAGER: Can only get colleagues and itself.
+     * ELSE: UNAUTHORIZED
+     *
+     * @param loggedInUser The user who logged in.
+     * @param id           The ID of the User to GET.
+     * @return Returns a ResponseEntity with the Requested User.
+     */
     public ResponseEntity getById(User loggedInUser, Integer id) {
         Optional<User> userToGet = userRepository.findById(id);
         if (userToGet.isPresent()) {
@@ -45,50 +65,90 @@ public class UserService {
         } else return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Returns Users who are not directors of any Companies.
+     * ADMIN: Can get all.
+     * ELSE: UNAUTHORIZED
+     *
+     * @param loggedInUser The user who logged in.
+     * @return Returns a ResponseEntity with the requested Users
+     */
     public ResponseEntity getUnassignedDirectors(User loggedInUser) {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-    }
-
-    public ResponseEntity putById(User userToSave, User loggedInUser, Integer id) {
-        userToSave.setId(id);
-        if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(userRepository.save(userToSave));
-        } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //TODO cant update company because of OneToOne
-            Optional<User> user = userRepository.findById(userToSave.getId());
-            if (user.isPresent()) {
-                if ((userHasRole(userToSave, Role.ROLE_MANAGER) && user.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
-                        || userToSave.getId().equals(loggedInUser.getId())) {
-                    return ResponseEntity.ok(userRepository.save(userToSave));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return ResponseEntity.notFound().build();
-        } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToSave.getId().equals(loggedInUser.getId())) {
-            return ResponseEntity.ok(userRepository.save(userToSave));
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity registerUser(User userToRegister, User loggedInUser) { //Auth, have to have workplace, DIRECTORS have to have companies
+    /**
+     * Updates a User by ID.
+     * ADMIN: Can Update all the users.
+     * DIRECTOR: Can only Update itself and Employees.
+     * MANAGER: Can only Update itself.
+     *
+     * @param userToUpdate The user with the updated information.
+     * @param loggedInUser The user who logged in.
+     * @param id           The ID of the User to Update.
+     * @return Returns a ResponseEntity with the updated User.
+     */
+    public ResponseEntity putById(User userToUpdate, User loggedInUser, Integer id) {
+        Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
+        if (userToCheck.isPresent()) {
+            userToUpdate.setId(id);
+            userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                return ResponseEntity.ok(userRepository.save(userToUpdate));
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //TODO cant update company because of OneToOne + Company becomes null upon PUT is Called
+                if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
+                        || userToUpdate.getId().equals(loggedInUser.getId())) {
+                    return ResponseEntity.ok(userRepository.save(userToUpdate));
+                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
+                return ResponseEntity.ok(userRepository.save(userToUpdate));
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Registers a new user to the Database.
+     * ADMIN: Can register any Users with any role.
+     * DIRECTOR: Can only register employees to his company.
+     * MANAGER: UNAUTHORIZED
+     * Already existing User: BAD REQUEST
+     * Non existing User: NOTFOUND
+     *
+     * @param userToRegister The user to register
+     * @param loggedInUser   The user who wants to register a new User.
+     * @return Returns a ResponseEntity of the saved History.
+     */
+    public ResponseEntity registerUser(User userToRegister, User loggedInUser) {
         Optional<User> otherUser = Optional.ofNullable(userRepository.findByUsername(userToRegister.getUsername()));
         if (otherUser.isPresent()) {
             return ResponseEntity.badRequest().build();
         } else {
             userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
             userToRegister.setEnabled(true);
-            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
                 if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
                     userToRegister.setRole(Role.ROLE_DIRECTOR);
                     userToRegister.setWorkplace(null);
+                    userToRegister.setCompany(null);
                 }
+                //Register Other Roles simply
                 return ResponseEntity.ok(userRepository.save(userToRegister));
-            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+            } else if (loggedInUser.getWorkplace() != null && loggedInUser.getCompany() != null && userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //Director
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToRegister));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED); //Manager
         }
     }
 
+    /**
+     * Returns the Employees of the user.
+     *
+     * @param user The User to get Employees of.
+     * @return Returns an ArrayList of Users.
+     */
     public Iterable<User> getEmployeesOfUser(User user) {
         User director = userRepository.findByUsername(user.getUsername());
         if (userHasRole(director, Role.ROLE_DIRECTOR) && director.getCompany() != null && director.getWorkplace() != null) {
@@ -96,6 +156,12 @@ public class UserService {
         } else return new ArrayList<>();
     }
 
+    /**
+     * Returns the Colleagues of the user.
+     *
+     * @param user The User to get Colleagues of.
+     * @return Returns an ArrayList of Users.
+     */
     public Iterable<User> getColleaguesOfUser(User user) {
         User employee = userRepository.findByUsername(user.getUsername());
         if (employee.getWorkplace() != null) {
@@ -103,6 +169,17 @@ public class UserService {
         } else return new ArrayList<>();
     }
 
+    /**
+     * Deletes User record by ID.
+     * ADMIN: Can delete any Users without any regulations.
+     * DIRECTOR: Can delete only employees.
+     * ELSE: UNAUTHORIZED
+     * Non existing History: NOTFOUND
+     *
+     * @param id           The ID of the History the user wants to DELETE.
+     * @param loggedInUser The user logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
     public ResponseEntity deleteById(Integer id, User loggedInUser) {
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
@@ -119,6 +196,12 @@ public class UserService {
         } else return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Checks if the Requested user is valid and Enabled.
+     *
+     * @param username Name of the user to check
+     * @return Returns a Valid user
+     */
     public User getValidUser(String username) {
         User loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser != null) {
@@ -130,15 +213,25 @@ public class UserService {
         return null; //throws FORBIDDEN
     }
 
+    /**
+     * Checks if the User has the role.
+     *
+     * @param user The User to check
+     * @param role The Role to check.
+     * @return boolean
+     */
     public boolean userHasRole(User user, Role role) {
         return user.getRole() == role;
     }
 
+    /**
+     * Checks if the User has any of the listed roles.
+     *
+     * @param user  The User to check
+     * @param roles The Roles to check.
+     * @return boolean
+     */
     public boolean userHasRole(User user, List<Role> roles) {
         return roles.contains(user.getRole());
-    }
-
-    public Integer size(){
-        return userRepository.findAll().size();
     }
 }

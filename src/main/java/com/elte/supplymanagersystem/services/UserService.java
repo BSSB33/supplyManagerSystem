@@ -96,10 +96,14 @@ public class UserService {
         if (userToCheck.isPresent()) {
             //userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if(userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                    userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
                         || userToUpdate.getId().equals(loggedInUser.getId())) {
+                    if(userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                        userToUpdate.setWorkplace(userToUpdate.getCompany());
                     return ResponseEntity.ok(userRepository.save(userToUpdate));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {

@@ -42,8 +42,7 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
-    //TODO change it to ManyToMany
-    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
+    @ManyToOne
     @JoinColumn
     private Company company;
 

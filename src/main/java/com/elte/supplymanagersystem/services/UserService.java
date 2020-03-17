@@ -91,13 +91,13 @@ public class UserService {
      * @return Returns a ResponseEntity with the updated User.
      */
     public ResponseEntity putById(User userToUpdate, User loggedInUser, Integer id) {
+        userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
-            userToUpdate.setId(id);
-            userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
+            //userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
-            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //TODO cant update company because of OneToOne + Company becomes null upon PUT is Called
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
                         || userToUpdate.getId().equals(loggedInUser.getId())) {
                     return ResponseEntity.ok(userRepository.save(userToUpdate));

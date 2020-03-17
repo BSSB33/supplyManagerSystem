@@ -150,9 +150,9 @@ public class OrderService {
      * @return Returns a ResponseEntity of the updated Order.
      */
     public ResponseEntity putById(Order orderToUpdate, User loggedInUser, Integer id) {
+        orderToUpdate.setId(id);
         Optional<Order> orderToCheck = orderRepository.findById(id);
         if (orderToCheck.isPresent()) {
-            orderToUpdate.setId(id);
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(orderRepository.save(orderToUpdate));
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {

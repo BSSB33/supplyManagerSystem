@@ -86,9 +86,9 @@ public class HistoryService {
      * @return Returns a ResponseEntity of the updated History.
      */
     public ResponseEntity putById(History historyToUpdate, User loggedInUser, Integer id) {
+        historyToUpdate.setId(id);
         Optional<History> historyToCheck = historyRepository.findById(historyToUpdate.getId());
         if (historyToCheck.isPresent()) {
-            historyToUpdate.setId(id);
             Order orderToGet = historyToUpdate.getOrder();
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(historyRepository.save(historyToUpdate));

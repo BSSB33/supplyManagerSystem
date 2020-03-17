@@ -3,18 +3,13 @@ insert into company_table (name) values ('BAV Zrt.');
 insert into company_table (name) values ('TopTrade Kft.');
 insert into company_table (name) values ('ELTE-Soft Kft.');
 
-insert into user_table (username, password, enabled, role, workplace_id) values ('Gabor', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_ADMIN', 4);
-insert into user_table (username, password, enabled, role, workplace_id) values ('Balazs', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 1);
-insert into user_table (username, password, enabled, role, workplace_id) values ('Judit', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 2);
-insert into user_table (username, password, enabled, role, workplace_id) values ('Gyuri', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 3);
-insert into user_table (username, password, enabled, role, workplace_id) values ('Emma', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_MANAGER', 1);
-insert into user_table (username, password, enabled, role, workplace_id) values ('TTManager', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_MANAGER', 3);
-insert into user_table (username, password, enabled, role, workplace_id) values ('Old Student', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', false, 'ROLE_MANAGER', 4);
-
-update company_table set director_id = 2 where name = 'TelnetWork Kft.';
-update company_table set director_id = 3 where name = 'BAV Zrt.';
-update company_table set director_id = 4 where name = 'TopTrade Kft.';
-update company_table set director_id = 1 where name = 'ELTE-Soft Kft.';
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Gabor', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_ADMIN', 4, 4);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Balazs', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 1, 1);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Judit', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 2, 2);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Gyuri', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_DIRECTOR', 3, 3);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Emma', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_MANAGER', null, 1);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('TTManager', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', true, 'ROLE_MANAGER', null, 3);
+insert into user_table (username, password, enabled, role, company_id, workplace_id) values ('Old Student', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', false, 'ROLE_MANAGER', null, 4);
 
 --TopTrade requests a processor from TelnetWork, both managers were selected.
 insert into order_table (price, product_name, status, buyer_id, seller_id, buyer_manager_id, seller_manager_id) values ('50000', 'Intel Core I5 6550 Processor', 'IN_STOCK', 3, 1, 6, 5); -- 1

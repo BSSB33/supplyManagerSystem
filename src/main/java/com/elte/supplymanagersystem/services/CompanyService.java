@@ -81,14 +81,13 @@ public class CompanyService {
      * @return Returns a ResponseEntity of the updated Company.
      */
     public ResponseEntity putById(Company companyToUpdate, User loggedInUser, Integer id) {
+        companyToUpdate.setId(id);
         Optional<Company> companyToCheck = companyRepository.findById(companyToUpdate.getId());
         if (companyToCheck.isPresent()) {
-            companyToUpdate.setId(id);
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(companyRepository.save(companyToUpdate));
             } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if (loggedInUser.getCompany().getId().equals(companyToUpdate.getId())) {
-                    //TODO Check after OneToOne Removed
                     Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
                     if (originalDirector.isPresent()) {
                         companyToUpdate.setDirector(originalDirector.get().getDirector());

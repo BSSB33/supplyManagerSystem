@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
+/**
+ * Authenticated User for Security Management
+ */
 @RequestScope
 @Component
 @Data

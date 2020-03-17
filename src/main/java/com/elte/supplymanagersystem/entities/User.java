@@ -10,6 +10,16 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+
+/**
+ * User Entity
+ * Users are used for login and order management
+ * A user have: Username, Password, Enabled/Disabled Status
+ * A Company: If the User is the director of a Company
+ * A User also can have connections with Orders, if the User is assigned to Orders
+ * Workplace: Users are assigned to their workplace
+ * Users are can be also creators of histories
+ */
 @Entity
 @Table(name = "USER_TABLE")
 @Data
@@ -32,7 +42,8 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
-    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //TODO change it to ManyToMany
+    @OneToOne(mappedBy = "director", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
     @JoinColumn
     private Company company;
 

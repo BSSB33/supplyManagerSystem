@@ -1,14 +1,21 @@
 package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.enums.HistoryType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
+/**
+ * Histories can be assigned to Orders
+ * Every History has an Author so only those Users will see the History who works at the same company as the Author
+ * With the help of HistoryType, Users can log the process of each order.
+ */
 @Entity
 @Table(name = "HISTORY_TABLE")
 @Data
@@ -35,6 +42,12 @@ public class History {
 
     @Column
     private String note;
+
+    @CreationTimestamp
+    private LocalDateTime createDateTime;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDateTime;
 
     //TODO add User, who added Timestamp
 }

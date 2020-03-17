@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repository interface for Companies: Type, ID
+ */
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
     Optional<Company> findByName(String name);

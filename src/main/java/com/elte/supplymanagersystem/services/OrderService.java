@@ -224,7 +224,7 @@ public class OrderService {
      * Unauthorized if the key value is null.
      *
      * @param loggedInUser The user who logged in.
-     * @return Returns a Map<Integer, Order> with the ID-s of the Orders are the keys.
+     * @return Returns a Map[Integer, Order] with the ID-s of the Orders are the keys.
      */
     public Map<Integer, Order> getMap(User loggedInUser) {
         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());

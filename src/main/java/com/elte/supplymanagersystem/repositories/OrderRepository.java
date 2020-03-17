@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 /**
- * Repository interface for Orders - < Type, ID >
+ * Repository interface for Orders: Type, ID
  */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {

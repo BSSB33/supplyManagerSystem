@@ -29,6 +29,7 @@ public class UserController {
      * Returns all the Users from UserService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Users in the Database.
      */
@@ -45,7 +46,8 @@ public class UserController {
      * Returns User by ID if the User is valid.
      * Calls getById method from OrderService.
      * Returns FORBIDDEN if the User is Invalid.
-     * @param id The ID of the User to get.
+     *
+     * @param id   The ID of the User to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of the User with the given ID.
      */
@@ -62,6 +64,7 @@ public class UserController {
      * Returns Users who are not directors.
      * Calls getUnassignedDirectors method from OrderService.
      * Returns FORBIDDEN if the User is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the requested Users
      */
@@ -78,8 +81,9 @@ public class UserController {
      * Updates a User by ID.
      * Calls putById method from UserService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param user The user with the updated information.
-     * @param id The ID of the User to update.
+     * @param id   The ID of the User to update.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
@@ -96,6 +100,7 @@ public class UserController {
      * Creates a new record of User.
      * Calls registerUser method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param user The User with the information to save.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
@@ -112,7 +117,8 @@ public class UserController {
      * Deletes a record by ID.
      * Calls deleteById method from UserService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the User to delete.
+     *
+     * @param id   The ID of the User to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
@@ -127,6 +133,7 @@ public class UserController {
 
     /**
      * Creates an authenticated User
+     *
      * @return Returns an authenticatedUser with OK (200)
      */
     @PostMapping("login")

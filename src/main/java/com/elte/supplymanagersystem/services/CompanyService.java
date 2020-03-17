@@ -58,6 +58,7 @@ public class CompanyService {
      * Returns a ResponseEntity with the Company the User works at.
      * ADMIN, DIRECTOR, MANAGER: Can get the Company.
      * ELSE: UNAUTHORIZED
+     *
      * @param loggedInUser The user logged in
      * @return Returns a ResponseEntity with the Company the User works at.
      */
@@ -104,7 +105,7 @@ public class CompanyService {
      * ELSE: UNAUTHORIZED
      *
      * @param companyToSave The Company with the information to save.
-     * @param loggedInUser The user logged in.
+     * @param loggedInUser  The user logged in.
      * @return Returns a ResponseEntity of the saved Company.
      */
     //Add
@@ -125,7 +126,7 @@ public class CompanyService {
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
-     * @param id The ID of the Company the user wants to DELETE.
+     * @param id           The ID of the Company the user wants to DELETE.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */

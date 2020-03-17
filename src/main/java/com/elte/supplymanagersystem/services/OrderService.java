@@ -1,6 +1,5 @@
 package com.elte.supplymanagersystem.services;
 
-import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
@@ -33,6 +32,7 @@ public class OrderService {
      * Only ADMINS have the right to get all the Orders.
      * ADMIN: Can get ALL the Orders.
      * MANAGER, DIRECTOR, ELSE: UNAUTHORIZED
+     *
      * @param loggedInUser The user who logged in.
      * @return Returns A ResponseEntity with All the Orders based on the Role of the User who logged in.
      */
@@ -50,7 +50,7 @@ public class OrderService {
      * Non existing ID - NOT FOUND
      *
      * @param loggedInUser The user who logged in.
-     * @param id The ID of the Order to return.
+     * @param id           The ID of the Order to return.
      * @return Returns a ResponseEntity of the Order.
      */
     public ResponseEntity getById(User loggedInUser, Integer id) {
@@ -78,7 +78,7 @@ public class OrderService {
      * Non existing Order: NOTFOUND
      *
      * @param loggedInUser The user who logged in.
-     * @param id The ID of the Order to get the Histories of.
+     * @param id           The ID of the Order to get the Histories of.
      * @return Returns a ResponseEntity of the Histories.
      */
     public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {
@@ -109,9 +109,9 @@ public class OrderService {
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the Orders where the user's company is a seller.
      */
-    public ResponseEntity getSalesByUser(User loggedInUser){
-        if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
-            if(loggedInUser.getWorkplace() != null){
+    public ResponseEntity getSalesByUser(User loggedInUser) {
+        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            if (loggedInUser.getWorkplace() != null) {
                 List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
@@ -128,14 +128,13 @@ public class OrderService {
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the Orders where the user's company is a buyer.
      */
-    public ResponseEntity getPurchasesByUser(User loggedInUser){
-        if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
-            if(loggedInUser.getWorkplace() != null){
+    public ResponseEntity getPurchasesByUser(User loggedInUser) {
+        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            if (loggedInUser.getWorkplace() != null) {
                 List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
-        }
-        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -146,11 +145,11 @@ public class OrderService {
      * Non existing Order: NOTFOUND
      *
      * @param orderToUpdate The Order with the information to update.
-     * @param loggedInUser    The user logged in.
-     * @param id              The ID of the Order the user wants to PUT (Update).
+     * @param loggedInUser  The user logged in.
+     * @param id            The ID of the Order the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Order.
      */
-    public ResponseEntity putById(Order orderToUpdate, User loggedInUser, Integer id){
+    public ResponseEntity putById(Order orderToUpdate, User loggedInUser, Integer id) {
         Optional<Order> orderToCheck = orderRepository.findById(id);
         if (orderToCheck.isPresent()) {
             orderToUpdate.setId(id);
@@ -172,20 +171,20 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Already existing Order: BAD REQUEST
      *
-     * @param orderToSave The Order with the information to save.
-     * @param loggedInUser    The user logged in.
+     * @param orderToSave  The Order with the information to save.
+     * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved Order.
      */
     //Add
-    public ResponseEntity addOrder(Order orderToSave, User loggedInUser){
+    public ResponseEntity addOrder(Order orderToSave, User loggedInUser) {
         Optional<Order> otherOrder = orderRepository.findByProductName(orderToSave.getProductName());
         if (otherOrder.isPresent())
             return ResponseEntity.badRequest().build();
         else {
-            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderRepository.save(orderToSave));
-            else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
-                if(orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())){
+            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+                if (orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())) {
                     return ResponseEntity.ok(orderRepository.save(orderToSave));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -199,18 +198,18 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Non existing Order: NOTFOUND
      *
-     * @param id The ID of the Company the user wants to DELETE.
+     * @param id           The ID of the Company the user wants to DELETE.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser){
+    public ResponseEntity deleteById(Integer id, User loggedInUser) {
         Optional<Order> orderToDelete = orderRepository.findById(id);
-        if (orderToDelete.isPresent()){
-            if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+        if (orderToDelete.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 orderRepository.deleteById(id);
                 return ResponseEntity.ok().build();
-            } else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+            } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToDelete.get().getId()) != null) {
                     orderRepository.deleteById(id);
@@ -223,6 +222,7 @@ public class OrderService {
     /**
      * Returns a Map with the orders of a company the User works at.
      * Unauthorized if the key value is null.
+     *
      * @param loggedInUser The user who logged in.
      * @return Returns a Map<Integer, Order> with the ID-s of the Orders are the keys.
      */

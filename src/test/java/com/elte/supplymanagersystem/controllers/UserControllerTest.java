@@ -1,7 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.TestUtils;
-import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.repositories.UserRepository;
 import com.elte.supplymanagersystem.services.UserService;
 import org.apache.http.HttpStatus;
@@ -30,6 +29,7 @@ class UserControllerTest {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private TestUtils testUtils = new TestUtils();
+
     //TODO make these separate Tests
     @Test
     public void testGetAllEndpointWithDifferentUsers() throws IOException, JSONException {

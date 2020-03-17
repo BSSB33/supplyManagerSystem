@@ -28,6 +28,7 @@ public class OrderController {
      * Returns all the Orders from OrderService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Orders in the Database.
      */
@@ -43,7 +44,8 @@ public class OrderController {
      * Returns the Order with the given ID from OrderService based on the Role of the logged in User.
      * Calls getById method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the Order to get.
+     *
+     * @param id   The ID of the Order to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of the Order with the given ID.
      */
@@ -59,7 +61,8 @@ public class OrderController {
      * Returns with the Histories of an order from OrderService based on the Role of the logged in User.
      * Calls getHistoriesByOrderId method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the Order to get the Histories of.
+     *
+     * @param id   The ID of the Order to get the Histories of.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the history of the requested Order to which the user is authorized.
      */
@@ -75,6 +78,7 @@ public class OrderController {
      * Returns Company Orders where the Company is a Seller based on the Workplace of the User who logged in.
      * Calls getSalesByUser method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of Orders.
      */
@@ -90,6 +94,7 @@ public class OrderController {
      * Returns Company Orders where the Company is a Seller based on the Workplace of the User who logged in.
      * Calls getPurchasesByUser method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of Orders.
      */
@@ -105,9 +110,10 @@ public class OrderController {
      * Updates an Order by ID based on User Role.
      * Calls putById method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param order The order with the updated information.
-     * @param id The ID of the Order to update.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param id    The ID of the Order to update.
+     * @param auth  Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
     //Update
@@ -123,8 +129,9 @@ public class OrderController {
      * Creates a new record of Order.
      * Calls addOrder method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param order The order with the information to save.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param auth  Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     //Add
@@ -140,7 +147,8 @@ public class OrderController {
      * Deletes a record by ID.
      * Calls deleteById method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the Order to delete.
+     *
+     * @param id   The ID of the Order to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */

@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class TestUtils {
 
-    private void logRequest(String endpoint, String credentials){
+    private void logRequest(String endpoint, String credentials) {
         String loggedInUser = credentials.split(":")[0];
         System.out.println("GetRequest to: " + "http://localhost:8080/" + endpoint + " -> LoggedInUser: " + loggedInUser);
     }

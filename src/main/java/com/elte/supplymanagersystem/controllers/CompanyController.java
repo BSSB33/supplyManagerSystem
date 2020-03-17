@@ -28,6 +28,7 @@ public class CompanyController {
      * Returns all the Companies from CompanyService based on the Role of the logged in User.
      * Calls getAll method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Companies in the Database.
      */
@@ -43,7 +44,8 @@ public class CompanyController {
      * Returns the Company with the given ID from CompanyService based on the Role of the logged in User.
      * Calls getById method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the Company to get.
+     *
+     * @param id   The ID of the Company to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of the Company with the given ID.
      */
@@ -59,6 +61,7 @@ public class CompanyController {
      * Returns the Workplace of the logged in User with the help of CompanyService.
      * Calls getCompanyOfLoggedInUser method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the Company of the user who logged in.
      */
@@ -74,9 +77,10 @@ public class CompanyController {
      * Updates a Company by ID based on User Role.
      * Calls putById method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param company The Company with the updated information.
-     * @param id The ID of the Company to update.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param id      The ID of the Company to update.
+     * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
     //Update
@@ -92,8 +96,9 @@ public class CompanyController {
      * Creates a new record of Company.
      * Calls addCompany method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
+     *
      * @param company The company with the information to save.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     //Add
@@ -109,7 +114,8 @@ public class CompanyController {
      * Deletes a record by ID.
      * Calls deleteById method from CompanyService.
      * Returns FORBIDDEN if the user is Invalid.
-     * @param id The ID of the Company to delete.
+     *
+     * @param id   The ID of the Company to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */

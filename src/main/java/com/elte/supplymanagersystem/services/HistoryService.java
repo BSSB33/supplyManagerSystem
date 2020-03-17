@@ -108,7 +108,7 @@ public class HistoryService {
      * ELSE: UNAUTHORIZED
      *
      * @param historyToSave The history with the information to save.
-     * @param loggedInUser    The user logged in.
+     * @param loggedInUser  The user logged in.
      * @return Returns a ResponseEntity of the saved History.
      */
     public ResponseEntity addHistory(History historyToSave, User loggedInUser) {
@@ -131,7 +131,7 @@ public class HistoryService {
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
-     * @param id The ID of the History the user wants to DELETE.
+     * @param id           The ID of the History the user wants to DELETE.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
@@ -156,7 +156,7 @@ public class HistoryService {
      * Checks if the User who logged in is authorized to modify the History record.
      *
      * @param loggedInUser The user logged in.
-     * @param orderToGet The order which contains the History
+     * @param orderToGet   The order which contains the History
      * @param historyToGet The History to check
      * @return boolean
      */

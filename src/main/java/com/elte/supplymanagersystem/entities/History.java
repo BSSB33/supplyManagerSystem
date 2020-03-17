@@ -1,7 +1,6 @@
 package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.enums.HistoryType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

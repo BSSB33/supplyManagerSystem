@@ -24,6 +24,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     /**
      * Loads and Returns the LoggedInUser by Username
+     *
      * @param username User Logged in
      * @return Authorized user
      */

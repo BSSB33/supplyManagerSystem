@@ -28,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Configuration method for the HTTP connection
+     *
      * @param http HttpSecurity object
      * @throws Exception Exceptions in configuration process
      */
@@ -46,13 +47,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .headers()
                 .frameOptions().disable();
-                //.and()
-                //.sessionManagement()
-                //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+        //.and()
+        //.sessionManagement()
+        //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     }
 
     /**
      * Configures Authentication with the help of userDetailsService
+     *
      * @param auth AuthenticationManagerBuilder Object for authentication
      * @throws Exception Exceptions inside userDetailsService
      */
@@ -65,6 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * This case it is used for creating in memory users for testing.
+     *
      * @param auth AuthenticationManagerBuilder Object for creating for example in memory users for testing.
      * @throws Exception Exceptions in inMemoryAuthentication
      */
@@ -77,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Makes a new passwordEncoder.
+     *
      * @return Returns a new BCryptPasswordEncoder
      */
     @Bean
@@ -86,6 +90,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Makes a new BasicAuthEntryPoint.
+     *
      * @return Returns a new CustomBasicAuthenticationEntryPoint
      */
     @Bean

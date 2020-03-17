@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class History {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -43,11 +44,11 @@ public class History {
     @Column
     private String note;
 
+    @Column(updatable = false)
     @CreationTimestamp
-    private LocalDateTime createDateTime;
+    private LocalDateTime createdAt;
 
+    @Column
     @UpdateTimestamp
-    private LocalDateTime updateDateTime;
-
-    //TODO add User, who added Timestamp
+    private LocalDateTime updatedAt;
 }

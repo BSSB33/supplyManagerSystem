@@ -26,25 +26,25 @@ insert into order_table (price, product_name, status, buyer_id, seller_id, buyer
 --ELTE gives an offer for a software development for TelnetWork, buyer manager not set yet.
 insert into order_table (price, product_name, status, buyer_id, seller_id, buyer_manager_id, seller_manager_id) values ('1000000', 'Development of a Warehouse management application', 'NEW', 1, 4, NULL, 1); -- 7
 
-insert into history_table (history_type, note, order_id, creator_id) values ('EMAIL_SENT', 'I sent out the specifications of requested Intel Core I5 processor', 1, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('MADE_AND_OFFER', 'I made an offer for the Intel Core I5 processor', 1, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('PHONE_CALL', 'I talked with the manager, they will probably accept our offer', 1, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('NOTE', 'We are planning to accept the offer', 1, 6);
-insert into history_table (history_type, note, order_id, creator_id) values ('NOTE', 'Stuff', 1, 6);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('EMAIL_SENT', 'I sent out the specifications of requested Intel Core I5 processor', 1, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('MADE_AND_OFFER', 'I made an offer for the Intel Core I5 processor', 1, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('PHONE_CALL', 'I talked with the manager, they will probably accept our offer', 1, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('NOTE', 'We are planning to accept the offer', 1, 6, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('NOTE', 'Stuff', 1, 6, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
 
-insert into history_table (history_type, note, order_id, creator_id) values ('EMAIL_SENT', 'I sent out the price and the details of the product.', 2, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('EMAIL_SENT', 'They Accepted your offer.', 2, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('STARTED_SHIPPING', 'I ordered Shipping', 2, 5);
-insert into history_table (history_type, note, order_id, creator_id) values ('SHIPPED', 'Success', 2, 6);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('EMAIL_SENT', 'I sent out the price and the details of the product.', 2, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('EMAIL_SENT', 'They Accepted your offer.', 2, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('STARTED_SHIPPING', 'I ordered Shipping', 2, 5, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('SHIPPED', 'Success', 2, 6, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
 
-insert into history_table (history_type, note, order_id, creator_id) values ('PAID', 'They paid the price of the product (Dell Display)', 3, 2);
-insert into history_table (history_type, note, order_id, creator_id) values ('PHONE_CALL', 'Everything went smoothly, we have delivered the product', 3, 2);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('PAID', 'They paid the price of the product (Dell Display)', 3, 2, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('PHONE_CALL', 'Everything went smoothly, we have delivered the product', 3, 2, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP );
 
-insert into history_table (history_type, note, order_id, creator_id) values ('ORDER', 'I ordered the carpet for the new office, waiting for manager to respond from TopTrade Kft.', 4, 3);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('ORDER', 'I ordered the carpet for the new office, waiting for manager to respond from TopTrade Kft.', 4, 3, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 
-insert into history_table (history_type, note, order_id, creator_id) values ('ORDER', 'I gave an offer for a statue(decoration) for TelnetWork, nobody answered yet.', 5, 3);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('ORDER', 'I gave an offer for a statue(decoration) for TelnetWork, nobody answered yet.', 5, 3, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 
-insert into history_table (history_type, note, order_id, creator_id) values ('ORDER', 'I ordered a computer to the new office, waiting for manager to response from TelnetWork Kft.', 6, 3);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('ORDER', 'I ordered a computer to the new office, waiting for manager to response from TelnetWork Kft.', 6, 3, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 
-insert into history_table (history_type, note, order_id, creator_id) values ('OFFER', 'I gave an offer for a  Warehouse management application for TelnetWork, nobody answered yet.', 7, 1);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('OFFER', 'I gave an offer for a  Warehouse management application for TelnetWork, nobody answered yet.', 7, 1, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 

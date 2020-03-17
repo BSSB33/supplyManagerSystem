@@ -1,4 +1,4 @@
-package com.elte.supplymanagersystem.controllers;
+package com.elte.supplymanagersystem.httpbodytests;
 
 import com.elte.supplymanagersystem.TestUtils;
 import com.elte.supplymanagersystem.repositories.UserRepository;
@@ -30,7 +30,6 @@ class UserControllerTest {
 
     private TestUtils testUtils = new TestUtils();
 
-    //TODO make these separate Tests
     @Test
     public void testGetAllEndpointWithDifferentUsers() throws IOException, JSONException {
         CloseableHttpResponse adminGetRequest = testUtils.sendGetRequest("users", "Gabor:password");
@@ -38,11 +37,11 @@ class UserControllerTest {
         CloseableHttpResponse managerGetRequest2 = testUtils.sendGetRequest("users", "Judit:password");
         CloseableHttpResponse disabledUserResponse = testUtils.sendGetRequest("users", "Old Student:password");
         CloseableHttpResponse invalidUserResponse = testUtils.sendGetRequest("users", "invalidUser:password");
-        assertEquals(HttpStatus.SC_OK, adminGetRequest.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, managerGetRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, managerGetRequest2.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_FORBIDDEN, disabledUserResponse.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, invalidUserResponse.getStatusLine().getStatusCode());
+//        assertEquals(HttpStatus.SC_OK, adminGetRequest.getStatusLine().getStatusCode());
+//        assertEquals(HttpStatus.SC_OK, managerGetRequest1.getStatusLine().getStatusCode());
+//        assertEquals(HttpStatus.SC_OK, managerGetRequest2.getStatusLine().getStatusCode());
+//        assertEquals(HttpStatus.SC_FORBIDDEN, disabledUserResponse.getStatusLine().getStatusCode());
+//        assertEquals(HttpStatus.SC_UNAUTHORIZED, invalidUserResponse.getStatusLine().getStatusCode());
 
         JSONArray jsonArray1 = testUtils.getJsonArray(adminGetRequest);
         assertEquals(jsonArray1.length(), 7);

@@ -3,6 +3,7 @@ package com.elte.supplymanagersystem.services;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.UserRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
+    static final Logger logger = Logger.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -214,7 +217,8 @@ public class UserService {
         User loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser != null) {
             if (loggedInUser.isEnabled()) {
-                System.out.println("User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
+
+                logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
                 return loggedInUser;
             }
         }

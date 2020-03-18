@@ -18,8 +18,6 @@ import java.util.Optional;
 @Service
 public class HistoryService {
 
-    final static Logger logger = Logger.getLogger(HistoryService.class);
-
     @Autowired
     private UserService userService;
 

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
-    final static Logger logger = Logger.getLogger(OrderService.class);
+    static final Logger logger = Logger.getLogger(OrderService.class);
 
     @Autowired
     private UserService userService;
@@ -92,7 +92,7 @@ public class OrderService {
                     ArrayList<History> authorizedHistories = new ArrayList<>();
                     orderToGet.get().getHistory().stream().filter(history ->
                             history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
-                            forEach(authorizedHistories::add); //TODO KIEMELNI/HIGHLIGHT
+                            forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);

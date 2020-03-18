@@ -1,11 +1,13 @@
 package com.elte.supplymanagersystem;
 
+import com.elte.supplymanagersystem.services.OrderService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,9 +16,11 @@ import java.io.IOException;
 
 public class TestUtils {
 
+    static final Logger logger = Logger.getLogger(TestUtils.class);
+
     private void logRequest(String endpoint, String credentials) {
         String loggedInUser = credentials.split(":")[0];
-        System.out.println("GetRequest to: " + "http://localhost:8080/" + endpoint + " -> LoggedInUser: " + loggedInUser);
+        logger.debug("Test: GetRequest to: " + "http://localhost:8080/" + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
     public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {

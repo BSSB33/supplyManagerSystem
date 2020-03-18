@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserControllerTest {
 
     //givenUserDoesNotExists_whenUserInfoIsRetrieved_then404IsReceived
-    //System.out.println(getJSONField(httpResponse, 0, "username")); //Gabor
     @Autowired
     UserService userService;
 
@@ -59,23 +58,23 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
-//    @Test
-//    void get() {
-//    }
-//
-//    @Test
-//    void getUnassignedDirectors() {
-//    }
-//
-//    @Test
-//    void put() {
-//    }
-//
-//    @Test
-//    void delete() {
-//    }
-//
-//    @Test
-//    void register() {
-//    }
+    @Test
+    void get() {
+    }
+
+    @Test
+    void getUnassignedDirectors() {
+    }
+
+    @Test
+    void put() {
+    }
+
+    @Test
+    void delete() {
+    }
+
+    @Test
+    void register() {
+    }
 }

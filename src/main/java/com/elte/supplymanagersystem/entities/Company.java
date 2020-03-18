@@ -53,6 +53,10 @@ public class Company {
     @JsonIgnore
     private List<Order> sales;
 
+    /**
+     * Constructor for constructing Company object from DTO Object
+     * @param companyDTO The DTO to construct from.
+     */
     public Company(CompanyDTO companyDTO) {
         this.name = companyDTO.getName();
         if (!CollectionUtils.isEmpty(companyDTO.getManagers()))

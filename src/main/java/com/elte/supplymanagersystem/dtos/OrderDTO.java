@@ -11,6 +11,9 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DTO Class so REST API doesn't have to send unused data
+ */
 @Data
 @NoArgsConstructor
 public class OrderDTO {
@@ -31,6 +34,10 @@ public class OrderDTO {
 
     private User sellerManager;
 
+    /**
+     * Constructor for Order Data Transfer Object
+     * @param order The Order object to construct the DTO of.
+     */
     public OrderDTO(Order order) {
         this.productName = order.getProductName();
         this.price = order.getPrice();

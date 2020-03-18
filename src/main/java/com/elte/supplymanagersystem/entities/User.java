@@ -69,6 +69,10 @@ public class User {
     @JsonIgnore
     private List<History> histories;
 
+    /**
+     * Constructor for constructing User object from DTO Object
+     *  @param userDTO The DTO to construct from.
+     */
     public User(UserDTO userDTO) {
         this.username = userDTO.getUsername();
         this.password = userDTO.getPassword();

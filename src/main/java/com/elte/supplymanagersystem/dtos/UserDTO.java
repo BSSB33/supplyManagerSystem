@@ -10,6 +10,9 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DTO Class so REST API doesn't have to send unused data
+ */
 @NoArgsConstructor
 @Data
 public class UserDTO {
@@ -32,6 +35,10 @@ public class UserDTO {
 
     private List<HistoryDTO> histories;
 
+    /**
+     * Constructor for User Data Transfer Object
+     * @param user The User object to construct the DTO of.
+     */
     public UserDTO(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();

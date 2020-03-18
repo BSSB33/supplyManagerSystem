@@ -8,6 +8,9 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DTO Class so REST API doesn't have to send unused data
+ */
 @Data
 @NoArgsConstructor
 public class CompanyDTO {
@@ -22,6 +25,10 @@ public class CompanyDTO {
 
     private List<OrderDTO> sales;
 
+    /**
+     * Constructor for Company Data Transfer Object
+     * @param company The Company object to construct the DTO of.
+     */
     public CompanyDTO(Company company) {
         this.name = company.getName();
         if (!CollectionUtils.isEmpty(company.getManagers()))

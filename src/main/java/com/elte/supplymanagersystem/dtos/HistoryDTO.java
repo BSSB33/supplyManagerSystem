@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO Class so REST API doesn't have to send unused data
+ */
 @Data
 @NoArgsConstructor
 public class HistoryDTO {
@@ -25,6 +28,10 @@ public class HistoryDTO {
 
     private LocalDateTime updatedAt;
 
+    /**
+     * Constructor for History Data Transfer Object
+     * @param history The History object to construct the DTO of.
+     */
     public HistoryDTO(History history) {
         this.creator = history.getCreator();
         this.order = history.getOrder();

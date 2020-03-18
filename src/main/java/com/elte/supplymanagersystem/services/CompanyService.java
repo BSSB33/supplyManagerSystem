@@ -122,6 +122,7 @@ public class CompanyService {
     /**
      * Deletes a Company record by ID.
      * ADMIN: The only User who can delete a company.
+     * NOT_ACCEPTABLE: If tries to delete Company with any Order, Manager.
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
@@ -134,8 +135,11 @@ public class CompanyService {
         Optional<Company> companyToDelete = companyRepository.findById(id);
         if (companyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                companyRepository.deleteById(id);
-                return ResponseEntity.ok().build();
+                if(companyToDelete.get().getManagers().isEmpty() && companyToDelete.get().getPurchases().isEmpty() &&
+                        companyToDelete.get().getSales().isEmpty() && companyToDelete.get().getDirector().isEmpty()){
+                    companyRepository.deleteById(id);
+                    return ResponseEntity.ok().build();
+                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
     }

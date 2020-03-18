@@ -64,7 +64,7 @@ public class HistoryController {
      * Calls putById method from HistoryService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param historyDTO The History with the updated information.
+     * @param historyDTO The History Data Transfer Object with the updated information.
      * @param id         The ID of the History to update.
      * @param auth       Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
@@ -74,8 +74,7 @@ public class HistoryController {
     public ResponseEntity put(@RequestBody HistoryDTO historyDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            History history = new History(historyDTO);
-            return historyService.putById(history, loggedInUser, id);
+            return historyService.putById(historyDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -84,7 +83,7 @@ public class HistoryController {
      * Calls addHistory method from HistoryService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param historyDTO The History with the information to save.
+     * @param historyDTO The History Data Transfer Object with the information to save.
      * @param auth       Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
@@ -93,8 +92,7 @@ public class HistoryController {
     public ResponseEntity post(@RequestBody HistoryDTO historyDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            History history = new History(historyDTO);
-            return historyService.addHistory(history, loggedInUser);
+            return historyService.addHistory(historyDTO, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

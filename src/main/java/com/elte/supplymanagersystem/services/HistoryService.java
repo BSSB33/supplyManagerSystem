@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
@@ -77,12 +78,13 @@ public class HistoryService {
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
-     * @param historyToUpdate The history with the information to update.
+     * @param historyDTO The history Data Transfer Object with the information to update.
      * @param loggedInUser    The user logged in.
      * @param id              The ID of the History the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated History.
      */
-    public ResponseEntity putById(History historyToUpdate, User loggedInUser, Integer id) {
+    public ResponseEntity putById(HistoryDTO historyDTO, User loggedInUser, Integer id) {
+        History historyToUpdate = new History(historyDTO);
         historyToUpdate.setId(id);
         Optional<History> historyToCheck = historyRepository.findById(historyToUpdate.getId());
         if (historyToCheck.isPresent()) {
@@ -104,11 +106,12 @@ public class HistoryService {
      * and also works at one of the companies of the Order to which the History belongs to.
      * ELSE: UNAUTHORIZED
      *
-     * @param historyToSave The history with the information to save.
+     * @param historyDTO The history Data Transfer Object with the information to save.
      * @param loggedInUser  The user logged in.
      * @return Returns a ResponseEntity of the saved History.
      */
-    public ResponseEntity addHistory(History historyToSave, User loggedInUser) {
+    public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
+        History historyToSave = new History(historyDTO);
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {

@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.dtos.CompanyDTO;
 import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
@@ -75,12 +76,13 @@ public class CompanyService {
      * ELSE: UNAUTHORIZED
      * Non existing Company: NOTFOUND
      *
-     * @param companyToUpdate The Company with the information to update.
+     * @param companyDTO The Company Data Transfer Object with the information to update.
      * @param loggedInUser    The user logged in.
      * @param id              The ID of the Company the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Company.
      */
-    public ResponseEntity putById(Company companyToUpdate, User loggedInUser, Integer id) {
+    public ResponseEntity putById(CompanyDTO companyDTO, User loggedInUser, Integer id) {
+        Company companyToUpdate = new Company(companyDTO);
         companyToUpdate.setId(id);
         Optional<Company> companyToCheck = companyRepository.findById(companyToUpdate.getId());
         if (companyToCheck.isPresent()) {
@@ -103,12 +105,13 @@ public class CompanyService {
      * ADMIN: The only User who can register a company
      * ELSE: UNAUTHORIZED
      *
-     * @param companyToSave The Company with the information to save.
+     * @param companyDTO The Company Data Transfer Object with the information to save.
      * @param loggedInUser  The user logged in.
      * @return Returns a ResponseEntity of the saved Company.
      */
     //Add
-    public ResponseEntity addCompany(Company companyToSave, User loggedInUser) {
+    public ResponseEntity addCompany(CompanyDTO companyDTO, User loggedInUser) {
+        Company companyToSave = new Company(companyDTO);
         Optional<Company> otherCompany = companyRepository.findByName(companyToSave.getName());
         if (otherCompany.isPresent())
             return ResponseEntity.badRequest().build();

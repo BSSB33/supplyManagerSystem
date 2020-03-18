@@ -83,7 +83,7 @@ public class UserController {
      * Calls putById method from UserService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param userDTO The user with the updated information.
+     * @param userDTO The user Data Transfer Object with the updated information.
      * @param id      The ID of the User to update.
      * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
@@ -93,8 +93,7 @@ public class UserController {
     public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            User user = new User(userDTO);
-            return userService.putById(user, loggedInUser, id);
+            return userService.putById(userDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -103,7 +102,7 @@ public class UserController {
      * Calls registerUser method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param userDTO The User with the information to save.
+     * @param userDTO The User Data Transfer Object with the information to save.
      * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
@@ -111,8 +110,7 @@ public class UserController {
     public ResponseEntity register(@RequestBody UserDTO userDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            User user = new User(userDTO);
-            return userService.registerUser(user, loggedInUser);
+            return userService.registerUser(userDTO, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

@@ -89,8 +89,7 @@ public class CompanyController {
     public ResponseEntity put(@RequestBody CompanyDTO companyDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            Company company = new Company(companyDTO);
-            return companyService.putById(company, loggedInUser, id);
+            return companyService.putById(companyDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -108,8 +107,7 @@ public class CompanyController {
     public ResponseEntity post(@RequestBody CompanyDTO companyDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            Company company = new Company(companyDTO);
-            return companyService.addCompany(company, loggedInUser);
+            return companyService.addCompany(companyDTO, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

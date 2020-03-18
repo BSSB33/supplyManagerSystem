@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
@@ -144,12 +145,13 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Non existing Order: NOTFOUND
      *
-     * @param orderToUpdate The Order with the information to update.
+     * @param orderDTO The Order Data Transfer Object with the information to update.
      * @param loggedInUser  The user logged in.
      * @param id            The ID of the Order the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Order.
      */
-    public ResponseEntity putById(Order orderToUpdate, User loggedInUser, Integer id) {
+    public ResponseEntity putById(OrderDTO orderDTO, User loggedInUser, Integer id) {
+        Order orderToUpdate = new Order(orderDTO);
         orderToUpdate.setId(id);
         Optional<Order> orderToCheck = orderRepository.findById(id);
         if (orderToCheck.isPresent()) {
@@ -171,12 +173,13 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Already existing Order: BAD REQUEST
      *
-     * @param orderToSave  The Order with the information to save.
+     * @param orderDTO  The Order Data Transfer Object with the information to save.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved Order.
      */
     //Add
-    public ResponseEntity addOrder(Order orderToSave, User loggedInUser) {
+    public ResponseEntity addOrder(OrderDTO orderDTO, User loggedInUser) {
+        Order orderToSave = new Order(orderDTO);
         Optional<Order> otherOrder = orderRepository.findByProductName(orderToSave.getProductName());
         if (otherOrder.isPresent())
             return ResponseEntity.badRequest().build();

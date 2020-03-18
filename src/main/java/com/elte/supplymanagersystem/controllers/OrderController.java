@@ -112,7 +112,7 @@ public class OrderController {
      * Calls putById method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param orderDTO The order with the updated information.
+     * @param orderDTO The order Data Transfer Object with the updated information.
      * @param id       The ID of the Order to update.
      * @param auth     Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
@@ -122,8 +122,7 @@ public class OrderController {
     public ResponseEntity put(@RequestBody OrderDTO orderDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            Order order = new Order(orderDTO);
-            return orderService.putById(order, loggedInUser, id);
+            return orderService.putById(orderDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -132,7 +131,7 @@ public class OrderController {
      * Calls addOrder method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param orderDTO The order with the information to save.
+     * @param orderDTO The order Data Transfer Object with the information to save.
      * @param auth     Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
@@ -141,8 +140,7 @@ public class OrderController {
     public ResponseEntity post(@RequestBody OrderDTO orderDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
-            Order order = new Order(orderDTO);
-            return orderService.addOrder(order, loggedInUser);
+            return orderService.addOrder(orderDTO, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.UserRepository;
@@ -61,10 +62,8 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null) { // Doesn't work anywhere
-                    if (loggedInUser.getId().equals(id)) {
-                        return ResponseEntity.ok(loggedInUser);
-                    } else return new ResponseEntity(HttpStatus.CONFLICT);
+                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) { // Doesn't work anywhere
+                    return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -92,12 +91,13 @@ public class UserService {
      * DIRECTOR: Can only Update itself and Employees.
      * MANAGER: Can only Update itself.
      *
-     * @param userToUpdate The user with the updated information.
+     * @param userDTO      The user Data Transfer Object with the updated information.
      * @param loggedInUser The user who logged in.
      * @param id           The ID of the User to Update.
      * @return Returns a ResponseEntity with the updated User.
      */
-    public ResponseEntity putById(User userToUpdate, User loggedInUser, Integer id) {
+    public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Integer id) {
+        User userToUpdate = new User(userDTO);
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
@@ -127,11 +127,12 @@ public class UserService {
      * Already existing User: BAD REQUEST
      * Non existing User: NOTFOUND
      *
-     * @param userToRegister The user to register
+     * @param userDTO The user (Data Transfer Object) to register
      * @param loggedInUser   The user who wants to register a new User.
      * @return Returns a ResponseEntity of the saved History.
      */
-    public ResponseEntity registerUser(User userToRegister, User loggedInUser) {
+    public ResponseEntity registerUser(UserDTO userDTO, User loggedInUser) {
+        User userToRegister = new User(userDTO);
         Optional<User> otherUser = Optional.ofNullable(userRepository.findByUsername(userToRegister.getUsername()));
         if (otherUser.isPresent()) {
             return ResponseEntity.badRequest().build();
@@ -215,12 +216,9 @@ public class UserService {
      */
     public User getValidUser(String username) {
         User loggedInUser = userRepository.findByUsername(username);
-        if (loggedInUser != null) {
-            if (loggedInUser.isEnabled()) {
-
-                logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
-                return loggedInUser;
-            }
+        if (loggedInUser != null && loggedInUser.isEnabled()) {
+            logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
+            return loggedInUser;
         }
         return null; //throws FORBIDDEN
     }

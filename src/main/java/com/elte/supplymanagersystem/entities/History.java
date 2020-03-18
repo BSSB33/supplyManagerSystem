@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.entities;
 
+import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.enums.HistoryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,7 +35,7 @@ public class History {
 
     @ManyToOne
     @JoinColumn
-    //@JsonIgnore
+    //@JsonIgnore TODO multiple JSONIgnore
     private Order order;
 
     @Column(nullable = false)
@@ -51,4 +52,13 @@ public class History {
     @Column
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public History(HistoryDTO historyDTO) {
+        this.creator = historyDTO.getCreator();
+        this.order = historyDTO.getOrder();
+        this.historyType = historyDTO.getHistoryType();
+        this.note = historyDTO.getNote();
+        this.createdAt = historyDTO.getCreatedAt();
+        this.updatedAt = historyDTO.getUpdatedAt();
+    }
 }

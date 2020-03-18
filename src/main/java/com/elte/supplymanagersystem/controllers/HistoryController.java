@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
+import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.HistoryService;
@@ -63,16 +64,17 @@ public class HistoryController {
      * Calls putById method from HistoryService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param history The History with the updated information.
-     * @param id      The ID of the History to update.
-     * @param auth    Authentication parameter for Security in order to get the User who logged in.
+     * @param historyDTO The History with the updated information.
+     * @param id         The ID of the History to update.
+     * @param auth       Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
     //Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody History history, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody HistoryDTO historyDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            History history = new History(historyDTO);
             return historyService.putById(history, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -82,15 +84,16 @@ public class HistoryController {
      * Calls addHistory method from HistoryService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param history The History with the information to save.
-     * @param auth    Authentication parameter for Security in order to get the User who logged in.
+     * @param historyDTO The History with the information to save.
+     * @param auth       Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     //Add
     @PostMapping("")
-    public ResponseEntity post(@RequestBody History history, Authentication auth) {
+    public ResponseEntity post(@RequestBody HistoryDTO historyDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            History history = new History(historyDTO);
             return historyService.addHistory(history, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }

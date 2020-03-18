@@ -61,8 +61,8 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if(loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null){ // Doesn't work anywhere
-                    if(loggedInUser.getId().equals(id)){
+                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null) { // Doesn't work anywhere
+                    if (loggedInUser.getId().equals(id)) {
                         return ResponseEntity.ok(loggedInUser);
                     } else return new ResponseEntity(HttpStatus.CONFLICT);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
@@ -103,13 +103,13 @@ public class UserService {
         if (userToCheck.isPresent()) {
             //userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if(userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
                         || userToUpdate.getId().equals(loggedInUser.getId())) {
-                    if(userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                    if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
                         userToUpdate.setWorkplace(userToUpdate.getCompany());
                     return ResponseEntity.ok(userRepository.save(userToUpdate));
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);

@@ -1,16 +1,19 @@
 package com.elte.supplymanagersystem.entities;
 
+import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -47,7 +50,7 @@ public class Order {
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<History> history;
+    private List<History> histories;
 
     @ManyToOne
     @JoinColumn
@@ -64,4 +67,16 @@ public class Order {
     @ManyToOne
     @JoinColumn
     private User sellerManager;
+
+    public Order(OrderDTO orderDTO) {
+        this.productName = orderDTO.getProductName();
+        this.price = orderDTO.getPrice();
+        this.status = orderDTO.getStatus();
+        this.buyer = orderDTO.getBuyer();
+        this.buyerManager = orderDTO.getBuyerManager();
+        this.seller = orderDTO.getSeller();
+        this.sellerManager = orderDTO.getSellerManager();
+        if (!CollectionUtils.isEmpty(orderDTO.getHistory()))
+            histories = orderDTO.getHistory().stream().map(History::new).collect(Collectors.toList());
+    }
 }

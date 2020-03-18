@@ -65,18 +65,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder());
     }
 
-    /**
-     * This case it is used for creating in memory users for testing.
-     *
-     * @param auth AuthenticationManagerBuilder Object for creating for example in memory users for testing.
-     * @throws Exception Exceptions in inMemoryAuthentication
-     */
-    @Autowired
-    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        /*auth
-                .inMemoryAuthentication()
-                .withUser("user").password("$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..").roles("USER");*/
-    }
+//    /**
+//     * This case it is used for creating in memory users for testing.
+//     *
+//     * @param auth AuthenticationManagerBuilder Object for creating for example in memory users for testing.
+//     * @throws Exception Exceptions in inMemoryAuthentication
+//     */
+//    @Autowired
+//    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .inMemoryAuthentication()
+//                .withUser("user").password("$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..").roles("USER");
+//    }
 
     /**
      * Makes a new passwordEncoder.

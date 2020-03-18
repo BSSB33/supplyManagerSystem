@@ -18,7 +18,7 @@ public interface HistoryRepository extends JpaRepository<History, Integer> {
 
     @Query("SELECT h FROM History h WHERE h.order = :order")
     List<History> findHistoriesByOrder(@Param("order") Order order);
-    
+
     @Modifying
     @Query("DELETE FROM History h WHERE h.id = :id")
     void deleteById(@Param("id") Integer id);

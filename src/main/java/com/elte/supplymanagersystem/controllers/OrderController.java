@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
+import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.OrderService;
@@ -111,16 +112,17 @@ public class OrderController {
      * Calls putById method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param order The order with the updated information.
-     * @param id    The ID of the Order to update.
-     * @param auth  Authentication parameter for Security in order to get the User who logged in.
+     * @param orderDTO The order with the updated information.
+     * @param id       The ID of the Order to update.
+     * @param auth     Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
     //Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody Order order, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody OrderDTO orderDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            Order order = new Order(orderDTO);
             return orderService.putById(order, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -130,15 +132,16 @@ public class OrderController {
      * Calls addOrder method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param order The order with the information to save.
-     * @param auth  Authentication parameter for Security in order to get the User who logged in.
+     * @param orderDTO The order with the information to save.
+     * @param auth     Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     //Add
     @PostMapping("")
-    public ResponseEntity post(@RequestBody Order order, Authentication auth) {
+    public ResponseEntity post(@RequestBody OrderDTO orderDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            Order order = new Order(orderDTO);
             return orderService.addOrder(order, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }

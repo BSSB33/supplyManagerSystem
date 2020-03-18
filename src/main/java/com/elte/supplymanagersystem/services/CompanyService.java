@@ -135,8 +135,8 @@ public class CompanyService {
         Optional<Company> companyToDelete = companyRepository.findById(id);
         if (companyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if(companyToDelete.get().getManagers().isEmpty() && companyToDelete.get().getPurchases().isEmpty() &&
-                        companyToDelete.get().getSales().isEmpty() && companyToDelete.get().getDirector().isEmpty()){
+                if (companyToDelete.get().getManagers().isEmpty() && companyToDelete.get().getPurchases().isEmpty() &&
+                        companyToDelete.get().getSales().isEmpty() && companyToDelete.get().getDirector().isEmpty()) {
                     companyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);

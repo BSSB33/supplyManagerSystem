@@ -85,12 +85,12 @@ public class OrderService {
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                return ResponseEntity.ok(orderToGet.get().getHistory());
+                return ResponseEntity.ok(orderToGet.get().getHistories());
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     ArrayList<History> authorizedHistories = new ArrayList<>();
-                    orderToGet.get().getHistory().stream().filter(history ->
+                    orderToGet.get().getHistories().stream().filter(history ->
                             history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
                             forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);

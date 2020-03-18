@@ -1,14 +1,17 @@
 package com.elte.supplymanagersystem.entities;
 
+import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -65,6 +68,21 @@ public class User {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<History> histories;
+
+    public User(UserDTO userDTO) {
+        this.username = userDTO.getUsername();
+        this.password = userDTO.getPassword();
+        this.enabled = userDTO.isEnabled();
+        this.company = userDTO.getCompany();
+        this.workplace = userDTO.getWorkplace();
+        this.role = userDTO.getRole();
+        if (!CollectionUtils.isEmpty(userDTO.getHistories()))
+            histories = userDTO.getHistories().stream().map(History::new).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(userDTO.getBuyerManager()))
+            buyerManager = userDTO.getBuyerManager().stream().map(Order::new).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(userDTO.getSellerManager()))
+            buyerManager = userDTO.getSellerManager().stream().map(Order::new).collect(Collectors.toList());
+    }
 
     /**
      * Checks if the two users are colleagues or not

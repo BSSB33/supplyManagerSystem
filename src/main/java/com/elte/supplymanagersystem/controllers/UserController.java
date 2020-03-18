@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
+import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;
 import com.elte.supplymanagersystem.services.UserService;
@@ -82,16 +83,17 @@ public class UserController {
      * Calls putById method from UserService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param user The user with the updated information.
-     * @param id   The ID of the User to update.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param userDTO The user with the updated information.
+     * @param id      The ID of the User to update.
+     * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the updated record.
      */
     //Save or Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody User user, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Integer id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            User user = new User(userDTO);
             return userService.putById(user, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -101,14 +103,15 @@ public class UserController {
      * Calls registerUser method from OrderService.
      * Returns FORBIDDEN if the user is Invalid.
      *
-     * @param user The User with the information to save.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param userDTO The User with the information to save.
+     * @param auth    Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     @PostMapping("register")
-    public ResponseEntity register(@RequestBody User user, Authentication auth) {
+    public ResponseEntity register(@RequestBody UserDTO userDTO, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
+            User user = new User(userDTO);
             return userService.registerUser(user, loggedInUser);
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }

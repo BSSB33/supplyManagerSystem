@@ -103,7 +103,7 @@ public class UserService {
         if (userToCheck.isPresent()) {
             //userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() != null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
@@ -142,8 +142,7 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
                 if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
                     userToRegister.setRole(Role.ROLE_DIRECTOR);
-                    userToRegister.setWorkplace(null);
-                    userToRegister.setCompany(null);
+                    userToRegister.setCompany(userToRegister.getWorkplace());
                 }
                 //Register Other Roles simply
                 return ResponseEntity.ok(userRepository.save(userToRegister));

@@ -53,13 +53,20 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetAllEndpointWithIvalidUser() throws IOException, JSONException {
+    public void testGetAllEndpointWithIvalidUser() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "invalidUser:password");
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
+//    @Test
+//    public void testPostUserWithAdmin() throws IOException {
+//        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users", "Gabor:password");
+//        assertEquals(postRequest.getEntity().getContent().toString(), testUtils.balazsJSON);
+//    }
+
     @Test
     void get() {
+
     }
 
     @Test

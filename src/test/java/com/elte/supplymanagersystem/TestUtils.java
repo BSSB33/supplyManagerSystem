@@ -1,11 +1,14 @@
 package com.elte.supplymanagersystem;
 
-import com.elte.supplymanagersystem.services.OrderService;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -16,20 +19,57 @@ import java.io.IOException;
 
 public class TestUtils {
 
-    static final Logger logger = Logger.getLogger(TestUtils.class);
+    public String balazsJSON = "{" +
+            "id: 2," +
+            "\"username\": \"Balazs\",\n" +
+            "\"password\": \"$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..\",\n" +
+            "\"enabled\": true,\n" +
+            "\"company\": {\n" +
+            "\"id\": 1,\n" +
+            "\"name\": \"TelnetWork Kft.\"\n" +
+            "},\n" +
+            "\"workplace\": {\n" +
+            "\"id\": 1,\n" +
+            "\"name\": \"TelnetWork Kft.\"\n" +
+            "},\n" +
+            "\"role\": \"ROLE_DIRECTOR\"\n" +
+            "}";
 
-    private void logRequest(String endpoint, String credentials) {
+    static final Logger logger = Logger.getLogger(TestUtils.class);
+    static final String apiURL = "http://localhost:8080/";
+
+    private void logRequest(String endpoint, String credentials, String typeOfRequest) {
         String loggedInUser = credentials.split(":")[0];
-        logger.debug("Test: GetRequest to: " + "http://localhost:8080/" + endpoint + " -> LoggedInUser: " + loggedInUser);
+        logger.debug("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
     public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
-        logRequest(endpoint, credentials);
-        HttpUriRequest request = new HttpGet("http://localhost:8080/" + endpoint);
-        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
-        request.setHeader("Authorization", "Basic " + encodedCredentials);
+        logRequest(endpoint, credentials, "GET");
 
-        return HttpClientBuilder.create().build().execute(request);//(HttpResponse) HttpClientBuilder.create().build().execute( request );
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(apiURL + endpoint);
+
+        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+        httpGet.setHeader("Authorization", "Basic " + encodedCredentials);
+
+        return client.execute(httpGet);
+    }
+
+    public CloseableHttpResponse sendPostRequest(String endpoint, String credentials) throws IOException {
+        logRequest(endpoint, credentials, "POST");
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(apiURL + endpoint);
+
+
+
+        StringEntity entity = new StringEntity(balazsJSON);
+        httpPost.setEntity(entity);
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setHeader("Content-type", "application/json");
+        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+        httpPost.setHeader("Authorization", "Basic " + encodedCredentials);
+        return client.execute(httpPost);
     }
 
     public JSONArray getJsonArray(CloseableHttpResponse httpResponse) throws IOException, JSONException {

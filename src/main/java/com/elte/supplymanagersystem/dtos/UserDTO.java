@@ -48,9 +48,9 @@ public class UserDTO {
         this.role = user.getRole();
         if (!CollectionUtils.isEmpty(user.getHistories()))
             histories = user.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getBuyerManager()))
-            buyerManager = user.getBuyerManager().stream().map(OrderDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getSellerManager()))
-            buyerManager = user.getSellerManager().stream().map(OrderDTO::new).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(user.getPurchases()))
+            buyerManager = user.getPurchases().stream().map(OrderDTO::new).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(user.getSells()))
+            buyerManager = user.getSells().stream().map(OrderDTO::new).collect(Collectors.toList());
     }
 }

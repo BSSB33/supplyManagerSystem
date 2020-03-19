@@ -197,11 +197,10 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 userToDisable.get().setEnabled(false);
                 return ResponseEntity.ok(userRepository.save(userToDisable.get()));
-            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                if (userToDisable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
-                    userToDisable.get().setEnabled(false);
-                    return ResponseEntity.ok(userRepository.save(userToDisable.get()));
-                } return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
+                    && userToDisable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                userToDisable.get().setEnabled(false);
+                return ResponseEntity.ok(userRepository.save(userToDisable.get()));
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
     }
@@ -212,8 +211,8 @@ public class UserService {
      * @return boolean
      */
     private boolean isDeletable(User userToDelete){
-        return userToDelete.getSellerManager().isEmpty()
-                && userToDelete.getBuyerManager().isEmpty()
+        return userToDelete.getSells().isEmpty()
+                && userToDelete.getPurchases().isEmpty()
                 && userToDelete.getHistories().isEmpty();
     }
 
@@ -237,13 +236,12 @@ public class UserService {
                     userRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                if (userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
-                    if(isDeletable(userToDelete.get())) {
-                        userRepository.deleteById(id);
-                        return ResponseEntity.ok().build();
-                    } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                } return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
+                    && userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                if(isDeletable(userToDelete.get())) {
+                    userRepository.deleteById(id);
+                    return ResponseEntity.ok().build();
+                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
     }

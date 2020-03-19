@@ -51,18 +51,15 @@ public class User {
     @JoinColumn
     private Company company;
 
-    //TODO rename fields
-    //TODO hibernate logs off
-    //TODO Optimise delete methods in services + commit + test run
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "buyerManager")
     @JsonIgnore
-    private List<Order> buyerManager;
+    private List<Order> purchases;
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "sellerManager")
     @JsonIgnore
-    private List<Order> sellerManager;
+    private List<Order> sells;
 
     @ManyToOne
     @JoinColumn
@@ -91,9 +88,9 @@ public class User {
         if (!CollectionUtils.isEmpty(userDTO.getHistories()))
             histories = userDTO.getHistories().stream().map(History::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(userDTO.getBuyerManager()))
-            buyerManager = userDTO.getBuyerManager().stream().map(Order::new).collect(Collectors.toList());
+            purchases = userDTO.getBuyerManager().stream().map(Order::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(userDTO.getSellerManager()))
-            buyerManager = userDTO.getSellerManager().stream().map(Order::new).collect(Collectors.toList());
+            purchases = userDTO.getSellerManager().stream().map(Order::new).collect(Collectors.toList());
     }
 
     /**

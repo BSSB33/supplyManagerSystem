@@ -199,7 +199,7 @@ public class OrderService {
      * @param orderToDelete The Order to check
      * @return boolean
      */
-    //TODO: bovitesi lehetoseg, konkret hibat dobni, mi hol van még benne.
+    //TODO: expansion option, throw a specific message, what else causes this to return false (for each entity)
     private boolean isDeletable(Order orderToDelete){
         return orderToDelete.getHistories().isEmpty();
     }

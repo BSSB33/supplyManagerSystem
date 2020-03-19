@@ -16,7 +16,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class TestUtils {
 
@@ -85,5 +89,19 @@ public class TestUtils {
     public String getJsonField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id).getString(field);
+    }
+
+    public String getContentOfFile(String path){
+        StringBuilder json = new StringBuilder();
+        try{
+            Scanner scanner = new Scanner(new FileReader(path));
+            while (scanner.hasNextLine()){
+                json.append(scanner.nextLine());
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return json.toString();
     }
 }

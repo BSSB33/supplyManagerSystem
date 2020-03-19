@@ -1,0 +1,15 @@
+{
+"id": 10,
+"username": "NewDirector",
+"password": "$2a$10$vOA0BOkiWGWt6hez6UEG2.Ia3.UDDrPG8gqVLD37MC7solBMSBX8K",
+"enabled": true,
+"company": {
+"id": 1,
+"name": "TelnetWork Kft."
+},
+"workplace": {
+"id": 1,
+"name": "TelnetWork Kft."
+},
+"role": "ROLE_DIRECTOR"
+}

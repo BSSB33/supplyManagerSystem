@@ -10,8 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -29,54 +32,67 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@TestPropertySource(locations="classpath:application.properties")
+@FixMethodOrder
 class UserControllerTest {
 
-//    @BeforeEach
-//    public void resetDb(){
-//
-//    }
-
-    //Example: givenUserDoesNotExists_whenUserInfoIsRetrieved_then404IsReceived
 
     private TestUtils testUtils = new TestUtils();
 
     @Test
-    public void testGetAllEndpointWithAdmin() throws IOException {
+    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        String expected = testUtils.getContentOfFile("src/test/input/allUsers.json");
+        JSONAssert.assertEquals(testUtils.getJsonArray(getRequest).toString(), new JSONArray(expected).toString(),
+                new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
     }
 
     @Test
-    public void testGetAllEndpointWithDirector() throws IOException {
+    void givenDirectorUser_whenGetAllEndpointIsCalled_thenAllEmployeesAreReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users", "Balazs:password");
         CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users", "Judit:password");
         assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
         assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+
+        String expected1 = testUtils.getContentOfFile("src/test/input/colleaguesOfBalazs.json");
+        JSONAssert.assertEquals(testUtils.getJsonArray(getRequest1).toString(), new JSONArray(expected1).toString(),
+                new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
+        String expected2 = testUtils.getContentOfFile("src/test/input/colleaguesOfJudit.json");
+        JSONAssert.assertEquals(testUtils.getJsonArray(getRequest2).toString(), new JSONArray(expected2).toString(),
+                new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
     }
 
     @Test
-    public void testGetAllEndpointWithManager() throws IOException {
+    void givenManagerUser_whenGetAllEndpointIsCalled_thenAllColleaguesAreReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Emma:password");
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        String expected = testUtils.getContentOfFile("src/test/input/colleaguesOfBalazs.json");
+        JSONAssert.assertEquals(testUtils.getJsonArray(getRequest).toString(), new JSONArray(expected).toString(),
+                new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
     }
 
     @Test
-    public void testGetAllEndpointWithDisabledUser() throws IOException {
+    void givenDisabledUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Old Student:password");
         assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    public void testGetAllEndpointWithIvalidUser() throws IOException {
+    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "invalidUser:password");
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
+//    @Test
+//    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserIsReturned() {
+//
+//    }
+
     @Test
-    public void testDeleteEndpointWithAdminUser() throws IOException {
+    void givenAdminUser_whenDeleteEndpointIsCalled_thenUserShouldBeDeleted() throws IOException {
         //Adds user
-        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password", peterJSON);
+        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
+                testUtils.getContentOfFile("src/test/input/userPeter.json"));
         assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
         //Deletes new user
         CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/8", "Gabor:password");
@@ -84,82 +100,36 @@ class UserControllerTest {
     }
 
     @Test
-    public void testPostUserWithAdmin_whenAddingNewUser() throws IOException, JSONException {
-        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password", peterJSON);
+    void givenAdminUser_whenRegisterEndpointIsCalled_withManagerUserToRegister_thenUserShouldBeRegistered() throws IOException, JSONException {
+        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
+                testUtils.getContentOfFile("src/test/input/userPeter.json"));
         assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/8", "Gabor:password");
-        JSONAssert.assertEquals(testUtils.getJsonObject(getRequest).toString(), registeredPeterJSON,
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/9", "Gabor:password");
+        JSONAssert.assertEquals(testUtils.getJsonObject(getRequest).toString(),
+                testUtils.getContentOfFile("src/test/input/userPeterRegistered.json"),
                 new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
-        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/8", "Gabor:password");
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/9", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    public void testPostUserWithAdmin_whenAddingExistingUser() throws IOException, JSONException { //TODO read JSONs from file
-        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password", balazsJSON);
+    void givenAdminUser_whenRegisterEndpointIsCalled_withDirectorUserToRegister_thenUserShouldBeRegistered_andCompanyShouldBeSet() throws IOException, JSONException {
+        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
+                testUtils.getContentOfFile("src/test/input/userNewDirector.json"));
+        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/10", "Gabor:password");
+        JSONAssert.assertEquals(testUtils.getJsonObject(getRequest).toString(),
+                testUtils.getContentOfFile("src/test/input/userNewDirectorRegistered.json"),
+                new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true)));
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/10", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenAdminUser_whenRegisterEndpointIsCalled_withExistingUserToRegister_thenBadRequestShouldBeThrown() throws IOException, JSONException {
+        CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
+                testUtils.getContentOfFile("src/test/input/userBalazs.json"));
         assertEquals(HttpStatus.SC_BAD_REQUEST, postRequest.getStatusLine().getStatusCode());
-        //JSONAssert.assertEquals(testUtils.getJsonObject(postRequest).toString(), registeredPeterJSON, JSONCompareMode.LENIENT);
     }
 
-    @Test
-    void get() {
-
-    }
-
-    @Test
-    void getUnassignedDirectors() {
-    }
-
-    @Test
-    void put() {
-    }
-
-    @Test
-    void delete() {
-    }
-
-    @Test
-    void register() {
-    }
-
-
-    public String balazsJSON = "{" +
-            "\"username\": \"Balazs\",\n" +
-            "\"password\": \"$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..\",\n" +
-            "\"enabled\": true,\n" +
-            "\"company\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"workplace\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"role\": \"ROLE_DIRECTOR\"\n" +
-            "}";
-
-    public String registeredPeterJSON = "{" +
-            "id: 8," +
-            "\"username\": \"Peter\",\n" +
-            "\"password\": \"$2a$10$3TMNND3EY3k7XBwV2Iue5.I9tDB4Hv9VBHg6NrCqxC21KYb3N.1By\",\n" +
-            "\"enabled\": true,\n" +
-            "\"company\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"workplace\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"role\": \"ROLE_DIRECTOR\"\n" +
-            "}";
-
-    public String peterJSON = "{" +
-            "\"username\": \"Peter\",\n" +
-            "\"password\": \"password\",\n" +
-            "\"enabled\": true,\n" +
-            "\"workplace\": {\n" +
-            "\"id\": 1\n" +
-            "},\n" +
-            "\"role\": \"ROLE_DIRECTOR\"\n" +
-            "}";
 }

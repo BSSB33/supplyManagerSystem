@@ -30,6 +30,7 @@ public class HistoryDTO {
 
     /**
      * Constructor for History Data Transfer Object
+     *
      * @param history The History object to construct the DTO of.
      */
     public HistoryDTO(History history) {

@@ -70,7 +70,8 @@ public class Order {
 
     /**
      * Constructor for constructing Order object from DTO Object
-     *  @param orderDTO The DTO to construct from.
+     *
+     * @param orderDTO The DTO to construct from.
      */
     public Order(OrderDTO orderDTO) {
         this.productName = orderDTO.getProductName();

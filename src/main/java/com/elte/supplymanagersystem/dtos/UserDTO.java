@@ -37,6 +37,7 @@ public class UserDTO {
 
     /**
      * Constructor for User Data Transfer Object
+     *
      * @param user The User object to construct the DTO of.
      */
     public UserDTO(User user) {

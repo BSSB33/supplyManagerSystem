@@ -3,8 +3,6 @@ package com.elte.supplymanagersystem.entities;
 import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.enums.HistoryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -58,6 +56,7 @@ public class History {
 
     /**
      * Constructor for constructing History object from DTO Object
+     *
      * @param historyDTO The DTO to construct from.
      */
     public History(HistoryDTO historyDTO) {

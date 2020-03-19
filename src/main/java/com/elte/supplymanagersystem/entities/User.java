@@ -76,7 +76,8 @@ public class User {
 
     /**
      * Constructor for constructing User object from DTO Object
-     *  @param userDTO The DTO to construct from.
+     *
+     * @param userDTO The DTO to construct from.
      */
     public User(UserDTO userDTO) {
         this.username = userDTO.getUsername();

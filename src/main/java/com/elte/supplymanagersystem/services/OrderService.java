@@ -145,9 +145,9 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Non existing Order: NOTFOUND
      *
-     * @param orderDTO The Order Data Transfer Object with the information to update.
-     * @param loggedInUser  The user logged in.
-     * @param id            The ID of the Order the user wants to PUT (Update).
+     * @param orderDTO     The Order Data Transfer Object with the information to update.
+     * @param loggedInUser The user logged in.
+     * @param id           The ID of the Order the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Order.
      */
     public ResponseEntity putById(OrderDTO orderDTO, User loggedInUser, Integer id) {
@@ -173,7 +173,7 @@ public class OrderService {
      * ELSE: UNAUTHORIZED
      * Already existing Order: BAD REQUEST
      *
-     * @param orderDTO  The Order Data Transfer Object with the information to save.
+     * @param orderDTO     The Order Data Transfer Object with the information to save.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved Order.
      */
@@ -196,11 +196,12 @@ public class OrderService {
 
     /**
      * Checks if the Order has any relations to other objects.
+     *
      * @param orderToDelete The Order to check
      * @return boolean
      */
     //TODO: expansion option, throw a specific message, what else causes this to return false (for each entity)
-    private boolean isDeletable(Order orderToDelete){
+    private boolean isDeletable(Order orderToDelete) {
         return orderToDelete.getHistories().isEmpty();
     }
 
@@ -221,20 +222,33 @@ public class OrderService {
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if(isDeletable(orderToDelete.get())){
+                if (isDeletable(orderToDelete.get())) {
                     orderRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                Map<Integer, Order> map = getMap(loggedInUser);
-                if (map.get(orderToDelete.get().getId()) != null) {
-                    if(isDeletable(orderToDelete.get())){
-                        orderRepository.deleteById(id);
-                        return ResponseEntity.ok().build();
-                    } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Helper method for deleteById(...)
+     * In case a user wants to delete an order these checks needed to be conducted.
+     *
+     * @param id            The ID of the Company the user wants to DELETE.
+     * @param loggedInUser  The user logged in.
+     * @param orderToDelete Order to delete
+     * @return Returns a ResponseEntity
+     */
+    private ResponseEntity deleteByDirectorOrManager(Integer id, User loggedInUser, Order orderToDelete) {
+        Map<Integer, Order> map = getMap(loggedInUser);
+        if (map.get(orderToDelete.getId()) != null) {
+            if (isDeletable(orderToDelete)) {
+                orderRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**

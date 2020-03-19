@@ -106,16 +106,29 @@ public class UserService {
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
-                        || userToUpdate.getId().equals(loggedInUser.getId())) {
-                    if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
-                        userToUpdate.setWorkplace(userToUpdate.getCompany());
-                    return ResponseEntity.ok(userRepository.save(userToUpdate));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Helper method for putById(...)
+     * In case a Director wants to PUT an order these checks needed to be conducted.
+     *
+     * @param userToUpdate The User with te updated information.
+     * @param loggedInUser The user who logged in.
+     * @param userToCheck  User for condition checking
+     * @return Returns a ResponseEntity
+     */
+    private ResponseEntity putByDirector(User userToUpdate, User loggedInUser, User userToCheck) {
+        if ((userHasRole(userToUpdate, Role.ROLE_MANAGER) && userToCheck.getWorkplace().getId().equals(loggedInUser.getCompany().getId()))
+                || userToUpdate.getId().equals(loggedInUser.getId())) {
+            if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
+                userToUpdate.setWorkplace(userToUpdate.getCompany());
+            return ResponseEntity.ok(userRepository.save(userToUpdate));
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -126,8 +139,8 @@ public class UserService {
      * Already existing User: BAD REQUEST
      * Non existing User: NOTFOUND
      *
-     * @param userDTO The user (Data Transfer Object) to register
-     * @param loggedInUser   The user who wants to register a new User.
+     * @param userDTO      The user (Data Transfer Object) to register
+     * @param loggedInUser The user who wants to register a new User.
      * @return Returns a ResponseEntity of the saved User.
      */
     public ResponseEntity registerUser(UserDTO userDTO, User loggedInUser) {
@@ -190,7 +203,7 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity disableUser(Integer id, User loggedInUser){
+    public ResponseEntity disableUser(Integer id, User loggedInUser) {
         Optional<User> userToDisable = userRepository.findById(id);
         if (userToDisable.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -206,10 +219,11 @@ public class UserService {
 
     /**
      * Checks if the user has any relations to other objects.
+     *
      * @param userToDelete The user to check
      * @return boolean
      */
-    private boolean isDeletable(User userToDelete){
+    private boolean isDeletable(User userToDelete) {
         return userToDelete.getSells().isEmpty()
                 && userToDelete.getPurchases().isEmpty()
                 && userToDelete.getHistories().isEmpty();
@@ -231,13 +245,13 @@ public class UserService {
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if(isDeletable(userToDelete.get())){
+                if (isDeletable(userToDelete.get())) {
                     userRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
                     && userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
-                if(isDeletable(userToDelete.get())) {
+                if (isDeletable(userToDelete.get())) {
                     userRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);

@@ -27,6 +27,7 @@ public class CompanyDTO {
 
     /**
      * Constructor for Company Data Transfer Object
+     *
      * @param company The Company object to construct the DTO of.
      */
     public CompanyDTO(Company company) {

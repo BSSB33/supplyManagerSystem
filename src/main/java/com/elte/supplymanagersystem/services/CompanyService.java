@@ -2,7 +2,6 @@ package com.elte.supplymanagersystem.services;
 
 import com.elte.supplymanagersystem.dtos.CompanyDTO;
 import com.elte.supplymanagersystem.entities.Company;
-import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.CompanyRepository;
@@ -77,9 +76,9 @@ public class CompanyService {
      * ELSE: UNAUTHORIZED
      * Non existing Company: NOTFOUND
      *
-     * @param companyDTO The Company Data Transfer Object with the information to update.
-     * @param loggedInUser    The user logged in.
-     * @param id              The ID of the Company the user wants to PUT (Update).
+     * @param companyDTO   The Company Data Transfer Object with the information to update.
+     * @param loggedInUser The user logged in.
+     * @param id           The ID of the Company the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Company.
      */
     public ResponseEntity putById(CompanyDTO companyDTO, User loggedInUser, Integer id) {
@@ -106,8 +105,8 @@ public class CompanyService {
      * ADMIN: The only User who can register a company
      * ELSE: UNAUTHORIZED
      *
-     * @param companyDTO The Company Data Transfer Object with the information to save.
-     * @param loggedInUser  The user logged in.
+     * @param companyDTO   The Company Data Transfer Object with the information to save.
+     * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved Company.
      */
     //Add
@@ -125,10 +124,11 @@ public class CompanyService {
 
     /**
      * Checks if the Company has any relations to other objects.
+     *
      * @param companyToDelete The Company to check
      * @return boolean
      */
-    private boolean isDeletable(Company companyToDelete){
+    private boolean isDeletable(Company companyToDelete) {
         return companyToDelete.getManagers().isEmpty() && companyToDelete.getPurchases().isEmpty() &&
                 companyToDelete.getSales().isEmpty();
     }

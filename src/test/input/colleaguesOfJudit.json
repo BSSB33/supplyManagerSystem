@@ -1,15 +1,17 @@
-[{
-"id": 3,
-"username": "Judit",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"workplace": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"role": "ROLE_DIRECTOR"
-}]
+[
+  {
+    "id": 3,
+    "username": "Judit",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": {
+      "id": 2,
+      "name": "BAV Zrt."
+    },
+    "workplace": {
+      "id": 2,
+      "name": "BAV Zrt."
+    },
+    "role": "ROLE_DIRECTOR"
+  }
+]

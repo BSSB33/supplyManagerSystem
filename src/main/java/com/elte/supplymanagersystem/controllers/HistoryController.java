@@ -1,7 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.dtos.HistoryDTO;
-import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.HistoryService;
 import com.elte.supplymanagersystem.services.UserService;

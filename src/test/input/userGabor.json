@@ -1,15 +1,15 @@
 {
-"id": 1,
-"username": "Gabor",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"workplace": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"role": "ROLE_ADMIN"
+  "id": 1,
+  "username": "Gabor",
+  "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+  "enabled": true,
+  "company": {
+    "id": 4,
+    "name": "ELTE-Soft Kft."
+  },
+  "workplace": {
+    "id": 4,
+    "name": "ELTE-Soft Kft."
+  },
+  "role": "ROLE_ADMIN"
 }

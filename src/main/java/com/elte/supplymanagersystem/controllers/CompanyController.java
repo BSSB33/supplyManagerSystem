@@ -1,7 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.dtos.CompanyDTO;
-import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.CompanyService;
 import com.elte.supplymanagersystem.services.UserService;

@@ -1,96 +1,98 @@
-[{
-"id": 1,
-"username": "Gabor",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"workplace": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"role": "ROLE_ADMIN"
-},
+[
   {
-"id": 2,
-"username": "Balazs",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 1,
-"name": "TelnetWork Kft."
-},
-"workplace": {
-"id": 1,
-"name": "TelnetWork Kft."
-},
-"role": "ROLE_DIRECTOR"
-},
+    "id": 1,
+    "username": "Gabor",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": {
+      "id": 4,
+      "name": "ELTE-Soft Kft."
+    },
+    "workplace": {
+      "id": 4,
+      "name": "ELTE-Soft Kft."
+    },
+    "role": "ROLE_ADMIN"
+  },
   {
-"id": 3,
-"username": "Judit",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"workplace": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"role": "ROLE_DIRECTOR"
-},
+    "id": 2,
+    "username": "Balazs",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "workplace": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "role": "ROLE_DIRECTOR"
+  },
   {
-"id": 4,
-"username": "Gyuri",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 3,
-"name": "TopTrade Kft."
-},
-"workplace": {
-"id": 3,
-"name": "TopTrade Kft."
-},
-"role": "ROLE_DIRECTOR"
-},
+    "id": 3,
+    "username": "Judit",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": {
+      "id": 2,
+      "name": "BAV Zrt."
+    },
+    "workplace": {
+      "id": 2,
+      "name": "BAV Zrt."
+    },
+    "role": "ROLE_DIRECTOR"
+  },
   {
-"id": 5,
-"username": "Emma",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": null,
-"workplace": {
-"id": 1,
-"name": "TelnetWork Kft."
-},
-"role": "ROLE_MANAGER"
-},
+    "id": 4,
+    "username": "Gyuri",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": {
+      "id": 3,
+      "name": "TopTrade Kft."
+    },
+    "workplace": {
+      "id": 3,
+      "name": "TopTrade Kft."
+    },
+    "role": "ROLE_DIRECTOR"
+  },
   {
-"id": 6,
-"username": "TTManager",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": null,
-"workplace": {
-"id": 3,
-"name": "TopTrade Kft."
-},
-"role": "ROLE_MANAGER"
-},
+    "id": 5,
+    "username": "Emma",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "role": "ROLE_MANAGER"
+  },
   {
-"id": 7,
-"username": "Old Student",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": false,
-"company": null,
-"workplace": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"role": "ROLE_MANAGER"
-}]
+    "id": 6,
+    "username": "TTManager",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 3,
+      "name": "TopTrade Kft."
+    },
+    "role": "ROLE_MANAGER"
+  },
+  {
+    "id": 7,
+    "username": "Old Student",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": false,
+    "company": null,
+    "workplace": {
+      "id": 4,
+      "name": "ELTE-Soft Kft."
+    },
+    "role": "ROLE_MANAGER"
+  }
+]

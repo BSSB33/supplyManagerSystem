@@ -78,9 +78,9 @@ public class HistoryService {
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
-     * @param historyDTO The history Data Transfer Object with the information to update.
-     * @param loggedInUser    The user logged in.
-     * @param id              The ID of the History the user wants to PUT (Update).
+     * @param historyDTO   The history Data Transfer Object with the information to update.
+     * @param loggedInUser The user logged in.
+     * @param id           The ID of the History the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated History.
      */
     public ResponseEntity putById(HistoryDTO historyDTO, User loggedInUser, Integer id) {
@@ -106,8 +106,8 @@ public class HistoryService {
      * and also works at one of the companies of the Order to which the History belongs to.
      * ELSE: UNAUTHORIZED
      *
-     * @param historyDTO The history Data Transfer Object with the information to save.
-     * @param loggedInUser  The user logged in.
+     * @param historyDTO   The history Data Transfer Object with the information to save.
+     * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved History.
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {

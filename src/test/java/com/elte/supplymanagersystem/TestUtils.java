@@ -1,14 +1,12 @@
 package com.elte.supplymanagersystem;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -16,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -91,11 +88,11 @@ public class TestUtils {
         return new JSONArray(json).getJSONObject(id).getString(field);
     }
 
-    public String getContentOfFile(String path){
+    public String getContentOfFile(String path) {
         StringBuilder json = new StringBuilder();
-        try{
+        try {
             Scanner scanner = new Scanner(new FileReader(path));
-            while (scanner.hasNextLine()){
+            while (scanner.hasNextLine()) {
                 json.append(scanner.nextLine());
             }
             scanner.close();

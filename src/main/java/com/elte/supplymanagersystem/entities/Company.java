@@ -57,6 +57,7 @@ public class Company {
 
     /**
      * Constructor for constructing Company object from DTO Object
+     *
      * @param companyDTO The DTO to construct from.
      */
     public Company(CompanyDTO companyDTO) {

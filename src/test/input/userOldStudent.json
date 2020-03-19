@@ -1,12 +1,12 @@
 {
-"id": 7,
-"username": "Old Student",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": false,
-"company": null,
-"workplace": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"role": "ROLE_MANAGER"
+  "id": 7,
+  "username": "Old Student",
+  "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+  "enabled": false,
+  "company": null,
+  "workplace": {
+    "id": 4,
+    "name": "ELTE-Soft Kft."
+  },
+  "role": "ROLE_MANAGER"
 }

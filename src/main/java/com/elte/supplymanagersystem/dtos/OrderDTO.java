@@ -36,6 +36,7 @@ public class OrderDTO {
 
     /**
      * Constructor for Order Data Transfer Object
+     *
      * @param order The Order object to construct the DTO of.
      */
     public OrderDTO(Order order) {

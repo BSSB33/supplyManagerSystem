@@ -13,6 +13,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.skyscreamer.jsonassert.Customization;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -100,5 +103,9 @@ public class TestUtils {
             e.printStackTrace();
         }
         return json.toString();
+    }
+
+    public CustomComparator getUserComparator(){
+        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true));
     }
 }

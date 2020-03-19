@@ -115,7 +115,24 @@ public class UserController {
     }
 
     /**
-     * Deletes a record by ID.
+     * Disables a User by ID.
+     * Calls disableUser method from UserService.
+     * Returns FORBIDDEN if the user is Invalid.
+     *
+     * @param id   The ID of the User to disable.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
+    @PutMapping("/{id}/disable")
+    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return userService.disableUser(id, loggedInUser);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Deletes a record by ID. - Deleting user is hard, it is recommended to Disable users! -
      * Calls deleteById method from UserService.
      * Returns FORBIDDEN if the user is Invalid.
      *

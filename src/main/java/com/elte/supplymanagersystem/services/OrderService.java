@@ -195,9 +195,20 @@ public class OrderService {
     }
 
     /**
+     * Checks if the Order has any relations to other objects.
+     * @param orderToDelete The Order to check
+     * @return boolean
+     */
+    //TODO: bovitesi lehetoseg, konkret hibat dobni, mi hol van még benne.
+    private boolean isDeletable(Order orderToDelete){
+        return orderToDelete.getHistories().isEmpty();
+    }
+
+    /**
      * Deletes an Order record by ID.
      * ADMIN: Can delete any Order without any regulations.
      * DIRECTOR, MANAGER:  Can only delete Order of the Company the user works at is a seller or a buyer in the Order.
+     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown.
      * ELSE: UNAUTHORIZED
      * Non existing Order: NOTFOUND
      *
@@ -210,13 +221,17 @@ public class OrderService {
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                orderRepository.deleteById(id);
-                return ResponseEntity.ok().build();
+                if(isDeletable(orderToDelete.get())){
+                    orderRepository.deleteById(id);
+                    return ResponseEntity.ok().build();
+                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToDelete.get().getId()) != null) {
-                    orderRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
+                    if(isDeletable(orderToDelete.get())){
+                        orderRepository.deleteById(id);
+                        return ResponseEntity.ok().build();
+                    } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
                 } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();

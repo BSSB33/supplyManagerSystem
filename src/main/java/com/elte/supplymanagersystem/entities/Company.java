@@ -37,19 +37,21 @@ public class Company {
     private String name;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "workplace", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workplace")//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<User> managers;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "company")//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<User> director;
 
-    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "buyer")//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> purchases;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "seller")//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> sales;
 

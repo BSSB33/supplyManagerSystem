@@ -101,7 +101,6 @@ public class UserService {
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
-            //userToUpdate.getCompany().setId(userToUpdate.getCompany().getId());
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
@@ -129,7 +128,7 @@ public class UserService {
      *
      * @param userDTO The user (Data Transfer Object) to register
      * @param loggedInUser   The user who wants to register a new User.
-     * @return Returns a ResponseEntity of the saved History.
+     * @return Returns a ResponseEntity of the saved User.
      */
     public ResponseEntity registerUser(UserDTO userDTO, User loggedInUser) {
         User userToRegister = new User(userDTO);
@@ -182,13 +181,51 @@ public class UserService {
     }
 
     /**
+     * Disables a User by ID.
+     * ADMIN: Can disable any Users without any regulations.
+     * DIRECTOR: Can disable only employees.
+     * ELSE: UNAUTHORIZED
+     * Non existing User: NOTFOUND
+     *
+     * @param id           The ID of the User the user wants to disable.
+     * @param loggedInUser The user logged in.
+     * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
+     */
+    public ResponseEntity disableUser(Integer id, User loggedInUser){
+        Optional<User> userToDisable = userRepository.findById(id);
+        if (userToDisable.isPresent()) {
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                userToDisable.get().setEnabled(false);
+                return ResponseEntity.ok(userRepository.save(userToDisable.get()));
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if (userToDisable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                    userToDisable.get().setEnabled(false);
+                    return ResponseEntity.ok(userRepository.save(userToDisable.get()));
+                } return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Checks if the user has any relations to other objects.
+     * @param userToDelete The user to check
+     * @return boolean
+     */
+    private boolean isDeletable(User userToDelete){
+        return userToDelete.getSellerManager().isEmpty()
+                && userToDelete.getBuyerManager().isEmpty()
+                && userToDelete.getHistories().isEmpty();
+    }
+
+    /**
      * Deletes User record by ID.
      * ADMIN: Can delete any Users without any regulations.
      * DIRECTOR: Can delete only employees.
      * ELSE: UNAUTHORIZED
-     * Non existing History: NOTFOUND
+     * If user has any Orders or History or Managers, then cannot be deleted: NOT_ACCEPTABLE is thrown.
+     * Non existing User: NOTFOUND
      *
-     * @param id           The ID of the History the user wants to DELETE.
+     * @param id           The ID of the User the user wants to DELETE.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
@@ -196,14 +233,17 @@ public class UserService {
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                userRepository.deleteById(id);
-                return ResponseEntity.ok().build();
-            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                if (userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                if(isDeletable(userToDelete.get())){
                     userRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                }
-                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if (userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                    if(isDeletable(userToDelete.get())) {
+                        userRepository.deleteById(id);
+                        return ResponseEntity.ok().build();
+                    } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                } return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         } else return ResponseEntity.notFound().build();
     }

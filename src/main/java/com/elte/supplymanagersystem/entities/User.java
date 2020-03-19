@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -49,11 +51,16 @@ public class User {
     @JoinColumn
     private Company company;
 
-    @OneToMany(mappedBy = "buyerManager", cascade = CascadeType.ALL)
+    //TODO rename fields
+    //TODO hibernate logs off
+    //TODO Optimise delete methods in services + commit + test run
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "buyerManager")
     @JsonIgnore
     private List<Order> buyerManager;
 
-    @OneToMany(mappedBy = "sellerManager", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "sellerManager")
     @JsonIgnore
     private List<Order> sellerManager;
 
@@ -65,7 +72,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "creator")
     @JsonIgnore
     private List<History> histories;
 

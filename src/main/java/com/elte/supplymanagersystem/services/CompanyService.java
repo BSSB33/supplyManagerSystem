@@ -2,6 +2,7 @@ package com.elte.supplymanagersystem.services;
 
 import com.elte.supplymanagersystem.dtos.CompanyDTO;
 import com.elte.supplymanagersystem.entities.Company;
+import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.CompanyRepository;
@@ -123,9 +124,20 @@ public class CompanyService {
     }
 
     /**
+     * Checks if the Company has any relations to other objects.
+     * @param companyToDelete The Company to check
+     * @return boolean
+     */
+    private boolean isDeletable(Company companyToDelete){
+        return companyToDelete.getManagers().isEmpty() && companyToDelete.getPurchases().isEmpty() &&
+                companyToDelete.getSales().isEmpty();
+    }
+
+    /**
      * Deletes a Company record by ID.
      * ADMIN: The only User who can delete a company.
      * NOT_ACCEPTABLE: If tries to delete Company with any Order, Manager.
+     * If the Company has Managers or Orders, then cannot be deleted: NOT_ACCEPTABLE is thrown.
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
@@ -138,8 +150,7 @@ public class CompanyService {
         Optional<Company> companyToDelete = companyRepository.findById(id);
         if (companyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (companyToDelete.get().getManagers().isEmpty() && companyToDelete.get().getPurchases().isEmpty() &&
-                        companyToDelete.get().getSales().isEmpty() && companyToDelete.get().getDirector().isEmpty()) {
+                if (isDeletable(companyToDelete.get())) {
                     companyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);

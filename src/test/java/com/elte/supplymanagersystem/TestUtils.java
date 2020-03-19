@@ -3,6 +3,7 @@ package com.elte.supplymanagersystem;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -15,25 +16,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class TestUtils {
-
-    public String balazsJSON = "{" +
-            "id: 2," +
-            "\"username\": \"Balazs\",\n" +
-            "\"password\": \"$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..\",\n" +
-            "\"enabled\": true,\n" +
-            "\"company\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"workplace\": {\n" +
-            "\"id\": 1,\n" +
-            "\"name\": \"TelnetWork Kft.\"\n" +
-            "},\n" +
-            "\"role\": \"ROLE_DIRECTOR\"\n" +
-            "}";
 
     static final Logger logger = Logger.getLogger(TestUtils.class);
     static final String apiURL = "http://localhost:8080/";
@@ -55,15 +44,13 @@ public class TestUtils {
         return client.execute(httpGet);
     }
 
-    public CloseableHttpResponse sendPostRequest(String endpoint, String credentials) throws IOException {
+    public CloseableHttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
         logRequest(endpoint, credentials, "POST");
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(apiURL + endpoint);
 
-
-
-        StringEntity entity = new StringEntity(balazsJSON);
+        StringEntity entity = new StringEntity(JSONToPost);
         httpPost.setEntity(entity);
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-type", "application/json");
@@ -72,9 +59,26 @@ public class TestUtils {
         return client.execute(httpPost);
     }
 
+    public CloseableHttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
+        logRequest(endpoint, credentials, "DELETE");
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpDelete httpDelete = new HttpDelete(apiURL + endpoint);
+
+        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+        httpDelete.setHeader("Authorization", "Basic " + encodedCredentials);
+
+        return client.execute(httpDelete);
+    }
+
     public JSONArray getJsonArray(CloseableHttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
-        return new JSONArray(json);
+        return new JSONArray(json);//TODO BROKEN?
+    }
+
+    public JSONObject getJsonObject(CloseableHttpResponse httpResponse) throws IOException, JSONException {
+        String json = EntityUtils.toString(httpResponse.getEntity());
+        return new JSONObject(json);
     }
 
     public JSONObject getJsonObject(CloseableHttpResponse httpResponse, Integer id) throws IOException, JSONException {
@@ -82,8 +86,22 @@ public class TestUtils {
         return new JSONArray(json).getJSONObject(id);
     }
 
-    public String getJSONField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+    public String getJsonField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id).getString(field);
+    }
+
+    public String getContentOfFile(String path){
+        StringBuilder json = new StringBuilder();
+        try{
+            Scanner scanner = new Scanner(new FileReader(path));
+            while (scanner.hasNextLine()){
+                json.append(scanner.nextLine());
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return json.toString();
     }
 }

@@ -13,6 +13,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.skyscreamer.jsonassert.Customization;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,7 +29,7 @@ public class TestUtils {
 
     private void logRequest(String endpoint, String credentials, String typeOfRequest) {
         String loggedInUser = credentials.split(":")[0];
-        logger.debug("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
+        logger.info("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
     public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
@@ -100,5 +103,9 @@ public class TestUtils {
             e.printStackTrace();
         }
         return json.toString();
+    }
+
+    public CustomComparator getUserComparator(){
+        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true));
     }
 }

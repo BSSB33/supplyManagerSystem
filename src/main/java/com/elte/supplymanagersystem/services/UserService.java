@@ -196,6 +196,31 @@ public class UserService {
     }
 
     /**
+     * Enables a User by ID.
+     * ADMIN: Can enable any Users without any regulations.
+     * DIRECTOR: Can enable only employees.
+     * ELSE: FORBIDDEN
+     * Non existing User: NOTFOUND
+     *
+     * @param id           The ID of the User the user wants to enable.
+     * @param loggedInUser The user logged in.
+     * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
+     */
+    public ResponseEntity enableUser(Integer id, User loggedInUser) {
+        Optional<User> userToEnable = userRepository.findById(id);
+        if (userToEnable.isPresent()) {
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                userToEnable.get().setEnabled(true);
+                return ResponseEntity.ok(userRepository.save(userToEnable.get()));
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
+                    && userToEnable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                userToEnable.get().setEnabled(true);
+                return ResponseEntity.ok(userRepository.save(userToEnable.get()));
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Disables a User by ID.
      * ADMIN: Can disable any Users without any regulations.
      * DIRECTOR: Can disable only employees.

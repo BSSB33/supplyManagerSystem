@@ -1,10 +1,7 @@
 package com.elte.supplymanagersystem;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -59,6 +56,21 @@ public class TestUtils {
         return client.execute(httpPost);
     }
 
+    public CloseableHttpResponse sendPutRequest(String endpoint, String credentials, String JSONToPut) throws IOException {
+        logRequest(endpoint, credentials, "PUT");
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(apiURL + endpoint);
+
+        StringEntity entity = new StringEntity(JSONToPut);
+        httpPut.setEntity(entity);
+        httpPut.setHeader("Accept", "application/json");
+        httpPut.setHeader("Content-type", "application/json");
+        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+        httpPut.setHeader("Authorization", "Basic " + encodedCredentials);
+        return client.execute(httpPut);
+    }
+
     public CloseableHttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "DELETE");
 
@@ -73,7 +85,7 @@ public class TestUtils {
 
     public JSONArray getJsonArray(CloseableHttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
-        return new JSONArray(json);//TODO BROKEN?
+        return new JSONArray(json);
     }
 
     public JSONObject getJsonObject(CloseableHttpResponse httpResponse) throws IOException, JSONException {
@@ -81,12 +93,17 @@ public class TestUtils {
         return new JSONObject(json);
     }
 
-    public JSONObject getJsonObject(CloseableHttpResponse httpResponse, Integer id) throws IOException, JSONException {
+    public JSONObject getJsonArrayObject(CloseableHttpResponse httpResponse, Integer id) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id);
     }
 
-    public String getJsonField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+    public String getJsonObjectField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+        String json = EntityUtils.toString(httpResponse.getEntity());
+        return new JSONObject(json).getString(field);
+    }
+
+    public String getJsonArrayField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id).getString(field);
     }

@@ -89,7 +89,6 @@ class UserControllerTest {
         assertEqualJSONUserToJSONObject(getRequest2, "userBalazs.json");
         assertEqualJSONUserToJSONObject(getRequest3, "userJudit.json");
         assertEqualJSONUserToJSONObject(getRequest4, "userEmma.json");
-
     }
 
     @Test
@@ -116,7 +115,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
         CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
 
@@ -136,14 +135,14 @@ class UserControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/2", "invalidUser:password");
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenUnauthorizedShouldBeThrown() throws IOException, JSONException {
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenUnauthorizedShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/20", "invalidUser:password");
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
@@ -155,9 +154,7 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
-
-
-
+    //Delete Endpoint
     @Test
     void givenAdminUser_whenDeleteEndpointIsCalled_thenUserShouldBeDeleted() throws IOException {
         //Adds user
@@ -169,6 +166,135 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
     }
 
+    @Test
+    void givenAdminUser_whenDeleteEndpointIsCalled_toDeleteANotDeletableUser_thenNotAcceptableShouldBeThrown() throws IOException {
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/2", "Gabor:password");
+        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnEmployeeUser_thenNotAcceptableShouldBeThrown() throws IOException {
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/5", "Balazs:password");
+        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnNonEmployeeUser_thenForbiddenShouldBeThrown() throws IOException {
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/3", "Balazs:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, deleteRequest.getStatusLine().getStatusCode());
+    }
+
+    //Disable Endpoint
+    @Test
+    void givenAdminUser_whenDisableEndpointIsCalled_toDisableAUser_thenTheUserShouldBeDisabled() throws IOException, JSONException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/3/disable", "Gabor:password", "");
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        assertEquals("false", testUtils.getJsonObjectField(putRequest, 3, "enabled"));
+        testUtils.sendPutRequest("users/3/enable", "Gabor:password", "");
+    }
+
+    @Test
+    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableAnEmployeeUser_thenTheUserShouldBeDisabled() throws IOException, JSONException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/5/disable", "Balazs:password", "");
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        assertEquals("false", testUtils.getJsonObjectField(putRequest, 5, "enabled"));
+        testUtils.sendPutRequest("users/5/enable", "Balazs:password", "");
+    }
+
+    @Test
+    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/4/disable", "Balazs:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenDisableEndpointIsCalled_toDisableAnColleagueUser_thenTheUserShouldNotBeDisabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2/disable", "Emma:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/6/disable", "Emma:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    //Enable Endpoint
+    @Test
+    void givenAdminUser_whenEnableEndpointIsCalled_toEnableAUser_thenTheUserShouldBeEnabled() throws IOException, JSONException {
+        //Prepare
+        testUtils.sendPutRequest("users/3/disable", "Gabor:password", "");
+        //Execute
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/3/enable", "Gabor:password", "");
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        assertEquals("true", testUtils.getJsonObjectField(putRequest, 3, "enabled"));
+    }
+
+    @Test
+    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableAnEmployeeUser_thenTheUserShouldBeDEnabled() throws IOException, JSONException {
+        //Prepare
+        testUtils.sendPutRequest("users/5/disable", "Balazs:password", "");
+        //Execute
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/5/enable", "Balazs:password", "");
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        assertEquals("true", testUtils.getJsonObjectField(putRequest, 5, "enabled"));
+    }
+
+    @Test
+    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws IOException {
+        //Execute
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/4/enable", "Balazs:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableABossUser_thenTheUserShouldNotBeEnabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2/enable", "Emma:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableAColleagueUser_thenTheUserShouldNotBeEnabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2/enable", "Emma:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/6/enable", "Emma:password", "");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    //Get Unassigned Directors Endpoint
+    @Test
+    void givenAdminUser_whenGetUnassignedDirectorsEndpointIsCalled_thenTheUsersShouldBeReturned() throws IOException, JSONException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/freeDirectors", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONUserArrayToJSONArray(getRequest, "nonDirectorUsers.json");
+    }
+
+    @Test
+    void givenNonAdminUser_whenGetUnassignedDirectorsEndpointIsCalled_thenTheUsersShouldNotBeReturned() throws IOException {
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/freeDirectors", "Balazs:password");
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/freeDirectors", "Emma:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
+    }
+
+    //Login Endpoint
+    @Test
+    void givenUser_whenLoginEndpointIsCalled_thenOkShouldBeReturned() throws IOException {
+        CloseableHttpResponse postRequest1 = testUtils.sendPostRequest("users/login", "Gabor:password", "");
+        CloseableHttpResponse postRequest2 = testUtils.sendPostRequest("users/login", "Balazs:password", "");
+        CloseableHttpResponse postRequest3 = testUtils.sendPostRequest("users/login", "Judit:password", "");
+        CloseableHttpResponse postRequest4 = testUtils.sendPostRequest("users/login", "Emma:password", "");
+        assertEquals(HttpStatus.SC_OK, postRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, postRequest2.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, postRequest3.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, postRequest4.getStatusLine().getStatusCode());
+    }
+
+    //Register Endpoint
     @Test
     void givenAdminUser_whenRegisterEndpointIsCalled_withManagerUserToRegister_thenUserShouldBeRegistered() throws IOException, JSONException {
         CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
@@ -202,5 +328,8 @@ class UserControllerTest {
                 testUtils.getContentOfFile(userJSONPath + "userBalazs.json"));
         assertEquals(HttpStatus.SC_BAD_REQUEST, postRequest.getStatusLine().getStatusCode());
     }
+
+    //TODO PUT USER - DELETE AFTER PUT
+    //TODO outscore assert methods
 
 }

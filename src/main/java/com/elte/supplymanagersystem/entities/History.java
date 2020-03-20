@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class History {
+public class History { //TODO Agi method: upon history queries only the names should be returned in the Response Entity
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

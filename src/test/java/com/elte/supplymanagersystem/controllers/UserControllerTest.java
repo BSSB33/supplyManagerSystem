@@ -1,4 +1,4 @@
-package com.elte.supplymanagersystem.controllerTests;
+package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.TestUtils;
 import org.apache.http.HttpStatus;
@@ -407,7 +407,7 @@ class UserControllerTest {
         CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("users/5", "Balazs:password", employee.toString());
         assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
     }
-    //TODO findWhereToPutBackTTManager
+
     @Test
     void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws IOException, JSONException {
         //Get Director
@@ -514,6 +514,4 @@ class UserControllerTest {
         CloseableHttpResponse deleteRequest2 = testUtils.sendDeleteRequest("users/6", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, deleteRequest2.getStatusLine().getStatusCode());
     }
-
-
 }

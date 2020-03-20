@@ -209,7 +209,7 @@ public class OrderService {
      * Deletes an Order record by ID.
      * ADMIN: Can delete any Order without any regulations.
      * DIRECTOR, MANAGER:  Can only delete Order of the Company the user works at is a seller or a buyer in the Order.
-     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown.
+     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown, and the connected Histories returned.
      * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
@@ -225,7 +225,7 @@ public class OrderService {
                 if (isDeletable(orderToDelete.get())) {
                     orderRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.get().getHistories());
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -248,7 +248,7 @@ public class OrderService {
             if (isDeletable(orderToDelete)) {
                 orderRepository.deleteById(id);
                 return ResponseEntity.ok().build();
-            } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.getHistories());
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

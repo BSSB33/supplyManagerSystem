@@ -1,4 +1,4 @@
-package com.elte.supplymanagersystem.httpstatustests;
+package com.elte.supplymanagersystem.controllerTests;
 
 import com.elte.supplymanagersystem.TestUtils;
 import org.apache.http.HttpStatus;
@@ -8,10 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
 import java.io.IOException;
 
@@ -36,6 +33,7 @@ class UserControllerTest {
                 testUtils.getUserComparator());
     }
 
+    //Get All Endpoint
     @Test
     void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Gabor:password");
@@ -75,6 +73,7 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
+    //Get By Id Endpoint
     @Test
     void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Gabor:password");
@@ -117,6 +116,15 @@ class UserControllerTest {
     }
 
     @Test
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
+
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
+    }
+
+    @Test
     void givenManagerUser_whenGetByIdEndpointIsCalledForColleague_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Emma:password");
         CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/4", "TTManager:password");
@@ -125,15 +133,6 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
         assertEqualJSONUserToJSONObject(getRequest1, "userBalazs.json");
         assertEqualJSONUserToJSONObject(getRequest2, "userGyuri.json");
-    }
-
-    @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException, JSONException {
-        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
-        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
-
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
     }
 
     @Test
@@ -150,6 +149,11 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
+    @Test
+    void givenDisabledUser_whenGetByIdEndpointIsCalled_thenFOShouldBeThrown() throws IOException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/2", "Old Student:password");
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    }
 
 
 

@@ -25,7 +25,7 @@ public class CompanyService {
     /**
      * Returns All the Companies in the Database.
      * ADMIN, DIRECTOR, MANAGER: Can get ALL the Users.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the list of the Companies.
@@ -33,13 +33,13 @@ public class CompanyService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
             return ResponseEntity.ok(companyRepository.findAll());
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Returns the Company with the requested ID.
      * ADMIN, DIRECTOR, MANAGER: Can get any the Users.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing Company: NOTFOUND
      *
      * @param loggedInUser The user logged in
@@ -51,14 +51,14 @@ public class CompanyService {
         if (companyToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
                 return ResponseEntity.ok(companyToGet.get());
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Returns a ResponseEntity with the Company the User works at.
      * ADMIN, DIRECTOR, MANAGER: Can get the Company.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user logged in
      * @return Returns a ResponseEntity with the Company the User works at.
@@ -66,14 +66,14 @@ public class CompanyService {
     public ResponseEntity getCompanyOfLoggedInUser(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
             return ResponseEntity.ok(loggedInUser.getWorkplace());
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Updates the Company by ID.
      * ADMIN: Can save any of the Company.
      * DIRECTOR: Only can update its Company, else: FORBIDDEN
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing Company: NOTFOUND
      *
      * @param companyDTO   The Company Data Transfer Object with the information to update.
@@ -91,19 +91,18 @@ public class CompanyService {
             } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if (loggedInUser.getCompany().getId().equals(companyToUpdate.getId())) {
                     Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
-                    if (originalDirector.isPresent()) {
+                    if (originalDirector.isPresent())
                         companyToUpdate.setDirector(originalDirector.get().getDirector());
-                        return ResponseEntity.ok(companyRepository.save(companyToUpdate));
-                    } else return ResponseEntity.ok(companyRepository.save(companyToUpdate));
+                    return ResponseEntity.ok(companyRepository.save(companyToUpdate));
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Creates a new record of Company.
      * ADMIN: The only User who can register a company
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param companyDTO   The Company Data Transfer Object with the information to save.
      * @param loggedInUser The user logged in.
@@ -118,7 +117,7 @@ public class CompanyService {
         else {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(companyRepository.save(companyToSave));
-            else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            else return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -154,7 +153,7 @@ public class CompanyService {
                     companyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 }

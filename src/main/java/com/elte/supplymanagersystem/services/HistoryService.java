@@ -31,7 +31,7 @@ public class HistoryService {
     /**
      * Returns All the Histories in the Database depending on the Role of the User.
      * ADMIN: Can get ALL the Users.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the list of Histories.
@@ -39,7 +39,7 @@ public class HistoryService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
-        else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -49,7 +49,7 @@ public class HistoryService {
      * ADMIN: Can get ALL
      * DIRECTOR, MANAGER: Can get Data if works in the same company as the Creator of the history,
      * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing History: NOTFOUND
      *
      * @param loggedInUser The user logged in
@@ -65,8 +65,8 @@ public class HistoryService {
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToGet.get())) {
                     return ResponseEntity.ok(historyToGet.get());
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -75,7 +75,7 @@ public class HistoryService {
      * ADMIN: Can save any of the Histories.
      * DIRECTOR, MANAGER: Only can update data if the user works in the same company as the Creator of the history,
      * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing History: NOTFOUND
      *
      * @param historyDTO   The history Data Transfer Object with the information to update.
@@ -94,8 +94,8 @@ public class HistoryService {
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToUpdate)) {
                     return ResponseEntity.ok(historyRepository.save(historyToUpdate));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -104,7 +104,7 @@ public class HistoryService {
      * ADMIN: Can add new Histories without any regulations.
      * DIRECTOR, MANAGER: Only can add History if the user works in the same company as the Creator of the history,
      * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param historyDTO   The history Data Transfer Object with the information to save.
      * @param loggedInUser The user logged in.
@@ -119,8 +119,8 @@ public class HistoryService {
             Order orderToGet = historyToSave.getOrder();
             if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToSave)) {
                 return ResponseEntity.ok(historyRepository.save(historyToSave));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -128,7 +128,7 @@ public class HistoryService {
      * ADMIN: Can delete any Histories without any regulations.
      * DIRECTOR, MANAGER: Only can delete History if the user works in the same company as the Creator of the history,
      * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing History: NOTFOUND
      *
      * @param id           The ID of the History the user wants to DELETE.
@@ -147,8 +147,8 @@ public class HistoryService {
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToDelete.get())) {
                     historyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 

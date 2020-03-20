@@ -27,7 +27,7 @@ public class HistoryController {
     /**
      * Returns all the Histories from HistoryService based on the Role of the logged in User.
      * Calls getAll method from HistoryService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Histories in the Database.
@@ -37,14 +37,14 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
 
     /**
      * Returns the History with the given ID from HistoryService based on the Role of the logged in User.
      * Calls getById method from HistoryService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the History to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -55,13 +55,13 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Updates a History by ID based on User Role.
      * Calls putById method from HistoryService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param historyDTO The History Data Transfer Object with the updated information.
      * @param id         The ID of the History to update.
@@ -74,13 +74,13 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.putById(historyDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Creates a new record of History.
      * Calls addHistory method from HistoryService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param historyDTO The History Data Transfer Object with the information to save.
      * @param auth       Authentication parameter for Security in order to get the User who logged in.
@@ -92,13 +92,13 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.addHistory(historyDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Deletes a record by ID.
      * Calls deleteById method from HistoryService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the History to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -110,7 +110,7 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
 }

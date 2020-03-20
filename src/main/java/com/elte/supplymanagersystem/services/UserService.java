@@ -4,6 +4,7 @@ import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.UserRepository;
+import com.sun.istack.Nullable;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserService {
      * ADMIN: Can get ALL the Users.
      * DIRECTOR: Can get only the Employees of his company.
      * MANAGER: Can get only his Colleagues.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the list of Users.
@@ -43,14 +44,14 @@ public class UserService {
             return ResponseEntity.ok(getEmployeesOfUser(loggedInUser));
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
             return ResponseEntity.ok(getColleaguesOfUser(loggedInUser));
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Returns the User with the Requested ID.
      * ADMIN: Can get ALL the Users.
      * DIRECTOR, MANAGER: Can only get colleagues and itself.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @param id           The ID of the User to GET.
@@ -66,15 +67,15 @@ public class UserService {
                     return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Returns Users who are not directors of any Companies.
      * ADMIN: Can get all.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the requested Users
@@ -82,7 +83,7 @@ public class UserService {
     public ResponseEntity getUnassignedDirectors(User loggedInUser) {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -90,6 +91,7 @@ public class UserService {
      * ADMIN: Can Update all the users.
      * DIRECTOR: Can only Update itself and Employees.
      * MANAGER: Can only Update itself.
+     * ELSE: FORBIDDEN
      *
      * @param userDTO      The user Data Transfer Object with the updated information.
      * @param loggedInUser The user who logged in.
@@ -109,13 +111,14 @@ public class UserService {
                 return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Helper method for putById(...)
      * In case a Director wants to PUT an order these checks needed to be conducted.
+     * Throws FORBIDDEN if doesn't have permission to do so.
      *
      * @param userToUpdate The User with te updated information.
      * @param loggedInUser The user who logged in.
@@ -128,14 +131,14 @@ public class UserService {
             if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
                 userToUpdate.setWorkplace(userToUpdate.getCompany());
             return ResponseEntity.ok(userRepository.save(userToUpdate));
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Registers a new user to the Database.
      * ADMIN: Can register any Users with any role.
      * DIRECTOR: Can only register employees to his company.
-     * MANAGER: UNAUTHORIZED
+     * MANAGER: FORBIDDEN
      * Already existing User: BAD REQUEST
      * Non existing User: NOTFOUND
      *
@@ -162,7 +165,7 @@ public class UserService {
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToRegister));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED); //Manager
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN); //Manager
         }
     }
 
@@ -196,7 +199,7 @@ public class UserService {
      * Disables a User by ID.
      * ADMIN: Can disable any Users without any regulations.
      * DIRECTOR: Can disable only employees.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing User: NOTFOUND
      *
      * @param id           The ID of the User the user wants to disable.
@@ -213,7 +216,7 @@ public class UserService {
                     && userToDisable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
                 userToDisable.get().setEnabled(false);
                 return ResponseEntity.ok(userRepository.save(userToDisable.get()));
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -233,7 +236,7 @@ public class UserService {
      * Deletes User record by ID.
      * ADMIN: Can delete any Users without any regulations.
      * DIRECTOR: Can delete only employees.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * If user has any Orders or History or Managers, then cannot be deleted: NOT_ACCEPTABLE is thrown.
      * Non existing User: NOTFOUND
      *
@@ -255,7 +258,7 @@ public class UserService {
                     userRepository.deleteById(id);
                     return ResponseEntity.ok().build();
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -266,12 +269,13 @@ public class UserService {
      * @return Returns a Valid user
      */
     public User getValidUser(String username) {
+        @Nullable
         User loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser != null && loggedInUser.isEnabled()) {
             logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
             return loggedInUser;
         }
-        return null; //throws FORBIDDEN
+        return null; //throws UNAUTHORIZED
     }
 
     /**

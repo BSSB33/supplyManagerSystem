@@ -29,7 +29,7 @@ public class UserController {
     /**
      * Returns all the Users from UserService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Users in the Database.
@@ -40,13 +40,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns User by ID if the User is valid.
      * Calls getById method from OrderService.
-     * Returns FORBIDDEN if the User is Invalid.
+     * Returns UNAUTHORIZED if the User is Invalid.
      *
      * @param id   The ID of the User to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -58,13 +58,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns Users who are not directors.
      * Calls getUnassignedDirectors method from OrderService.
-     * Returns FORBIDDEN if the User is Invalid.
+     * Returns UNAUTHORIZED if the User is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the requested Users
@@ -75,13 +75,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getUnassignedDirectors(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Updates a User by ID.
      * Calls putById method from UserService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param userDTO The user Data Transfer Object with the updated information.
      * @param id      The ID of the User to update.
@@ -94,13 +94,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.putById(userDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Creates a new record of User.
      * Calls registerUser method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param userDTO The User Data Transfer Object with the information to save.
      * @param auth    Authentication parameter for Security in order to get the User who logged in.
@@ -111,13 +111,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.registerUser(userDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Disables a User by ID.
      * Calls disableUser method from UserService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the User to disable.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -128,13 +128,13 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.disableUser(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Deletes a record by ID. - Deleting user is hard, it is recommended to Disable users! -
      * Calls deleteById method from UserService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the User to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -146,7 +146,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**

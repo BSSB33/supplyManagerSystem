@@ -32,7 +32,7 @@ public class OrderService {
     /**
      * Only ADMINS have the right to get all the Orders.
      * ADMIN: Can get ALL the Orders.
-     * MANAGER, DIRECTOR, ELSE: UNAUTHORIZED
+     * MANAGER, DIRECTOR, ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns A ResponseEntity with All the Orders based on the Role of the User who logged in.
@@ -40,14 +40,14 @@ public class OrderService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(orderRepository.findAll());
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Returns the Order by ID.
      * ADMIN: Can get All the Orders.
      * DIRECTOR, MANAGER: Get orders if issued by, or for the company the user works at.
-     * ELSE - UNAUTHORIZED
+     * ELSE - FORBIDDEN
      * Non existing ID - NOT FOUND
      *
      * @param loggedInUser The user who logged in.
@@ -63,8 +63,8 @@ public class OrderService {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -75,7 +75,7 @@ public class OrderService {
      * ADMIN: Can get ALL
      * DIRECTOR, MANAGER: Can get Data if works in the same company as the Creator of the history,
      * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
      * @param loggedInUser The user who logged in.
@@ -95,15 +95,15 @@ public class OrderService {
                             history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
                             forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Returns the Sales of the Company the user works at.
      * ADMIN, DIRECTOR, MANAGER: Get orders if issued by, or for the company the user works at (even admins)
-     * ELSE - UNAUTHORIZED
+     * ELSE - FORBIDDEN
      * ID NOT FOUND - NOT FOUND
      * Unemployed user - BAD REQUEST
      *
@@ -116,13 +116,13 @@ public class OrderService {
                 List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Returns the Purchases of the Company the user works at.
      * ADMIN, DIRECTOR, MANAGER: Get orders if issued by, or for the company the user works at (even admins)
-     * ELSE - UNAUTHORIZED
+     * ELSE - FORBIDDEN
      * ID NOT FOUND - NOT FOUND
      * Unemployed user - BAD REQUEST
      *
@@ -135,14 +135,14 @@ public class OrderService {
                 List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
      * Updates the Order by ID.
      * ADMIN: Can save any of the Order.
      * DIRECTOR, MANAGER: Update Order if issued by, or for the company the user works at.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
      * @param orderDTO     The Order Data Transfer Object with the information to update.
@@ -161,8 +161,8 @@ public class OrderService {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToUpdate.getId()) != null) {
                     return ResponseEntity.ok(orderRepository.save(orderToUpdate));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -170,7 +170,7 @@ public class OrderService {
      * Creates a new record of Order.
      * ADMIN: Can add new Order without any regulations.
      * DIRECTOR, MANAGER: Can only add Order of the Company the user works at is a seller or a buyer in the Order.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Already existing Order: BAD REQUEST
      *
      * @param orderDTO     The Order Data Transfer Object with the information to save.
@@ -189,8 +189,8 @@ public class OrderService {
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 if (orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())) {
                     return ResponseEntity.ok(orderRepository.save(orderToSave));
-                } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -210,7 +210,7 @@ public class OrderService {
      * ADMIN: Can delete any Order without any regulations.
      * DIRECTOR, MANAGER:  Can only delete Order of the Company the user works at is a seller or a buyer in the Order.
      * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown.
-     * ELSE: UNAUTHORIZED
+     * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
      * @param id           The ID of the Company the user wants to DELETE.
@@ -228,13 +228,14 @@ public class OrderService {
                 } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
-            } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
     /**
      * Helper method for deleteById(...)
      * In case a user wants to delete an order these checks needed to be conducted.
+     * Throws FORBIDDEN if the user doesn't have permission to delete the specific Order
      *
      * @param id            The ID of the Company the user wants to DELETE.
      * @param loggedInUser  The user logged in.
@@ -248,7 +249,7 @@ public class OrderService {
                 orderRepository.deleteById(id);
                 return ResponseEntity.ok().build();
             } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**

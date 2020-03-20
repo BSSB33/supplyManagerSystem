@@ -27,7 +27,7 @@ public class CompanyController {
     /**
      * Returns all the Companies from CompanyService based on the Role of the logged in User.
      * Calls getAll method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Companies in the Database.
@@ -37,13 +37,13 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns the Company with the given ID from CompanyService based on the Role of the logged in User.
      * Calls getById method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the Company to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -54,13 +54,13 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns the Workplace of the logged in User with the help of CompanyService.
      * Calls getCompanyOfLoggedInUser method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the Company of the user who logged in.
@@ -70,13 +70,13 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getCompanyOfLoggedInUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Updates a Company by ID based on User Role.
      * Calls putById method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param companyDTO The Company with the updated information.
      * @param id         The ID of the Company to update.
@@ -89,13 +89,13 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.putById(companyDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Creates a new record of Company.
      * Calls addCompany method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param companyDTO The company with the information to save.
      * @param auth       Authentication parameter for Security in order to get the User who logged in.
@@ -107,13 +107,13 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.addCompany(companyDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Deletes a record by ID.
      * Calls deleteById method from CompanyService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the Company to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -125,6 +125,6 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }

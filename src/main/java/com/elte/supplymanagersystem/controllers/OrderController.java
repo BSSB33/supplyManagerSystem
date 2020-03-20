@@ -27,7 +27,7 @@ public class OrderController {
     /**
      * Returns all the Orders from OrderService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with All the Orders in the Database.
@@ -37,13 +37,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns the Order with the given ID from OrderService based on the Role of the logged in User.
      * Calls getById method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the Order to get.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -54,13 +54,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns with the Histories of an order from OrderService based on the Role of the logged in User.
      * Calls getHistoriesByOrderId method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the Order to get the Histories of.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -71,13 +71,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns Company Orders where the Company is a Seller based on the Workplace of the User who logged in.
      * Calls getSalesByUser method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of Orders.
@@ -87,13 +87,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getSalesByUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Returns Company Orders where the Company is a Seller based on the Workplace of the User who logged in.
      * Calls getPurchasesByUser method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity of Orders.
@@ -103,13 +103,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getPurchasesByUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Updates an Order by ID based on User Role.
      * Calls putById method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param orderDTO The order Data Transfer Object with the updated information.
      * @param id       The ID of the Order to update.
@@ -122,13 +122,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.putById(orderDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Creates a new record of Order.
      * Calls addOrder method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param orderDTO The order Data Transfer Object with the information to save.
      * @param auth     Authentication parameter for Security in order to get the User who logged in.
@@ -140,13 +140,13 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.addOrder(orderDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Deletes a record by ID.
      * Calls deleteById method from OrderService.
-     * Returns FORBIDDEN if the user is Invalid.
+     * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param id   The ID of the Order to delete.
      * @param auth Authentication parameter for Security in order to get the User who logged in.
@@ -158,6 +158,6 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }

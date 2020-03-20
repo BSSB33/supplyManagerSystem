@@ -104,7 +104,7 @@ public class UserService {
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() != null)
+                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {

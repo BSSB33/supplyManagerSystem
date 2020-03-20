@@ -69,7 +69,6 @@ public class UserController {
      * @param auth Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the requested Users
      */
-    //Get Unassigned Directors
     @GetMapping("/freeDirectors")
     public ResponseEntity getUnassignedDirectors(Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());

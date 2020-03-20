@@ -3,12 +3,17 @@ package com.elte.supplymanagersystem.controllerTests;
 import com.elte.supplymanagersystem.TestUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
 
@@ -18,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserControllerTest {
 
     final static String userJSONPath = "src/test/input/users/";
-    private TestUtils testUtils = new TestUtils();
+    private static TestUtils testUtils = new TestUtils();
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     private void assertEqualJSONUserToJSONObject(CloseableHttpResponse request, String expectedJSONPath) throws IOException, JSONException {
@@ -329,7 +336,184 @@ class UserControllerTest {
         assertEquals(HttpStatus.SC_BAD_REQUEST, postRequest.getStatusLine().getStatusCode());
     }
 
-    //TODO PUT USER - DELETE AFTER PUT
-    //TODO outscore assert methods
+    //Put By ID Endpoint
+    @Test
+    void givenAnyUser_whenPutByIdEndpointIsCalled_withNonExistingUser_thenNotFoundShouldBeThrown() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/20", "Emma:password", "{\"id\":20}");
+        assertEquals(HttpStatus.SC_NOT_FOUND, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenAnyUser_whenPutByIdEndpointIsCalled_withEmptyUserBodey_thenBadRequestShouldBeThrown() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/20", "Emma:password", "");
+        assertEquals(HttpStatus.SC_BAD_REQUEST, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenAdminUser_whenPutByIdEndpointIsCalled_thenTheRequestedUserShouldBeUpdated() throws IOException, JSONException {
+        //Getting User by ID
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/3", "Gabor:password");
+        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
+        jsonObject.put("username", "Judit2");
+        //Execute
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/3", "Gabor:password", jsonObject.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        //Check
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/3", "Gabor:password");
+        String nameOfUser = testUtils.getJsonObject(getRequest2).getString("username");
+        assertEquals("Judit2", nameOfUser);
+        //Restore
+        jsonObject.put("username", "Judit");
+        CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("users/3", "Gabor:password", jsonObject.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenAdminUser_whenPutByIdEndpointIsCalled_withADirectorWithoutWorkplace_thenTheRequestedUserShouldBeUpdatedAndCompanyShouldAppearAtWorkplaceField() throws IOException, JSONException {
+        //Getting User by ID
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
+        jsonObject.put("workplace", null);
+        //Execute
+        System.out.println(jsonObject.toString());
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2", "Gabor:password", jsonObject.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        String workplaceOfUser = testUtils.getJsonObject(getRequest2).getString("workplace");
+        JSONAssert.assertEquals("{\"id\": 1,\"name\": \"TelnetWork Kft.\"}", workplaceOfUser, JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAnEmployeeFromItsCompany_thenTheRequestedUserShouldBeUpdated() throws IOException, JSONException {
+        //Get Employee
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/5", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        JSONObject employee = testUtils.getJsonObject(getRequest1);
+        employee.put("username", "Employee");
+        //Rename Employee
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/5", "Balazs:password", employee.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        //GetEmployee again
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/5", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
+        assertEquals("Employee", modifiedEmployee.getString("username"));
+
+        //Restore original Object
+        employee.put("username", "Emma");
+        CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("users/5", "Balazs:password", employee.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    }
+    //TODO findWhereToPutBackTTManager
+    @Test
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws IOException, JSONException {
+        //Get Director
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        JSONObject director = testUtils.getJsonObject(getRequest1);;
+        director.put("username", "Balazs2");
+        //Rename Director
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2", "Balazs:password", director.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        //GetDirector again
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Balazs2:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
+        assertEquals("Balazs2", modifiedEmployee.getString("username"));
+        //Restore original Object
+        director.put("username", "Balazs");
+        CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("users/2", "Balazs2:password", director.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAManagerWhoWorksSomeWhereElse_thenForbiddenShouldBeThrown() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/6", "Balazs:password", "{\"username\":\"OtherWorker\"}");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws IOException, JSONException {
+        //Get Director
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/5", "Emma:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        JSONObject director = testUtils.getJsonObject(getRequest1);;
+        director.put("username", "Emma2");
+        //Rename Director
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/5", "Emma:password", director.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        //GetDirector again
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/5", "Emma2:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
+        assertEquals("Emma2", modifiedEmployee.getString("username"));
+        //Restore original Object
+        director.put("username", "Emma");
+        CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("users/5", "Emma2:password", director.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyColleague_thenForbiddenShouldBeThrown() throws IOException {
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/2", "Emma:password", "{\"username\":\"OtherWorker\"}");
+        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    @AfterAll
+    static void givenAdminUser_whenPutByIdEndpointIsCalled_withAUserConnectedWithOtherObjects_afterRemovingConnections_thenTheRequestedUserShouldBeDeleted() throws IOException, JSONException {
+        //Get User by ID
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/6", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
+        //Try To Delete
+        CloseableHttpResponse deleteRequest = testUtils.sendDeleteRequest("users/6", "Gabor:password");
+        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
+        //Remove all connections from user side
+        jsonObject.put("workplace", null);
+        CloseableHttpResponse putRequest = testUtils.sendPutRequest("users/6", "Gabor:password", jsonObject.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
+        //Get Histories
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("histories/9", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        JSONObject history1 = testUtils.getJsonObject(getRequest2);
+        history1.put("creator", null);
+        CloseableHttpResponse getRequest3 = testUtils.sendGetRequest("histories/5", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        JSONObject history2 = testUtils.getJsonObject(getRequest3);
+        history2.put("creator", null);
+        CloseableHttpResponse getRequest4 = testUtils.sendGetRequest("histories/4", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest4.getStatusLine().getStatusCode());
+        JSONObject history3 = testUtils.getJsonObject(getRequest4);
+        history3.put("creator", null);
+        //Put History
+        CloseableHttpResponse putRequest2 = testUtils.sendPutRequest("histories/9", "Gabor:password", history1.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+        CloseableHttpResponse putRequest3 = testUtils.sendPutRequest("histories/5", "Gabor:password", history2.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest3.getStatusLine().getStatusCode());
+        CloseableHttpResponse putRequest4 = testUtils.sendPutRequest("histories/4", "Gabor:password", history3.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest4.getStatusLine().getStatusCode());
+        //Get Orders
+        CloseableHttpResponse getRequest6 = testUtils.sendGetRequest("orders/1", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest6.getStatusLine().getStatusCode());
+        JSONObject order1 = testUtils.getJsonObject(getRequest6);
+        order1.put("buyerManager", null);
+        CloseableHttpResponse getRequest5 = testUtils.sendGetRequest("orders/2", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest5.getStatusLine().getStatusCode());
+        JSONObject order2 = testUtils.getJsonObject(getRequest5);
+        order2.put("buyerManager", null);
+        //Put Orders
+        CloseableHttpResponse putRequest6 = testUtils.sendPutRequest("orders/1", "Gabor:password", order1.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest6.getStatusLine().getStatusCode());
+        CloseableHttpResponse putRequest5 = testUtils.sendPutRequest("orders/2", "Gabor:password", order2.toString());
+        assertEquals(HttpStatus.SC_OK, putRequest5.getStatusLine().getStatusCode());
+        //Remove User
+        CloseableHttpResponse deleteRequest2 = testUtils.sendDeleteRequest("users/6", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, deleteRequest2.getStatusLine().getStatusCode());
+    }
+
 
 }

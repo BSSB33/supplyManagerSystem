@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @FixMethodOrder
 class UserControllerTest {
 
-    final static String userJSONPath = "src/test/input/";
+    final static String userJSONPath = "src/test/input/users/";
     private TestUtils testUtils = new TestUtils();
 
 
@@ -37,7 +37,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersReturned() throws IOException, JSONException {
+    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
 
@@ -45,7 +45,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenGetAllEndpointIsCalled_thenAllEmployeesAreReturned() throws IOException, JSONException {
+    void givenDirectorUser_whenGetAllEndpointIsCalled_thenAllEmployeesShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users", "Balazs:password");
         CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users", "Judit:password");
 
@@ -56,7 +56,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenManagerUser_whenGetAllEndpointIsCalled_thenAllColleaguesAreReturned() throws IOException, JSONException {
+    void givenManagerUser_whenGetAllEndpointIsCalled_thenAllColleaguesShouldBeReturned() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Emma:password");
 
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
@@ -76,12 +76,82 @@ class UserControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserIsReturned() throws IOException, JSONException {
-        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/1", "Gabor:password");
+    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Gabor:password");
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Gabor:password");
+        CloseableHttpResponse getRequest3 = testUtils.sendGetRequest("users/3", "Gabor:password");
+        CloseableHttpResponse getRequest4 = testUtils.sendGetRequest("users/5", "Gabor:password");
+
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getRequest3.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getRequest4.getStatusLine().getStatusCode());
+        assertEqualJSONUserToJSONObject(getRequest1, "userGabor.json");
+        assertEqualJSONUserToJSONObject(getRequest2, "userBalazs.json");
+        assertEqualJSONUserToJSONObject(getRequest3, "userJudit.json");
+        assertEqualJSONUserToJSONObject(getRequest4, "userEmma.json");
+
+    }
+
+    @Test
+    void givenAdminUser_whenGetByIdEndpointIsCalledForNonExistingUserId_thenTheNotFoundShouldBeThrown() throws IOException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/10", "Gabor:password");
+
+        assertEquals(HttpStatus.SC_NOT_FOUND, getRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAnEmployee_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/5", "Balazs:password");
 
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest, "userGabor.json");
+        assertEqualJSONUserToJSONObject(getRequest, "userEmma.json");
     }
+
+    @Test
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForItself_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/2", "Balazs:password");
+
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONUserToJSONObject(getRequest, "userBalazs.json");
+    }
+
+    @Test
+    void givenManagerUser_whenGetByIdEndpointIsCalledForColleague_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Emma:password");
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/4", "TTManager:password");
+
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
+        assertEqualJSONUserToJSONObject(getRequest1, "userBalazs.json");
+        assertEqualJSONUserToJSONObject(getRequest2, "userGyuri.json");
+    }
+
+    @Test
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenUnauthorizedShouldBeThrown() throws IOException, JSONException {
+        CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
+        CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
+
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest1.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/2", "invalidUser:password");
+
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+        CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/20", "invalidUser:password");
+
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
+    }
+
+
+
 
 
     @Test

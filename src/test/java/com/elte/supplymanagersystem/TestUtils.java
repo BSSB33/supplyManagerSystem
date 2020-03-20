@@ -29,7 +29,7 @@ public class TestUtils {
 
     private void logRequest(String endpoint, String credentials, String typeOfRequest) {
         String loggedInUser = credentials.split(":")[0];
-        logger.debug("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
+        logger.info("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
     public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {

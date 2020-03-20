@@ -64,9 +64,9 @@ class UserControllerTest {
     }
 
     @Test
-    void givenDisabledUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown() throws IOException {
+    void givenDisabledUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users", "Old Student:password");
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
@@ -128,26 +128,26 @@ class UserControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenUnauthorizedShouldBeThrown() throws IOException, JSONException {
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException, JSONException {
         CloseableHttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
         CloseableHttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
 
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
     }
 
     @Test
     void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/2", "invalidUser:password");
 
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenUnauthorizedShouldBeThrown() throws IOException, JSONException {
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/20", "invalidUser:password");
 
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
 
@@ -181,7 +181,7 @@ class UserControllerTest {
     @Test
     void givenAdminUser_whenRegisterEndpointIsCalled_withDirectorUserToRegister_thenUserShouldBeRegistered_andCompanyShouldBeSet() throws IOException, JSONException {
         CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile("src/test/input/userNewDirector.json"));
+                testUtils.getContentOfFile(userJSONPath + "userNewDirector.json"));
         assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
 
         CloseableHttpResponse getRequest = testUtils.sendGetRequest("users/10", "Gabor:password");
@@ -195,7 +195,7 @@ class UserControllerTest {
     @Test
     void givenAdminUser_whenRegisterEndpointIsCalled_withExistingUserToRegister_thenBadRequestShouldBeThrown() throws IOException, JSONException {
         CloseableHttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile("src/test/input/userBalazs.json"));
+                testUtils.getContentOfFile(userJSONPath + "userBalazs.json"));
         assertEquals(HttpStatus.SC_BAD_REQUEST, postRequest.getStatusLine().getStatusCode());
     }
 

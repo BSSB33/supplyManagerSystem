@@ -1,14 +1,12 @@
 [
-{
+  {
 "id": 10,
 "creator": {
 "id": 2,
 "username": "Balazs"
 },
 "historyType": "PAID",
-"note": "They paid the price of the product (Dell Display)",
-"createdAt": "2020-03-21T21:14:27.132941",
-"updatedAt": "2020-03-21T21:14:27.132941"
+"note": "They paid the price of the product (Dell Display)"
 },
   {
 "id": 11,
@@ -17,8 +15,6 @@
 "username": "Balazs"
 },
 "historyType": "PHONE_CALL",
-"note": "Everything went smoothly, we have delivered the product",
-"createdAt": "2020-03-21T21:14:27.133217",
-"updatedAt": "2020-03-21T21:14:27.133217"
+"note": "Everything went smoothly, we have delivered the product"
 }
 ]

@@ -92,11 +92,15 @@ public class HistoryService {
         historyToUpdate.setId(id);
         Optional<History> historyToCheck = historyRepository.findById(historyToUpdate.getId());
         if (historyToCheck.isPresent()) {
-            Order orderToGet = historyToUpdate.getOrder();
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if(historyToUpdate.getCreator() == null) {
+                    historyToUpdate.setCreator(loggedInUser);
+                }
                 return ResponseEntity.ok(historyRepository.save(historyToUpdate));
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+                Order orderToGet = historyToUpdate.getOrder(); //TODO null!
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToUpdate)) {
+                    historyToUpdate.setCreator(historyToUpdate.getCreator());
                     return ResponseEntity.ok(historyRepository.save(historyToUpdate));
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -116,14 +120,14 @@ public class HistoryService {
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
         History historyToSave = new History(historyDTO);
-        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+            if(historyToSave.getCreator() == null)
+                historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
+        }
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             historyToSave.setCreator(loggedInUser);
-            Order orderToGet = historyToSave.getOrder();
-            if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToSave)) {
-                return ResponseEntity.ok(historyRepository.save(historyToSave));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

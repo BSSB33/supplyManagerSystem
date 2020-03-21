@@ -1,167 +1,137 @@
 [
-{
-"id": 1,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "EMAIL_SENT",
-"note": "I sent out the specifications of requested Intel Core I5 processor",
-"createdAt": "2020-03-21T21:05:26.737531",
-"updatedAt": "2020-03-21T21:05:26.737531"
-},
   {
-"id": 2,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "MADE_AND_OFFER",
-"note": "I made an offer for the Intel Core I5 processor",
-"createdAt": "2020-03-21T21:05:26.738515",
-"updatedAt": "2020-03-21T21:05:26.738515"
-},
+    "id": 1,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "EMAIL_SENT",
+    "note": "I sent out the specifications of requested Intel Core I5 processor"
+  },
   {
-"id": 3,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "PHONE_CALL",
-"note": "I talked with the manager, they will probably accept our offer",
-"createdAt": "2020-03-21T21:05:26.738855",
-"updatedAt": "2020-03-21T21:05:26.738855"
-},
+    "id": 2,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "MADE_AND_OFFER",
+    "note": "I made an offer for the Intel Core I5 processor"
+  },
   {
-"id": 4,
-"creator": {
-"id": 6,
-"username": "TTManager"
-},
-"historyType": "NOTE",
-"note": "We are planning to accept the offer",
-"createdAt": "2020-03-21T21:05:26.739163",
-"updatedAt": "2020-03-21T21:05:26.739163"
-},
+    "id": 3,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "PHONE_CALL",
+    "note": "I talked with the manager, they will probably accept our offer"
+  },
   {
-"id": 5,
-"creator": {
-"id": 6,
-"username": "TTManager"
-},
-"historyType": "NOTE",
-"note": "Stuff",
-"createdAt": "2020-03-21T21:05:26.73946",
-"updatedAt": "2020-03-21T21:05:26.73946"
-},
+    "id": 4,
+    "creator": {
+      "id": 6,
+      "username": "TTManager"
+    },
+    "historyType": "NOTE",
+    "note": "We are planning to accept the offer"
+  },
   {
-"id": 6,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "EMAIL_SENT",
-"note": "I sent out the price and the details of the product.",
-"createdAt": "2020-03-21T21:05:26.739747",
-"updatedAt": "2020-03-21T21:05:26.739747"
-},
+    "id": 5,
+    "creator": {
+      "id": 6,
+      "username": "TTManager"
+    },
+    "historyType": "NOTE",
+    "note": "Stuff"
+  },
   {
-"id": 7,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "EMAIL_SENT",
-"note": "They Accepted your offer.",
-"createdAt": "2020-03-21T21:05:26.740054",
-"updatedAt": "2020-03-21T21:05:26.740054"
-},
+    "id": 6,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "EMAIL_SENT",
+    "note": "I sent out the price and the details of the product."
+  },
   {
-"id": 8,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "STARTED_SHIPPING",
-"note": "I ordered Shipping",
-"createdAt": "2020-03-21T21:05:26.740313",
-"updatedAt": "2020-03-21T21:05:26.740313"
-},
+    "id": 7,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "EMAIL_SENT",
+    "note": "They Accepted your offer."
+  },
   {
-"id": 9,
-"creator": {
-"id": 6,
-"username": "TTManager"
-},
-"historyType": "SHIPPED",
-"note": "Success",
-"createdAt": "2020-03-21T21:05:26.740579",
-"updatedAt": "2020-03-21T21:05:26.740579"
-},
+    "id": 8,
+    "creator": {
+      "id": 5,
+      "username": "Emma"
+    },
+    "historyType": "STARTED_SHIPPING",
+    "note": "I ordered Shipping"
+  },
   {
-"id": 10,
-"creator": {
-"id": 2,
-"username": "Balazs"
-},
-"historyType": "PAID",
-"note": "They paid the price of the product (Dell Display)",
-"createdAt": "2020-03-21T21:05:26.740827",
-"updatedAt": "2020-03-21T21:05:26.740827"
-},
+    "id": 9,
+    "creator": {
+      "id": 6,
+      "username": "TTManager"
+    },
+    "historyType": "SHIPPED",
+    "note": "Success"
+  },
   {
-"id": 11,
-"creator": {
-"id": 2,
-"username": "Balazs"
-},
-"historyType": "PHONE_CALL",
-"note": "Everything went smoothly, we have delivered the product",
-"createdAt": "2020-03-21T21:05:26.741063",
-"updatedAt": "2020-03-21T21:05:26.741063"
-},
+    "id": 10,
+    "creator": {
+      "id": 2,
+      "username": "Balazs"
+    },
+    "historyType": "PAID",
+    "note": "They paid the price of the product (Dell Display)"
+  },
   {
-"id": 12,
-"creator": {
-"id": 3,
-"username": "Judit"
-},
-"historyType": "ORDER",
-"note": "I ordered the carpet for the new office, waiting for manager to respond from TopTrade Kft.",
-"createdAt": "2020-03-21T21:05:26.741305",
-"updatedAt": "2020-03-21T21:05:26.741305"
-},
+    "id": 11,
+    "creator": {
+      "id": 2,
+      "username": "Balazs"
+    },
+    "historyType": "PHONE_CALL",
+    "note": "Everything went smoothly, we have delivered the product"
+  },
   {
-"id": 13,
-"creator": {
-"id": 3,
-"username": "Judit"
-},
-"historyType": "ORDER",
-"note": "I gave an offer for a statue(decoration) for TelnetWork, nobody answered yet.",
-"createdAt": "2020-03-21T21:05:26.741582",
-"updatedAt": "2020-03-21T21:05:26.741582"
-},
+    "id": 12,
+    "creator": {
+      "id": 3,
+      "username": "Judit"
+    },
+    "historyType": "ORDER",
+    "note": "I ordered the carpet for the new office, waiting for manager to respond from TopTrade Kft."
+  },
   {
-"id": 14,
-"creator": {
-"id": 3,
-"username": "Judit"
-},
-"historyType": "ORDER",
-"note": "I ordered a computer to the new office, waiting for manager to response from TelnetWork Kft.",
-"createdAt": "2020-03-21T21:05:26.741886",
-"updatedAt": "2020-03-21T21:05:26.741886"
-},
+    "id": 13,
+    "creator": {
+      "id": 3,
+      "username": "Judit"
+    },
+    "historyType": "ORDER",
+    "note": "I gave an offer for a statue(decoration) for TelnetWork, nobody answered yet."
+  },
   {
-"id": 15,
-"creator": {
-"id": 1,
-"username": "Gabor"
-},
-"historyType": "OFFER",
-"note": "I gave an offer for a Warehouse management application for TelnetWork, nobody answered yet.",
-"createdAt": "2020-03-21T21:05:26.742156",
-"updatedAt": "2020-03-21T21:05:26.742156"
-}
+    "id": 14,
+    "creator": {
+      "id": 3,
+      "username": "Judit"
+    },
+    "historyType": "ORDER",
+    "note": "I ordered a computer to the new office, waiting for manager to response from TelnetWork Kft."
+  },
+  {
+    "id": 15,
+    "creator": {
+      "id": 1,
+      "username": "Gabor"
+    },
+    "historyType": "OFFER",
+    "note": "I gave an offer for a Warehouse management application for TelnetWork, nobody answered yet."
+  }
 ]

@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.Suite;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.core.annotation.Order;
@@ -17,7 +18,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Order(1)
 @FixMethodOrder
 class UserControllerTest {
 

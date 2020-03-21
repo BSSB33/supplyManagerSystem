@@ -126,4 +126,9 @@ public class TestUtils {
     public CustomComparator getUserComparator(){
         return new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true));
     }
+
+    public CustomComparator getHistoryComparator(){
+        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("updatedAt", (o1, o2) -> true),
+                new Customization("createdAt", (o1, o2) -> true));
+    }
 }

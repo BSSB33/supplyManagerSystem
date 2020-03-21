@@ -47,5 +47,5 @@ insert into history_table (history_type, note, order_id, creator_id, created_at,
 
 insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('ORDER', 'I ordered a computer to the new office, waiting for manager to response from TelnetWork Kft.', 6, 3, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 
-insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('OFFER', 'I gave an offer for a  Warehouse management application for TelnetWork, nobody answered yet.', 7, 1, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
+insert into history_table (history_type, note, order_id, creator_id, created_at, updated_at) values ('OFFER', 'I gave an offer for a Warehouse management application for TelnetWork, nobody answered yet.', 7, 1, CURRENT_TIMESTAMP,  CURRENT_TIMESTAMP);
 

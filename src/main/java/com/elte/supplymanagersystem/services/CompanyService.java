@@ -63,7 +63,8 @@ public class CompanyService {
      * @return Returns a ResponseEntity with the Company the User works at.
      */
     public ResponseEntity getCompanyOfLoggedInUser(User loggedInUser) {
-        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
+        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))
+                && loggedInUser.getWorkplace() != null) {
             return ResponseEntity.ok(loggedInUser.getWorkplace());
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -90,8 +91,7 @@ public class CompanyService {
             } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if (loggedInUser.getCompany().getId().equals(companyToUpdate.getId())) {
                     Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
-                    if (originalDirector.isPresent())
-                        companyToUpdate.setDirector(originalDirector.get().getDirector());
+                    originalDirector.ifPresent(company -> companyToUpdate.setDirector(company.getDirector()));
                     return ResponseEntity.ok(companyRepository.save(companyToUpdate));
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);

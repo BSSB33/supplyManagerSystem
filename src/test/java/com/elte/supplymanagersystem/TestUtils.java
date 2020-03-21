@@ -1,6 +1,7 @@
 package com.elte.supplymanagersystem;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -29,7 +30,7 @@ public class TestUtils {
         logger.info("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
-    public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
+    public HttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "GET");
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -41,7 +42,7 @@ public class TestUtils {
         return client.execute(httpGet);
     }
 
-    public CloseableHttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
+    public HttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
         logRequest(endpoint, credentials, "POST");
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -56,7 +57,7 @@ public class TestUtils {
         return client.execute(httpPost);
     }
 
-    public CloseableHttpResponse sendPutRequest(String endpoint, String credentials, String JSONToPut) throws IOException {
+    public HttpResponse sendPutRequest(String endpoint, String credentials, String JSONToPut) throws IOException {
         logRequest(endpoint, credentials, "PUT");
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -71,7 +72,7 @@ public class TestUtils {
         return client.execute(httpPut);
     }
 
-    public CloseableHttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
+    public HttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "DELETE");
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -83,27 +84,27 @@ public class TestUtils {
         return client.execute(httpDelete);
     }
 
-    public JSONArray getJsonArray(CloseableHttpResponse httpResponse) throws IOException, JSONException {
+    public JSONArray getJsonArray(HttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json);
     }
 
-    public JSONObject getJsonObject(CloseableHttpResponse httpResponse) throws IOException, JSONException {
+    public JSONObject getJsonObject(HttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONObject(json);
     }
 
-    public JSONObject getJsonArrayObject(CloseableHttpResponse httpResponse, Integer id) throws IOException, JSONException {
+    public JSONObject getJsonArrayObject(HttpResponse httpResponse, Integer id) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id);
     }
 
-    public String getJsonObjectField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+    public String getJsonObjectField(HttpResponse httpResponse, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONObject(json).getString(field);
     }
 
-    public String getJsonArrayField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+    public String getJsonArrayField(HttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id).getString(field);
     }

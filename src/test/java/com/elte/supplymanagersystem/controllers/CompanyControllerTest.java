@@ -3,6 +3,7 @@ package com.elte.supplymanagersystem.controllers;
 import com.elte.supplymanagersystem.TestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

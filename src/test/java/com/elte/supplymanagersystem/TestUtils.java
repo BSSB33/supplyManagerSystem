@@ -2,6 +2,7 @@ package com.elte.supplymanagersystem;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,19 +34,19 @@ public class TestUtils {
     public HttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "GET");
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(apiURL + endpoint);
+        HttpClient client = HttpClients.createDefault();
 
+        HttpGet httpGet = new HttpGet(apiURL + endpoint);
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
         httpGet.setHeader("Authorization", "Basic " + encodedCredentials);
 
-        return client.execute(httpGet);
+        return client.execute(httpGet); //TODO httpGet.releaseConnection() after execute
     }
 
     public HttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
         logRequest(endpoint, credentials, "POST");
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(apiURL + endpoint);
 
         StringEntity entity = new StringEntity(JSONToPost);
@@ -60,7 +61,7 @@ public class TestUtils {
     public HttpResponse sendPutRequest(String endpoint, String credentials, String JSONToPut) throws IOException {
         logRequest(endpoint, credentials, "PUT");
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         HttpPut httpPut = new HttpPut(apiURL + endpoint);
 
         StringEntity entity = new StringEntity(JSONToPut);
@@ -75,7 +76,7 @@ public class TestUtils {
     public HttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "DELETE");
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         HttpDelete httpDelete = new HttpDelete(apiURL + endpoint);
 
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));

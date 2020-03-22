@@ -43,6 +43,7 @@ public class HistoryControllerTest {
     public void givenAdminUser_whenGetAllEndpointIsCalled_thenAllTheHistoriesShouldBeReturned() throws IOException, JSONException {
         HttpResponse getRequest = testUtils.sendGetRequest("histories", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        //TODO try to fix content check
     }
 
     @Test
@@ -74,7 +75,7 @@ public class HistoryControllerTest {
 
     @Test
     @Order(5)
-    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
+    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
         HttpResponse getRequest1 = testUtils.sendGetRequest("histories/1", "Balazs:password");
         assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
         HttpResponse getRequest2 = testUtils.sendGetRequest("histories/2", "Emma:password");
@@ -82,6 +83,15 @@ public class HistoryControllerTest {
 
         assertEqualJSONHistoryToJSONObject(getRequest1, "history1.json");
         assertEqualJSONHistoryToJSONObject(getRequest2, "history2.json");
+    }
+
+    @Test
+    @Order(5)
+    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorDoNotWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest1 = testUtils.sendGetRequest("histories/12", "Balazs:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
+        HttpResponse getRequest2 = testUtils.sendGetRequest("histories/13", "Emma:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
     }
 
     @Test

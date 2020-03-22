@@ -51,6 +51,7 @@ public class Company {
     @JsonIgnore
     private List<Order> purchases;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "seller")//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Order> sales;

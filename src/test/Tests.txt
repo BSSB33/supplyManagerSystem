@@ -27,5 +27,4 @@ Put("{/id}")
     http://localhost:8080/users/NEM alkalmazott - D -> UNAUTHORIZED
     http://localhost:8080/users/saját_maga - M -> OK
     http://localhost:8080/users/barki_mas- M -> UNAUTHORIZED
-
-
+Delete()

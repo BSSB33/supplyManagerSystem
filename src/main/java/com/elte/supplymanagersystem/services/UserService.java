@@ -12,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -104,7 +102,7 @@ public class UserService {
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() != null)
+                if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
@@ -196,6 +194,31 @@ public class UserService {
     }
 
     /**
+     * Enables a User by ID.
+     * ADMIN: Can enable any Users without any regulations.
+     * DIRECTOR: Can enable only employees.
+     * ELSE: FORBIDDEN
+     * Non existing User: NOTFOUND
+     *
+     * @param id           The ID of the User the user wants to enable.
+     * @param loggedInUser The user logged in.
+     * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
+     */
+    public ResponseEntity enableUser(Integer id, User loggedInUser) {
+        Optional<User> userToEnable = userRepository.findById(id);
+        if (userToEnable.isPresent()) {
+            if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                userToEnable.get().setEnabled(true);
+                return ResponseEntity.ok(userRepository.save(userToEnable.get()));
+            } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
+                    && userToEnable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
+                userToEnable.get().setEnabled(true);
+                return ResponseEntity.ok(userRepository.save(userToEnable.get()));
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Disables a User by ID.
      * ADMIN: Can disable any Users without any regulations.
      * DIRECTOR: Can disable only employees.
@@ -237,7 +260,8 @@ public class UserService {
      * ADMIN: Can delete any Users without any regulations.
      * DIRECTOR: Can delete only employees.
      * ELSE: FORBIDDEN
-     * If user has any Orders or History or Managers, then cannot be deleted: NOT_ACCEPTABLE is thrown.
+     * If user has any Orders or History or Managers, then cannot be deleted: NOT_ACCEPTABLE is thrown
+     * and the connected Orders and Histories are returned.
      * Non existing User: NOTFOUND
      *
      * @param id           The ID of the User the user wants to DELETE.
@@ -248,18 +272,32 @@ public class UserService {
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (isDeletable(userToDelete.get())) {
-                    userRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                return testAndDeleteUser(id, userToDelete.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
                     && userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
-                if (isDeletable(userToDelete.get())) {
-                    userRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                return testAndDeleteUser(id, userToDelete.get());
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Helper method for Testing If a user is deletable or not.
+     * Checks and returns a ResponseEntity whether the user is deletable or not.
+     * @param id The id of user to delete.
+     * @param userToDelete The User To delete. (for returning components)
+     * @return ResponseEntity
+     */
+    private ResponseEntity testAndDeleteUser(Integer id, User userToDelete) {
+        if (isDeletable(userToDelete)) {
+            userRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        } else {
+            Set<Object> remainingObjects = new HashSet<>();
+            remainingObjects.addAll(userToDelete.getSells());
+            remainingObjects.addAll(userToDelete.getPurchases());
+            remainingObjects.addAll(userToDelete.getHistories());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(remainingObjects);
+        }
     }
 
     /**

@@ -1,10 +1,12 @@
 package com.elte.supplymanagersystem.services;
 
+import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
+import com.elte.supplymanagersystem.repositories.HistoryRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
 
     /**
      * Only ADMINS have the right to get all the Orders.
@@ -96,6 +101,38 @@ public class OrderService {
                             forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Creates a new record of History for the Selected Order.
+     * ADMIN: Can add new Histories without any regulations.
+     * DIRECTOR, MANAGER: Only can add History if the user works in the same company as the Creator of the history,
+     * and also works at one of the companies of the Order to which the History belongs to.
+     * ELSE: FORBIDDEN
+     *
+     * @param historyDTO   The history Data Transfer Object with the information to save.
+     * @param loggedInUser The user logged in.
+     * @return Returns a ResponseEntity of the saved History.
+     */
+    public ResponseEntity postHistoryForOrderById(HistoryDTO historyDTO, User loggedInUser, Integer idOfOrder) {
+        Optional<Order> orderToGet = orderRepository.findById(idOfOrder);
+        if (orderToGet.isPresent()) {
+            History historyToSave = new History(historyDTO);
+            historyToSave.setOrder(orderToGet.get());
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+                if(historyToSave.getCreator() == null)
+                    historyToSave.setCreator(loggedInUser);
+                return ResponseEntity.ok(historyRepository.save(historyToSave));
+            }
+            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+                historyToSave.setCreator(loggedInUser);
+                historyToSave.setOrder(orderToGet.get());
+                if(orderToGet.get().getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
+                        || orderToGet.get().getSeller().getId().equals(loggedInUser.getWorkplace().getId()))
+                    return ResponseEntity.ok(historyRepository.save(historyToSave));
+                else return new ResponseEntity(HttpStatus.FORBIDDEN);
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
@@ -187,7 +224,8 @@ public class OrderService {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderRepository.save(orderToSave));
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                if (orderToSave.getBuyer().equals(loggedInUser.getWorkplace()) || orderToSave.getSeller().equals(loggedInUser.getWorkplace())) {
+                if (orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
+                        || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId())) {
                     return ResponseEntity.ok(orderRepository.save(orderToSave));
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -200,7 +238,6 @@ public class OrderService {
      * @param orderToDelete The Order to check
      * @return boolean
      */
-    //TODO: expansion option, throw a specific message, what else causes this to return false (for each entity)
     private boolean isDeletable(Order orderToDelete) {
         return orderToDelete.getHistories().isEmpty();
     }
@@ -209,7 +246,7 @@ public class OrderService {
      * Deletes an Order record by ID.
      * ADMIN: Can delete any Order without any regulations.
      * DIRECTOR, MANAGER:  Can only delete Order of the Company the user works at is a seller or a buyer in the Order.
-     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown.
+     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown, and the connected Histories returned.
      * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
@@ -225,7 +262,7 @@ public class OrderService {
                 if (isDeletable(orderToDelete.get())) {
                     orderRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.get().getHistories());
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -248,7 +285,7 @@ public class OrderService {
             if (isDeletable(orderToDelete)) {
                 orderRepository.deleteById(id);
                 return ResponseEntity.ok().build();
-            } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.getHistories());
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

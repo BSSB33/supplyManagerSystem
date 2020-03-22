@@ -1,5 +1,6 @@
 package com.elte.supplymanagersystem.controllers;
 
+import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.OrderService;
@@ -71,6 +72,24 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
+        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Creates a new record of History.
+     * Calls postHistoryForOrderById method from OrderService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param historyDTO The History Data Transfer Object with the information to save.
+     * @param id The ID of the Order, to which the user want to add history.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with the saved record.
+     */
+    @PostMapping("/{id}/histories")
+    public ResponseEntity postHistoryForOrderById(@RequestBody HistoryDTO historyDTO, @PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return orderService.postHistoryForOrderById(historyDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 

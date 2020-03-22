@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CompanyService {
@@ -64,7 +63,8 @@ public class CompanyService {
      * @return Returns a ResponseEntity with the Company the User works at.
      */
     public ResponseEntity getCompanyOfLoggedInUser(User loggedInUser) {
-        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
+        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))
+                && loggedInUser.getWorkplace() != null) {
             return ResponseEntity.ok(loggedInUser.getWorkplace());
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
@@ -91,8 +91,7 @@ public class CompanyService {
             } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
                 if (loggedInUser.getCompany().getId().equals(companyToUpdate.getId())) {
                     Optional<Company> originalDirector = companyRepository.findById(companyToUpdate.getId());
-                    if (originalDirector.isPresent())
-                        companyToUpdate.setDirector(originalDirector.get().getDirector());
+                    originalDirector.ifPresent(company -> companyToUpdate.setDirector(company.getDirector()));
                     return ResponseEntity.ok(companyRepository.save(companyToUpdate));
                 } else return new ResponseEntity(HttpStatus.FORBIDDEN);
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -136,7 +135,8 @@ public class CompanyService {
      * Deletes a Company record by ID.
      * ADMIN: The only User who can delete a company.
      * NOT_ACCEPTABLE: If tries to delete Company with any Order, Manager.
-     * If the Company has Managers or Orders, then cannot be deleted: NOT_ACCEPTABLE is thrown.
+     * If the Company has Managers or Orders, then cannot be deleted: NOT_ACCEPTABLE is thrown,
+     * and the connected Managers, Purchases, Sales, Directors are returned.
      * ELSE: UNAUTHORIZED
      * Non existing History: NOTFOUND
      *
@@ -152,7 +152,14 @@ public class CompanyService {
                 if (isDeletable(companyToDelete.get())) {
                     companyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                } else{
+                    Set<Object> remainingObjects = new HashSet<>();
+                    remainingObjects.addAll(companyToDelete.get().getDirector());
+                    remainingObjects.addAll(companyToDelete.get().getManagers());
+                    remainingObjects.addAll(companyToDelete.get().getPurchases());
+                    remainingObjects.addAll(companyToDelete.get().getSales());
+                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(remainingObjects);
+                }
             } else return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }

@@ -3,6 +3,7 @@ package com.elte.supplymanagersystem.entities;
 import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.enums.HistoryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,6 +33,7 @@ public class History {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnoreProperties({"password", "company", "workplace", "role", "enabled"})
     private User creator;
 
     @ManyToOne
@@ -50,10 +52,6 @@ public class History {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
     /**
      * Constructor for constructing History object from DTO Object
      *
@@ -65,6 +63,5 @@ public class History {
         this.historyType = historyDTO.getHistoryType();
         this.note = historyDTO.getNote();
         this.createdAt = historyDTO.getCreatedAt();
-        this.updatedAt = historyDTO.getUpdatedAt();
     }
 }

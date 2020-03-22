@@ -1,10 +1,9 @@
 package com.elte.supplymanagersystem;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -32,22 +31,22 @@ public class TestUtils {
         logger.info("Test: " + typeOfRequest + " request to: " + apiURL + endpoint + " -> LoggedInUser: " + loggedInUser);
     }
 
-    public CloseableHttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
+    public HttpResponse sendGetRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "GET");
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(apiURL + endpoint);
+        HttpClient client = HttpClients.createDefault();
 
+        HttpGet httpGet = new HttpGet(apiURL + endpoint);
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
         httpGet.setHeader("Authorization", "Basic " + encodedCredentials);
 
-        return client.execute(httpGet);
+        return client.execute(httpGet); //TODO httpGet.releaseConnection() after execute
     }
 
-    public CloseableHttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
+    public HttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
         logRequest(endpoint, credentials, "POST");
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(apiURL + endpoint);
 
         StringEntity entity = new StringEntity(JSONToPost);
@@ -59,10 +58,25 @@ public class TestUtils {
         return client.execute(httpPost);
     }
 
-    public CloseableHttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
+    public HttpResponse sendPutRequest(String endpoint, String credentials, String JSONToPut) throws IOException {
+        logRequest(endpoint, credentials, "PUT");
+
+        HttpClient client = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(apiURL + endpoint);
+
+        StringEntity entity = new StringEntity(JSONToPut);
+        httpPut.setEntity(entity);
+        httpPut.setHeader("Accept", "application/json");
+        httpPut.setHeader("Content-type", "application/json");
+        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+        httpPut.setHeader("Authorization", "Basic " + encodedCredentials);
+        return client.execute(httpPut);
+    }
+
+    public HttpResponse sendDeleteRequest(String endpoint, String credentials) throws IOException {
         logRequest(endpoint, credentials, "DELETE");
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         HttpDelete httpDelete = new HttpDelete(apiURL + endpoint);
 
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
@@ -71,22 +85,27 @@ public class TestUtils {
         return client.execute(httpDelete);
     }
 
-    public JSONArray getJsonArray(CloseableHttpResponse httpResponse) throws IOException, JSONException {
+    public JSONArray getJsonArray(HttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
-        return new JSONArray(json);//TODO BROKEN?
+        return new JSONArray(json);
     }
 
-    public JSONObject getJsonObject(CloseableHttpResponse httpResponse) throws IOException, JSONException {
+    public JSONObject getJsonObject(HttpResponse httpResponse) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONObject(json);
     }
 
-    public JSONObject getJsonObject(CloseableHttpResponse httpResponse, Integer id) throws IOException, JSONException {
+    public JSONObject getJsonArrayObject(HttpResponse httpResponse, Integer id) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id);
     }
 
-    public String getJsonField(CloseableHttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
+    public String getJsonObjectField(HttpResponse httpResponse, String field) throws IOException, JSONException {
+        String json = EntityUtils.toString(httpResponse.getEntity());
+        return new JSONObject(json).getString(field);
+    }
+
+    public String getJsonArrayField(HttpResponse httpResponse, Integer id, String field) throws IOException, JSONException {
         String json = EntityUtils.toString(httpResponse.getEntity());
         return new JSONArray(json).getJSONObject(id).getString(field);
     }
@@ -107,5 +126,9 @@ public class TestUtils {
 
     public CustomComparator getUserComparator(){
         return new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true));
+    }
+
+    public CustomComparator getHistoryComparator(){
+        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("createdAt", (o1, o2) -> true));
     }
 }

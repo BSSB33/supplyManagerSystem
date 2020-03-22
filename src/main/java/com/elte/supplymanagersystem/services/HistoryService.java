@@ -31,6 +31,7 @@ public class HistoryService {
     /**
      * Returns All the Histories in the Database depending on the Role of the User.
      * ADMIN: Can get ALL the Users.
+     * DIRECTOR, MANAGER: Can get histories they created.
      * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
@@ -39,6 +40,9 @@ public class HistoryService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
+        else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+            return ResponseEntity.ok(loggedInUser.getHistories());
+        }
         else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
@@ -71,35 +75,6 @@ public class HistoryService {
     }
 
     /**
-     * Updates the History by ID.
-     * ADMIN: Can save any of the Histories.
-     * DIRECTOR, MANAGER: Only can update data if the user works in the same company as the Creator of the history,
-     * and also works at one of the companies of the Order to which the History belongs to.
-     * ELSE: FORBIDDEN
-     * Non existing History: NOTFOUND
-     *
-     * @param historyDTO   The history Data Transfer Object with the information to update.
-     * @param loggedInUser The user logged in.
-     * @param id           The ID of the History the user wants to PUT (Update).
-     * @return Returns a ResponseEntity of the updated History.
-     */
-    public ResponseEntity putById(HistoryDTO historyDTO, User loggedInUser, Integer id) {
-        History historyToUpdate = new History(historyDTO);
-        historyToUpdate.setId(id);
-        Optional<History> historyToCheck = historyRepository.findById(historyToUpdate.getId());
-        if (historyToCheck.isPresent()) {
-            Order orderToGet = historyToUpdate.getOrder();
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                return ResponseEntity.ok(historyRepository.save(historyToUpdate));
-            } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToUpdate)) {
-                    return ResponseEntity.ok(historyRepository.save(historyToUpdate));
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-        } else return ResponseEntity.notFound().build();
-    }
-
-    /**
      * Creates a new record of History.
      * ADMIN: Can add new Histories without any regulations.
      * DIRECTOR, MANAGER: Only can add History if the user works in the same company as the Creator of the history,
@@ -112,14 +87,14 @@ public class HistoryService {
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
         History historyToSave = new History(historyDTO);
-        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+            if(historyToSave.getCreator() == null)
+                historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
+        }
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             historyToSave.setCreator(loggedInUser);
-            Order orderToGet = historyToSave.getOrder();
-            if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToSave)) {
-                return ResponseEntity.ok(historyRepository.save(historyToSave));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 

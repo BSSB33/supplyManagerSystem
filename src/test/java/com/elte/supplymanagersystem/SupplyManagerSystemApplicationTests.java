@@ -1,8 +1,7 @@
 package com.elte.supplymanagersystem;
 
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class SupplyManagerSystemApplicationTests {
-
+//@Suite.SuiteClasses({CompanyControllerTest.class, HistoryControllerTest.class, UserControllerTest.class})
+//@RunWith(Suite.class)
+public class SupplyManagerSystemApplicationTests {
+    //TODO restart app / after before tests
 }

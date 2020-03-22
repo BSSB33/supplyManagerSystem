@@ -40,7 +40,6 @@ public class HistoryController {
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-
     /**
      * Returns the History with the given ID from HistoryService based on the Role of the logged in User.
      * Calls getById method from HistoryService.
@@ -55,25 +54,6 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-    }
-
-    /**
-     * Updates a History by ID based on User Role.
-     * Calls putById method from HistoryService.
-     * Returns UNAUTHORIZED if the user is Invalid.
-     *
-     * @param historyDTO The History Data Transfer Object with the updated information.
-     * @param id         The ID of the History to update.
-     * @param auth       Authentication parameter for Security in order to get the User who logged in.
-     * @return Returns a ResponseEntity with the updated record.
-     */
-    //Update
-    @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody HistoryDTO historyDTO, @PathVariable Integer id, Authentication auth) {
-        User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) {
-            return historyService.putById(historyDTO, loggedInUser, id);
         } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 

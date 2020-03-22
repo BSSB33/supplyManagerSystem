@@ -26,8 +26,6 @@ public class HistoryDTO {
 
     private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
-
     /**
      * Constructor for History Data Transfer Object
      *
@@ -39,6 +37,5 @@ public class HistoryDTO {
         this.historyType = history.getHistoryType();
         this.note = history.getNote();
         this.createdAt = history.getCreatedAt();
-        this.updatedAt = history.getUpdatedAt();
     }
 }

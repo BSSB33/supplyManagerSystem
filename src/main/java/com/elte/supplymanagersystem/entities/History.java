@@ -52,10 +52,6 @@ public class History {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
     /**
      * Constructor for constructing History object from DTO Object
      *
@@ -67,6 +63,5 @@ public class History {
         this.historyType = historyDTO.getHistoryType();
         this.note = historyDTO.getNote();
         this.createdAt = historyDTO.getCreatedAt();
-        this.updatedAt = historyDTO.getUpdatedAt();
     }
 }

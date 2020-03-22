@@ -474,25 +474,12 @@ class UserControllerTest {
         jsonObject.put("workplace", null);
         HttpResponse putRequest = testUtils.sendPutRequest("users/6", "Gabor:password", jsonObject.toString());
         assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //Get Histories
-        HttpResponse getRequest2 = testUtils.sendGetRequest("histories/9", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        JSONObject history1 = testUtils.getJsonObject(getRequest2);
-        history1.put("creator", null);
-        HttpResponse getRequest3 = testUtils.sendGetRequest("histories/5", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        JSONObject history2 = testUtils.getJsonObject(getRequest3);
-        history2.put("creator", null);
-        HttpResponse getRequest4 = testUtils.sendGetRequest("histories/4", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest4.getStatusLine().getStatusCode());
-        JSONObject history3 = testUtils.getJsonObject(getRequest4);
-        history3.put("creator", null);
         //Put History
-        HttpResponse putRequest2 = testUtils.sendPutRequest("histories/9", "Gabor:password", history1.toString());
+        HttpResponse putRequest2 = testUtils.sendDeleteRequest("histories/9", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
-        HttpResponse putRequest3 = testUtils.sendPutRequest("histories/5", "Gabor:password", history2.toString());
+        HttpResponse putRequest3 = testUtils.sendDeleteRequest("histories/5", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, putRequest3.getStatusLine().getStatusCode());
-        HttpResponse putRequest4 = testUtils.sendPutRequest("histories/4", "Gabor:password", history3.toString());
+        HttpResponse putRequest4 = testUtils.sendDeleteRequest("histories/4", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, putRequest4.getStatusLine().getStatusCode());
         //Get Orders
         HttpResponse getRequest6 = testUtils.sendGetRequest("orders/1", "Gabor:password");

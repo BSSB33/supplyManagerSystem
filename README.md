@@ -17,3 +17,7 @@ A Projekt az ELTE IK PTI BSc képzéshez készült szakdolgozat keretein belül 
 > tudják az egyes lépések közötti állapotot. Az architektúra koncepciója miatt a dolgozatot a REST által nyújtott eszközök köré
 > kívánom építeni Spring segítségével. Ezen felül más, az iparban is használt fejlesztői eszközöket is igénybe tervezek venni, mint
 > például a Git és a Lombok.
+
+#### Bővítési lehetőségek:
+-Megrendelés megnyitási/zárolási ideje
+-HTTPS titkosítás

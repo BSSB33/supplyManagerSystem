@@ -12,6 +12,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ public class User {
     @Column(updatable = false, nullable = false)
     private Integer id;
 
+    //@Size(min = 4, max = 10, message = "Username Length Should Be 4-10 characters long")
     @Column(nullable = false)
     private String username;
 

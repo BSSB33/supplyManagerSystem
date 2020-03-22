@@ -9,11 +9,8 @@ import org.json.JSONObject;
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runners.Suite;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.core.annotation.Order;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.io.IOException;
 

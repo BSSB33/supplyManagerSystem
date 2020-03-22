@@ -40,10 +40,9 @@ public class HistoryService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
-        else if(userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))){
+        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             return ResponseEntity.ok(loggedInUser.getHistories());
-        }
-        else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -87,12 +86,11 @@ public class HistoryService {
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
         History historyToSave = new History(historyDTO);
-        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
-            if(historyToSave.getCreator() == null)
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+            if (historyToSave.getCreator() == null)
                 historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
-        }
-        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+        } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return new ResponseEntity(HttpStatus.FORBIDDEN);

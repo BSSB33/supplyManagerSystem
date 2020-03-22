@@ -15,7 +15,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import java.io.IOException;
 
 import static com.elte.supplymanagersystem.controllers.HistoryControllerTest.historyJSONPath;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FixMethodOrder
 class OrderControllerTest {

@@ -3,9 +3,11 @@ package com.elte.supplymanagersystem;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -40,7 +42,7 @@ public class TestUtils {
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
         httpGet.setHeader("Authorization", "Basic " + encodedCredentials);
 
-        return client.execute(httpGet); //TODO httpGet.releaseConnection() after execute
+        return client.execute(httpGet);
     }
 
     public HttpResponse sendPostRequest(String endpoint, String credentials, String JSONToPost) throws IOException {
@@ -124,11 +126,11 @@ public class TestUtils {
         return json.toString();
     }
 
-    public CustomComparator getUserComparator(){
+    public CustomComparator getUserComparator() {
         return new CustomComparator(JSONCompareMode.LENIENT, new Customization("password", (o1, o2) -> true));
     }
 
-    public CustomComparator getHistoryComparator(){
+    public CustomComparator getHistoryComparator() {
         return new CustomComparator(JSONCompareMode.LENIENT, new Customization("createdAt", (o1, o2) -> true));
     }
 }

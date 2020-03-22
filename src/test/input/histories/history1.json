@@ -1,11 +1,11 @@
 {
-"id": 1,
-"creator": {
-"id": 5,
-"username": "Emma"
-},
-"historyType": "EMAIL_SENT",
-"note": "I sent out the specifications of requested Intel Core I5 processor",
-"createdAt": "2020-03-21T21:14:27.129641",
-"updatedAt": "2020-03-21T21:14:27.129641"
+  "id": 1,
+  "creator": {
+    "id": 5,
+    "username": "Emma"
+  },
+  "historyType": "EMAIL_SENT",
+  "note": "I sent out the specifications of requested Intel Core I5 processor",
+  "createdAt": "2020-03-21T21:14:27.129641",
+  "updatedAt": "2020-03-21T21:14:27.129641"
 }

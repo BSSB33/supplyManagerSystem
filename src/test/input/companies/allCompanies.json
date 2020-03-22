@@ -1,22 +1,22 @@
 [
-{
-"id": 1,
-"name": "TelnetWork Kft."
-},
   {
-"id": 2,
-"name": "BAV Zrt."
-},
+    "id": 1,
+    "name": "TelnetWork Kft."
+  },
   {
-"id": 3,
-"name": "TopTrade Kft."
-},
+    "id": 2,
+    "name": "BAV Zrt."
+  },
   {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
+    "id": 3,
+    "name": "TopTrade Kft."
+  },
   {
-"id": 5,
-"name": "Unknown Kft."
-}
+    "id": 4,
+    "name": "ELTE-Soft Kft."
+  },
+  {
+    "id": 5,
+    "name": "Unknown Kft."
+  }
 ]

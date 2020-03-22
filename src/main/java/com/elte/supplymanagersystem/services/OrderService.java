@@ -121,15 +121,14 @@ public class OrderService {
         if (orderToGet.isPresent()) {
             History historyToSave = new History(historyDTO);
             historyToSave.setOrder(orderToGet.get());
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
-                if(historyToSave.getCreator() == null)
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if (historyToSave.getCreator() == null)
                     historyToSave.setCreator(loggedInUser);
                 return ResponseEntity.ok(historyRepository.save(historyToSave));
-            }
-            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 historyToSave.setCreator(loggedInUser);
                 historyToSave.setOrder(orderToGet.get());
-                if(orderToGet.get().getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
+                if (orderToGet.get().getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
                         || orderToGet.get().getSeller().getId().equals(loggedInUser.getWorkplace().getId()))
                     return ResponseEntity.ok(historyRepository.save(historyToSave));
                 else return new ResponseEntity(HttpStatus.FORBIDDEN);

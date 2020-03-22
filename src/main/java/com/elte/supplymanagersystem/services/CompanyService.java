@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CompanyService {
@@ -152,7 +155,7 @@ public class CompanyService {
                 if (isDeletable(companyToDelete.get())) {
                     companyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else{
+                } else {
                     Set<Object> remainingObjects = new HashSet<>();
                     remainingObjects.addAll(companyToDelete.get().getDirector());
                     remainingObjects.addAll(companyToDelete.get().getManagers());

@@ -1,38 +1,38 @@
 {
+  "id": 1,
+  "productName": "Intel Core I5 6550 Processor",
+  "price": 50000,
+  "status": "IN_STOCK",
+  "buyer": {
+    "id": 3,
+    "name": "TopTrade Kft."
+  },
+  "buyerManager": {
+    "id": 6,
+    "username": "TTManager",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 3,
+      "name": "TopTrade Kft."
+    },
+    "role": "ROLE_MANAGER"
+  },
+  "seller": {
     "id": 1,
-    "productName": "Intel Core I5 6550 Processor",
-    "price": 50000,
-    "status": "IN_STOCK",
-    "buyer": {
-        "id": 3,
-        "name": "TopTrade Kft."
+    "name": "TelnetWork Kft."
+  },
+  "sellerManager": {
+    "id": 5,
+    "username": "Emma",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 1,
+      "name": "TelnetWork Kft."
     },
-    "buyerManager": {
-        "id": 6,
-        "username": "TTManager",
-        "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-        "enabled": true,
-        "company": null,
-        "workplace": {
-            "id": 3,
-            "name": "TopTrade Kft."
-        },
-        "role": "ROLE_MANAGER"
-    },
-    "seller": {
-        "id": 1,
-        "name": "TelnetWork Kft."
-    },
-    "sellerManager": {
-        "id": 5,
-        "username": "Emma",
-        "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-        "enabled": true,
-        "company": null,
-        "workplace": {
-            "id": 1,
-            "name": "TelnetWork Kft."
-        },
-        "role": "ROLE_MANAGER"
-    }
+    "role": "ROLE_MANAGER"
+  }
 }

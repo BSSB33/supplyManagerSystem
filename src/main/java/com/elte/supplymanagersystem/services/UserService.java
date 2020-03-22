@@ -283,7 +283,8 @@ public class UserService {
     /**
      * Helper method for Testing If a user is deletable or not.
      * Checks and returns a ResponseEntity whether the user is deletable or not.
-     * @param id The id of user to delete.
+     *
+     * @param id           The id of user to delete.
      * @param userToDelete The User To delete. (for returning components)
      * @return ResponseEntity
      */

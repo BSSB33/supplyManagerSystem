@@ -12,7 +12,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 

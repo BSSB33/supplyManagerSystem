@@ -1,62 +1,62 @@
 [
-{
-"id": 5,
-"productName": "Statue (Decoration)",
-"price": 110000,
-"status": "NEW",
-"buyer": {
-"id": 1,
-"name": "TelnetWork Kft."
-},
-"buyerManager": null,
-"seller": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"sellerManager": {
-"id": 3,
-"username": "Judit",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"workplace": {
-"id": 2,
-"name": "BAV Zrt."
-},
-"role": "ROLE_DIRECTOR"
-}
-},
   {
-"id": 7,
-"productName": "Development of a Warehouse management application",
-"price": 1000000,
-"status": "NEW",
-"buyer": {
-"id": 1,
-"name": "TelnetWork Kft."
-},
-"buyerManager": null,
-"seller": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"sellerManager": {
-"id": 1,
-"username": "Gabor",
-"password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
-"enabled": true,
-"company": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"workplace": {
-"id": 4,
-"name": "ELTE-Soft Kft."
-},
-"role": "ROLE_ADMIN"
-}
-}
+    "id": 5,
+    "productName": "Statue (Decoration)",
+    "price": 110000,
+    "status": "NEW",
+    "buyer": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "buyerManager": null,
+    "seller": {
+      "id": 2,
+      "name": "BAV Zrt."
+    },
+    "sellerManager": {
+      "id": 3,
+      "username": "Judit",
+      "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+      "enabled": true,
+      "company": {
+        "id": 2,
+        "name": "BAV Zrt."
+      },
+      "workplace": {
+        "id": 2,
+        "name": "BAV Zrt."
+      },
+      "role": "ROLE_DIRECTOR"
+    }
+  },
+  {
+    "id": 7,
+    "productName": "Development of a Warehouse management application",
+    "price": 1000000,
+    "status": "NEW",
+    "buyer": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "buyerManager": null,
+    "seller": {
+      "id": 4,
+      "name": "ELTE-Soft Kft."
+    },
+    "sellerManager": {
+      "id": 1,
+      "username": "Gabor",
+      "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+      "enabled": true,
+      "company": {
+        "id": 4,
+        "name": "ELTE-Soft Kft."
+      },
+      "workplace": {
+        "id": 4,
+        "name": "ELTE-Soft Kft."
+      },
+      "role": "ROLE_ADMIN"
+    }
+  }
 ]

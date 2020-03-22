@@ -81,8 +81,8 @@ public class OrderController {
      * Returns UNAUTHORIZED if the user is Invalid.
      *
      * @param historyDTO The History Data Transfer Object with the information to save.
-     * @param id The ID of the Order, to which the user want to add history.
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @param id         The ID of the Order, to which the user want to add history.
+     * @param auth       Authentication parameter for Security in order to get the User who logged in.
      * @return Returns a ResponseEntity with the saved record.
      */
     @PostMapping("/{id}/histories")

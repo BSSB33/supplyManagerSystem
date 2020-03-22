@@ -24,13 +24,13 @@ class CompanyControllerTest {
     final static String companyJSONPath = "src/test/input/companies/";
     private static TestUtils testUtils = new TestUtils();
 
-    private void assertEqualJSONCompanyToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONCompanyToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
                 new JSONObject(testUtils.getContentOfFile(companyJSONPath + expectedJSONPath)).toString(),
                 JSONCompareMode.LENIENT);
     }
 
-    private void assertEqualJSONCompanyArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONCompanyArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
                 new JSONArray(testUtils.getContentOfFile(companyJSONPath + expectedJSONPath)).toString(),
                 JSONCompareMode.LENIENT);

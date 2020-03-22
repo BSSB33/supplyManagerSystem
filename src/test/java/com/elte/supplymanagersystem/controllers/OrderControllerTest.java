@@ -14,6 +14,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.io.IOException;
 
+import static com.elte.supplymanagersystem.controllers.HistoryControllerTest.historyJSONPath;
 import static org.junit.jupiter.api.Assertions.*;
 
 @FixMethodOrder
@@ -22,13 +23,13 @@ class OrderControllerTest {
     final static String orderJSONPath = "src/test/input/orders/";
     private static TestUtils testUtils = new TestUtils();
 
-    private void assertEqualJSONOrderToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONOrderToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
                 new JSONObject(testUtils.getContentOfFile(orderJSONPath + expectedJSONPath)).toString(),
                 JSONCompareMode.LENIENT);
     }
 
-    private void assertEqualJSONOrderArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONOrderArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
                 new JSONArray(testUtils.getContentOfFile(orderJSONPath + expectedJSONPath)).toString(),
                 JSONCompareMode.LENIENT);
@@ -36,81 +37,143 @@ class OrderControllerTest {
 
     //Get All Endpoint
     @Test
-    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllOrdersShouldBeReturned(){
-
+    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllOrdersShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONOrderArrayToJSONArray(getRequest, "allOrders.json");
     }
 
     @Test
-    void givenNonAdminUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown(){
-
+    void givenNonAdminUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/", "Emma:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown(){
+    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/", "ivalidUser:password");
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    }
 
+    //Get Purchases Endpoint
+    @Test
+    void givenDirectorUser_whenGetPurchasesEndpointIsCalled_thenAllOrdersShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/purchases", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONOrderArrayToJSONArray(getRequest, "ordersOfBalazs.json");
+    }
+
+    @Test
+    void givenInvalidUser_whenGetPurchasesEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/purchases", "ivalidUser:password");
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    }
+
+    //Get Sales Endpoint
+    @Test
+    void givenDirectorUser_whenGetSalesEndpointIsCalled_thenAllOrdersShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/sales", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONOrderArrayToJSONArray(getRequest, "salesOfBalazs.json");
+    }
+
+    @Test
+    void givenInvalidUser_whenGetSalesEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/sales", "ivalidUser:password");
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
     //Get By Id Endpoint
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedOrderShouldBeReturned(){
-
+    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedOrderShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONOrderToJSONObject(getRequest, "order1.json");
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheOrderIsIssuedByOrForTheUsersCompany_thenTheRequestedOrderShouldBeReturned(){
-
+    void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheOrderIsIssuedByOrForTheUsersCompany_thenTheRequestedOrderShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+        assertEqualJSONOrderToJSONObject(getRequest, "order1.json");
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheOrderIsNotIssuedByOrForTheUsersCompany_thenForbiddenShouldBeThrown(){
-
+    void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheOrderIsNotIssuedByOrForTheUsersCompany_thenForbiddenShouldBeThrown() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1", "Judit:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown(){
-
+    void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1", "invalidUser:password");
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalled_withANonExistingOrder_thenNotFoundShouldBeThrown(){
-
+    void givenAdminUser_whenGetByIdEndpointIsCalled_withANonExistingOrder_thenNotFoundShouldBeThrown() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/100", "Gabor:password");
+        assertEquals(HttpStatus.SC_NOT_FOUND, getRequest.getStatusLine().getStatusCode());
     }
 
     //Get Histories Of Order Endpoint
     @Test
-    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenTheAllHistoriesOfTheOrderShouldBeReturned(){
-
+    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenTheAllHistoriesOfTheOrderShouldBeReturned() throws IOException, JSONException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1/histories", "Gabor:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifOrderNotExists_thenNotFoundShouldBeThrown(){
-
+    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenTheAllHistoriesOfTheOrderShouldBeReturned2() throws IOException, JSONException {
+        HttpResponse getRequest1 = testUtils.sendGetRequest("orders/1/histories", "TTManager:password");
+        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenTheAllAuthorizedHistoriesOfTheOrderShouldBeReturned(){
-
+    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifOrderNotExists_thenNotFoundShouldBeThrown() throws IOException {
+        HttpResponse getRequest1 = testUtils.sendGetRequest("orders/100/histories", "Gabor:password");
+        assertEquals(HttpStatus.SC_NOT_FOUND, getRequest1.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifUserIsNotAuthorizedForOrder_thenForbiddenShouldBeThrown(){
+    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenTheAllAuthorizedHistoriesOfTheOrderShouldBeReturned() throws IOException {
+        HttpResponse getRequest = testUtils.sendGetRequest("orders/1/histories", "Balazs:password");
+        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+    }
 
+    @Test
+    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifUserIsNotAuthorizedForOrder_thenForbiddenShouldBeThrown() throws IOException {
+        HttpResponse getRequest1 = testUtils.sendGetRequest("orders/1/histories", "Judit:password");
+        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
     }
 
     //Post Histories For Order Endpoint
     @Test
-    void givenAdminUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded(){
-
+    void givenAdminUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/1/histories", "Gabor:password",
+                testUtils.getContentOfFile(historyJSONPath + "history1.json"));
+        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded_AndTheCreatorShouldBeSet(){
-
+    void givenUnauthorizedUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldNotBeAdded() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/1/histories", "Judit:password",
+                testUtils.getContentOfFile(historyJSONPath + "history1.json"));
+        assertEquals(HttpStatus.SC_FORBIDDEN, postRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_ifUnauthorizedForOrder_thenForbiddenShouldBeThrown(){
+    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded_AndTheCreatorShouldBeSet() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/1/histories", "Balazs:password",
+                testUtils.getContentOfFile(historyJSONPath + "newHistory.json"));
+        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
+    }
 
+    @Test
+    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_ifUnauthorizedForOrder_thenForbiddenShouldBeThrown() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/1/histories", "Judit:password",
+                testUtils.getContentOfFile(orderJSONPath + "newOrder.json"));
+        assertEquals(HttpStatus.SC_FORBIDDEN, postRequest.getStatusLine().getStatusCode());
     }
 
     //Post Order Endpoint
@@ -123,23 +186,17 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenPostOrderEndpointIsCalled_ifCreatorIsNull_thenTheOrderShouldBeAdded_andCreatorShouldBeSet(){
-
+    void givenDirectorOrManagerUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/", "Balazs:password",
+                testUtils.getContentOfFile(orderJSONPath + "newOrder2.json"));
+        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
     }
 
     @Test
-    void givenAdminUser_whenPostOrderEndpointIsCalled_ifCreatorIsNotNull_thenTheOrderShouldBeAdded(){
-
-    }
-
-    @Test
-    void givenDirectorUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded_AndTheCreatorShouldBeSet(){
-
-    }
-
-    @Test
-    void givenInvalidUser_whenPostOrderEndpointIsCalled_thenUnauthorizedShouldBeThrown(){
-
+    void givenInvalidUser_whenPostOrderEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
+        HttpResponse postRequest = testUtils.sendPostRequest("orders/", "invalidUser:password",
+                testUtils.getContentOfFile(orderJSONPath + "newOrder2.json"));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, postRequest.getStatusLine().getStatusCode());
     }
 
     //Put Order Endpoint
@@ -163,7 +220,7 @@ class OrderControllerTest {
         assertEquals(HttpStatus.SC_OK, putRequest1.getStatusLine().getStatusCode());
         //Rollback
         HttpResponse putRequest2 = testUtils.sendPutRequest("orders/6", "Balazs:password",
-                "{\"productName\":\"New Order\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
+                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
                         ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
         assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
     }
@@ -184,7 +241,7 @@ class OrderControllerTest {
         assertEquals(HttpStatus.SC_OK, putRequest1.getStatusLine().getStatusCode());
         //Rollback
         HttpResponse putRequest2 = testUtils.sendPutRequest("orders/6", "Emma:password",
-                "{\"productName\":\"New Order\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
+                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
                         ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
         assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
     }

@@ -25,13 +25,13 @@ public class HistoryControllerTest {
     final static String historyJSONPath = "src/test/input/histories/";
     private static TestUtils testUtils = new TestUtils();
 
-    private void assertEqualJSONHistoryToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONHistoryToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
                 new JSONObject(testUtils.getContentOfFile(historyJSONPath + expectedJSONPath)).toString(),
                 testUtils.getHistoryComparator());
     }
 
-    private void assertEqualJSONHistoryArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONHistoryArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
                 new JSONArray(testUtils.getContentOfFile(historyJSONPath + expectedJSONPath)).toString(),
                 testUtils.getHistoryComparator());
@@ -43,7 +43,6 @@ public class HistoryControllerTest {
     public void givenAdminUser_whenGetAllEndpointIsCalled_thenAllTheHistoriesShouldBeReturned() throws IOException, JSONException {
         HttpResponse getRequest = testUtils.sendGetRequest("histories", "Gabor:password");
         assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        //TODO try to fix content check
     }
 
     @Test
@@ -100,7 +99,7 @@ public class HistoryControllerTest {
         HttpResponse getRequest = testUtils.sendGetRequest("histories/1", "invalisUser:password");
         assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
     }
-    //TODO history access check to different users
+
     //Delete History Endpoint
     @Test
     @Order(7)

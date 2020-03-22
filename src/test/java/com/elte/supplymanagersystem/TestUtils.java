@@ -129,7 +129,6 @@ public class TestUtils {
     }
 
     public CustomComparator getHistoryComparator(){
-        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("updatedAt", (o1, o2) -> true),
-                new Customization("createdAt", (o1, o2) -> true));
+        return new CustomComparator(JSONCompareMode.LENIENT, new Customization("createdAt", (o1, o2) -> true));
     }
 }

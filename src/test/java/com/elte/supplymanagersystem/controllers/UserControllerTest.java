@@ -13,6 +13,7 @@ import org.junit.runners.Suite;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.core.annotation.Order;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.io.IOException;
 
@@ -24,13 +25,13 @@ class UserControllerTest {
     final static String userJSONPath = "src/test/input/users/";
     private static TestUtils testUtils = new TestUtils();
 
-    private void assertEqualJSONUserToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONUserToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
                 new JSONObject(testUtils.getContentOfFile(userJSONPath + expectedJSONPath)).toString(),
                 testUtils.getUserComparator());
     }
 
-    private void assertEqualJSONUserArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
+    void assertEqualJSONUserArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
         JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
                 new JSONArray(testUtils.getContentOfFile(userJSONPath + expectedJSONPath)).toString(),
                 testUtils.getUserComparator());
@@ -372,7 +373,6 @@ class UserControllerTest {
         JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
         jsonObject.put("workplace", null);
         //Execute
-        System.out.println(jsonObject.toString());
         HttpResponse putRequest = testUtils.sendPutRequest("users/2", "Gabor:password", jsonObject.toString());
         assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
 

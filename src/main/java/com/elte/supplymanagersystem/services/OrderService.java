@@ -112,6 +112,7 @@ public class OrderService {
      * and also works at one of the companies of the Order to which the History belongs to.
      * ELSE: FORBIDDEN
      *
+     * @param idOfOrder    The ID of Order to which we want to add the history to.
      * @param historyDTO   The history Data Transfer Object with the information to save.
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved History.

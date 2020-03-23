@@ -1,5 +1,6 @@
 com.elte.supplymanagersystem
 com.elte.supplymanagersystem.controllers
+com.elte.supplymanagersystem.dtos
 com.elte.supplymanagersystem.entities
 com.elte.supplymanagersystem.enums
 com.elte.supplymanagersystem.repositories

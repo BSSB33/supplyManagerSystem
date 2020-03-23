@@ -1,7 +1,17 @@
-package com.elte.supplymanagersystem;
+package com.elte;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 //import org.apache.catalina.Context;
 //import org.apache.catalina.connector.Connector;
 //import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -11,9 +21,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class SupplyManagerSystemApplication {
+public class SupplyManagerSystemApplication extends SpringBootServletInitializer {
 
-    //TODO Tomcat release -> git
     public static void main(String[] args) {
         SpringApplication.run(SupplyManagerSystemApplication.class, args);
     }
@@ -44,4 +53,13 @@ public class SupplyManagerSystemApplication {
 //        return connector;
 //    }
 
+}
+
+@RestController
+class GreetingController {
+
+    @RequestMapping("/")
+    ResponseEntity hello() {
+        return ResponseEntity.status(HttpStatus.OK).body("SupplyManagerSystemApplication Is Running");
+    }
 }

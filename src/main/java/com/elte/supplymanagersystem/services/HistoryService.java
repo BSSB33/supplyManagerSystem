@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
+
 @Service
 public class HistoryService {
 
@@ -42,7 +44,7 @@ public class HistoryService {
             return ResponseEntity.ok(historyRepository.findAll());
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             return ResponseEntity.ok(loggedInUser.getHistories());
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -68,8 +70,8 @@ public class HistoryService {
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToGet.get())) {
                     return ResponseEntity.ok(historyToGet.get());
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -93,7 +95,7 @@ public class HistoryService {
         } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -120,8 +122,8 @@ public class HistoryService {
                 if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToDelete.get())) {
                     historyRepository.deleteById(id);
                     return ResponseEntity.ok().build();
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 

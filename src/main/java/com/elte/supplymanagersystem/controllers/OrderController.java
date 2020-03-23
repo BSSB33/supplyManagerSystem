@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+
 /**
  * The Order Controller is responsible for: creating Endpoints and wiring User and Order Services
  */
@@ -38,7 +40,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -55,7 +57,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -72,7 +74,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -90,7 +92,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.postHistoryForOrderById(historyDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -106,7 +108,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getSalesByUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -122,7 +124,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getPurchasesByUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -141,7 +143,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.putById(orderDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -159,7 +161,7 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.addOrder(orderDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -177,6 +179,6 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 }

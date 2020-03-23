@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
+
 @Service
 public class UserService {
 
@@ -42,7 +44,7 @@ public class UserService {
             return ResponseEntity.ok(getEmployeesOfUser(loggedInUser));
         } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER)) {
             return ResponseEntity.ok(getColleaguesOfUser(loggedInUser));
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -65,8 +67,8 @@ public class UserService {
                     return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -81,7 +83,7 @@ public class UserService {
     public ResponseEntity getUnassignedDirectors(User loggedInUser) {
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -109,7 +111,7 @@ public class UserService {
                 return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -129,7 +131,7 @@ public class UserService {
             if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR))
                 userToUpdate.setWorkplace(userToUpdate.getCompany());
             return ResponseEntity.ok(userRepository.save(userToUpdate));
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -163,7 +165,7 @@ public class UserService {
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToRegister));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN); //Manager
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN); //Manager
         }
     }
 
@@ -214,7 +216,7 @@ public class UserService {
                     && userToEnable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
                 userToEnable.get().setEnabled(true);
                 return ResponseEntity.ok(userRepository.save(userToEnable.get()));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -239,7 +241,7 @@ public class UserService {
                     && userToDisable.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
                 userToDisable.get().setEnabled(false);
                 return ResponseEntity.ok(userRepository.save(userToDisable.get()));
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -276,7 +278,7 @@ public class UserService {
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)
                     && userToDelete.get().getWorkplace().getId().equals(loggedInUser.getCompany().getId())) {
                 return testAndDeleteUser(id, userToDelete.get());
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -297,7 +299,9 @@ public class UserService {
             remainingObjects.addAll(userToDelete.getSells());
             remainingObjects.addAll(userToDelete.getPurchases());
             remainingObjects.addAll(userToDelete.getHistories());
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(remainingObjects);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    "Record Cannot Be Deleted, because it is still relationally connected the following objects: "
+                            + remainingObjects);
         }
     }
 

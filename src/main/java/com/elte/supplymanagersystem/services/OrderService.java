@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
+
 @Service
 public class OrderService {
 
@@ -45,7 +47,7 @@ public class OrderService {
     public ResponseEntity getAll(User loggedInUser) {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(orderRepository.findAll());
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -68,8 +70,8 @@ public class OrderService {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -100,8 +102,8 @@ public class OrderService {
                             history.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId())).
                             forEach(authorizedHistories::add); //KIEMELNI/HIGHLIGHT
                     return ResponseEntity.ok(authorizedHistories);
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -132,8 +134,8 @@ public class OrderService {
                 if (orderToGet.get().getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
                         || orderToGet.get().getSeller().getId().equals(loggedInUser.getWorkplace().getId()))
                     return ResponseEntity.ok(historyRepository.save(historyToSave));
-                else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -153,7 +155,7 @@ public class OrderService {
                 List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -172,7 +174,7 @@ public class OrderService {
                 List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
             } else return ResponseEntity.badRequest().build();
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -198,8 +200,8 @@ public class OrderService {
                 Map<Integer, Order> map = getMap(loggedInUser);
                 if (map.get(orderToUpdate.getId()) != null) {
                     return ResponseEntity.ok(orderRepository.save(orderToUpdate));
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -227,8 +229,8 @@ public class OrderService {
                 if (orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
                         || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId())) {
                     return ResponseEntity.ok(orderRepository.save(orderToSave));
-                } else return new ResponseEntity(HttpStatus.FORBIDDEN);
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         }
     }
 
@@ -265,7 +267,7 @@ public class OrderService {
                 } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.get().getHistories());
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
-            } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }
 
@@ -285,8 +287,9 @@ public class OrderService {
             if (isDeletable(orderToDelete)) {
                 orderRepository.deleteById(id);
                 return ResponseEntity.ok().build();
-            } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.getHistories());
-        } else return new ResponseEntity(HttpStatus.FORBIDDEN);
+            } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+                    "Record Cannot Be Deleted, because it is still relationally connected the following objects: " + orderToDelete.getHistories());
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**

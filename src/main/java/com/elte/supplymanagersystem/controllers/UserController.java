@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+
 /**
  * The User Controller is responsible for: creating Endpoints and wiring the User Service
  */
@@ -25,6 +27,7 @@ public class UserController {
 
     @Autowired
     private AuthenticatedUser authenticatedUser;
+    private static final String UNAUTHORIZED_USER = "Invalid User!";
 
     /**
      * Returns all the Users from UserService based on the Role of the logged in User.
@@ -40,7 +43,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -58,7 +61,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -74,7 +77,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getUnassignedDirectors(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -93,7 +96,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.putById(userDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -110,7 +113,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.registerUser(userDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -127,7 +130,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.disableUser(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -144,7 +147,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.enableUser(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -162,7 +165,7 @@ public class UserController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**

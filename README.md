@@ -1,4 +1,4 @@
-# SupplyManagerSystem - SMS - BackEnd
+# SupplyManagerSystem - SMS - BackEnd - 1.0.0
 A Projekt az ELTE IK - PTI BSc képzéshez készült szakdolgozatnak.
 
 ```
@@ -94,7 +94,7 @@ Témavezető: Dr. Szendrei Rudolf
  [JavaDOC](https://github.com/BSSB33/supplyManagerSystem/tree/release/RELEASE-1.0.0/docs)  
  [Tests](https://github.com/BSSB33/supplyManagerSystem/tree/release/RELEASE-1.0.0/docs/TestResults)
  
- UML with Entities:
+#### UML with Entities:
  
 ![UMLDiagram](https://github.com/BSSB33/supplyManagerSystem/blob/release/RELEASE-1.0.0/docs/UML/EntitiesUML.png "UML with Entities")
 

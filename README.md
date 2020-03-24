@@ -95,7 +95,8 @@ Témavezető: Dr. Szendrei Rudolf
  [Tests](https://github.com/BSSB33/supplyManagerSystem/tree/release/RELEASE-1.0.0/docs/TestResults)
  
  UML with Entities:
-![alt text](https://github.com/BSSB33/supplyManagerSystem/blob/release/RELEASE-1.0.0/docs/UML/EntitiesUML.png "UML with Entities")
+ 
+![UMLDiagram](https://github.com/BSSB33/supplyManagerSystem/blob/release/RELEASE-1.0.0/docs/UML/EntitiesUML.png "UML with Entities")
 
 
 

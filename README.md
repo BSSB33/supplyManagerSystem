@@ -90,7 +90,13 @@ Témavezető: Dr. Szendrei Rudolf
     - [x] [GET] get feedback of running : `/`
     
     
-### UML:
+### Additional Data:
+ [JavaDOC](https://github.com/BSSB33/supplyManagerSystem/tree/release/RELEASE-1.0.0/docs)  
+ [Tests](https://github.com/BSSB33/supplyManagerSystem/tree/release/RELEASE-1.0.0/docs/TestResults)
+ 
+ UML with Entities:
+![alt text](https://github.com/BSSB33/supplyManagerSystem/blob/release/RELEASE-1.0.0/docs/UML/EntitiesUML.png "UML with Entities")
+
 
 
 ### Test Descriptions:

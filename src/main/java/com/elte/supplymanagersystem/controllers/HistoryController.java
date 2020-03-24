@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+
 /**
  * The History Controller is responsible for: creating Endpoints and wiring User and History Services
  */
@@ -37,7 +39,7 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -54,7 +56,7 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -72,7 +74,7 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.addHistory(historyDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -90,7 +92,7 @@ public class HistoryController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
 }

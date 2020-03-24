@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+
 /**
  * The Company Controller is responsible for: creating Endpoints and wiring User and Company Services
  */
@@ -37,7 +39,7 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getAll(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -54,7 +56,7 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getById(loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -70,7 +72,7 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getCompanyOfLoggedInUser(loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -89,7 +91,7 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.putById(companyDTO, loggedInUser, id);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -107,7 +109,7 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.addCompany(companyDTO, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
     /**
@@ -125,6 +127,6 @@ public class CompanyController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.deleteById(id, loggedInUser);
-        } else return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 }

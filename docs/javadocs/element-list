@@ -1,0 +1,8 @@
+com.elte
+com.elte.supplymanagersystem.controllers
+com.elte.supplymanagersystem.dtos
+com.elte.supplymanagersystem.entities
+com.elte.supplymanagersystem.enums
+com.elte.supplymanagersystem.repositories
+com.elte.supplymanagersystem.security
+com.elte.supplymanagersystem.services

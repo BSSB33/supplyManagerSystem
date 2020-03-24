@@ -1,0 +1,20 @@
+[
+  {
+    "id": 4,
+    "creator": {
+      "id": 6,
+      "username": "TTManager"
+    },
+    "historyType": "NOTE",
+    "note": "We are planning to accept the offer"
+  },
+  {
+    "id": 5,
+    "creator": {
+      "id": 6,
+      "username": "TTManager"
+    },
+    "historyType": "NOTE",
+    "note": "Stuff"
+  }
+]

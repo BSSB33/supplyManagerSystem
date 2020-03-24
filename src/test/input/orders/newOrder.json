@@ -1,0 +1,17 @@
+{
+  "productName": "New Order",
+  "price": 22500,
+  "status": "IN_STOCK",
+  "buyer": {
+    "id": 3
+  },
+  "buyerManager": {
+    "id": 6
+  },
+  "seller": {
+    "id": 1
+  },
+  "sellerManager": {
+    "id": 5
+  }
+}

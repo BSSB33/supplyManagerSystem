@@ -1,0 +1,12 @@
+{
+  "id": 6,
+  "username": "TTManager",
+  "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+  "enabled": true,
+  "company": null,
+  "workplace": {
+    "id": 3,
+    "name": "TopTrade Kft."
+  },
+  "role": "ROLE_MANAGER"
+}

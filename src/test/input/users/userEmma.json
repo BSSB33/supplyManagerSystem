@@ -1,0 +1,12 @@
+{
+  "id": 5,
+  "username": "Emma",
+  "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+  "enabled": true,
+  "company": null,
+  "workplace": {
+    "id": 1,
+    "name": "TelnetWork Kft."
+  },
+  "role": "ROLE_MANAGER"
+}

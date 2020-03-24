@@ -1,0 +1,15 @@
+{
+  "id": 2,
+  "username": "Balazs",
+  "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+  "enabled": true,
+  "company": {
+    "id": 1,
+    "name": "TelnetWork Kft."
+  },
+  "workplace": {
+    "id": 1,
+    "name": "TelnetWork Kft."
+  },
+  "role": "ROLE_DIRECTOR"
+}

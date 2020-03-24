@@ -1,0 +1,38 @@
+[
+  {
+    "id": 5,
+    "username": "Emma",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 1,
+      "name": "TelnetWork Kft."
+    },
+    "role": "ROLE_MANAGER"
+  },
+  {
+    "id": 6,
+    "username": "TTManager",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": true,
+    "company": null,
+    "workplace": {
+      "id": 3,
+      "name": "TopTrade Kft."
+    },
+    "role": "ROLE_MANAGER"
+  },
+  {
+    "id": 7,
+    "username": "Old Student",
+    "password": "$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..",
+    "enabled": false,
+    "company": null,
+    "workplace": {
+      "id": 4,
+      "name": "ELTE-Soft Kft."
+    },
+    "role": "ROLE_MANAGER"
+  }
+]

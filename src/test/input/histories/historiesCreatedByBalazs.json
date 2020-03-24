@@ -1,0 +1,20 @@
+[
+  {
+    "id": 10,
+    "creator": {
+      "id": 2,
+      "username": "Balazs"
+    },
+    "historyType": "PAID",
+    "note": "They paid the price of the product (Dell Display)"
+  },
+  {
+    "id": 11,
+    "creator": {
+      "id": 2,
+      "username": "Balazs"
+    },
+    "historyType": "PHONE_CALL",
+    "note": "Everything went smoothly, we have delivered the product"
+  }
+]

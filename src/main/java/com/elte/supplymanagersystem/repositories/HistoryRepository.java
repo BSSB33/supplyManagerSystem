@@ -1,14 +1,20 @@
 package com.elte.supplymanagersystem.repositories;
 
-import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
-import com.elte.supplymanagersystem.entities.User;
-import org.springframework.data.repository.CrudRepository;
+import com.elte.supplymanagersystem.entities.Order;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
+/**
+ * Repository interface for Histories: Type, ID
+ */
 @Repository
-public interface HistoryRepository extends CrudRepository<History, Integer> {
-    //Optional<History> findHistoryType(History.HistoryType historyType);
+public interface HistoryRepository extends JpaRepository<History, Integer> {
+
+    @Query("SELECT h FROM History h WHERE h.order = :order")
+    List<History> findHistoriesByOrder(@Param("order") Order order);
 }

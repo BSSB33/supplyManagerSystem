@@ -45,6 +45,7 @@ public class OrderService {
      * @return Returns A ResponseEntity with All the Orders based on the Role of the User who logged in.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(orderRepository.findAll());
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -62,6 +63,7 @@ public class OrderService {
      * @return Returns a ResponseEntity of the Order.
      */
     public ResponseEntity getById(User loggedInUser, Integer id) {
+        logger.info("getById() called");
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
@@ -90,6 +92,7 @@ public class OrderService {
      * @return Returns a ResponseEntity of the Histories.
      */
     public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {
+        logger.info("getHistoriesByOrderId() called");
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -120,6 +123,7 @@ public class OrderService {
      * @return Returns a ResponseEntity of the saved History.
      */
     public ResponseEntity postHistoryForOrderById(HistoryDTO historyDTO, User loggedInUser, Integer idOfOrder) {
+        logger.info("postHistoryForOrderById() called");
         Optional<Order> orderToGet = orderRepository.findById(idOfOrder);
         if (orderToGet.isPresent()) {
             History historyToSave = new History(historyDTO);
@@ -150,6 +154,7 @@ public class OrderService {
      * @return Returns a ResponseEntity with the Orders where the user's company is a seller.
      */
     public ResponseEntity getSalesByUser(User loggedInUser) {
+        logger.info("getSalesByUser() called");
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             if (loggedInUser.getWorkplace() != null) {
                 List<Order> currentCompany = orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace());
@@ -169,6 +174,7 @@ public class OrderService {
      * @return Returns a ResponseEntity with the Orders where the user's company is a buyer.
      */
     public ResponseEntity getPurchasesByUser(User loggedInUser) {
+        logger.info("getPurchasesByUser() called");
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             if (loggedInUser.getWorkplace() != null) {
                 List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
@@ -190,6 +196,7 @@ public class OrderService {
      * @return Returns a ResponseEntity of the updated Order.
      */
     public ResponseEntity putById(OrderDTO orderDTO, User loggedInUser, Integer id) {
+        logger.info("putById() called");
         Order orderToUpdate = new Order(orderDTO);
         orderToUpdate.setId(id);
         Optional<Order> orderToCheck = orderRepository.findById(id);
@@ -218,6 +225,7 @@ public class OrderService {
      */
     //Add
     public ResponseEntity addOrder(OrderDTO orderDTO, User loggedInUser) {
+        logger.info("addOrder() called");
         Order orderToSave = new Order(orderDTO);
         Optional<Order> otherOrder = orderRepository.findByProductName(orderToSave.getProductName());
         if (otherOrder.isPresent())
@@ -258,6 +266,7 @@ public class OrderService {
      */
     //Remove
     public ResponseEntity deleteById(Integer id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {

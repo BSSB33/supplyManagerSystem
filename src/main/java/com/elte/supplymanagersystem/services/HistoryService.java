@@ -6,6 +6,7 @@ import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.HistoryRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
 
 @Service
 public class HistoryService {
+
+    static final Logger logger = Logger.getLogger(HistoryService.class);
 
     @Autowired
     private UserService userService;
@@ -40,6 +43,7 @@ public class HistoryService {
      * @return Returns a ResponseEntity with the list of Histories.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
@@ -62,6 +66,7 @@ public class HistoryService {
      * @return Returns a ResponseEntity of the History with the requested History filtered by Role.
      */
     public ResponseEntity getById(User loggedInUser, Integer id) {
+        logger.info("getById() called");
         Optional<History> historyToGet = historyRepository.findById(id);
         if (historyToGet.isPresent()) {
             Order orderToGet = historyToGet.get().getOrder();
@@ -87,6 +92,7 @@ public class HistoryService {
      * @return Returns a ResponseEntity of the saved History.
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
+        logger.info("addHistory() called");
         History historyToSave = new History(historyDTO);
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             if (historyToSave.getCreator() == null)
@@ -112,6 +118,7 @@ public class HistoryService {
      */
     //Remove
     public ResponseEntity deleteById(Integer id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<History> historyToDelete = historyRepository.findById(id);
         if (historyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {

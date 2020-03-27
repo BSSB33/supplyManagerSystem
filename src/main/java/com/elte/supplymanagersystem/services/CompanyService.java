@@ -5,6 +5,7 @@ import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.CompanyRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
 
 @Service
 public class CompanyService {
+
+    static final Logger logger = Logger.getLogger(CompanyService.class);
 
     @Autowired
     private UserService userService;
@@ -35,6 +38,7 @@ public class CompanyService {
      * @return Returns a ResponseEntity with the list of the Companies.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
             return ResponseEntity.ok(companyRepository.findAll());
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -51,6 +55,7 @@ public class CompanyService {
      * @return Returns a ResponseEntity of the Company.
      */
     public ResponseEntity getById(User loggedInUser, Integer id) {
+        logger.info("getById() called");
         Optional<Company> companyToGet = companyRepository.findById(id);
         if (companyToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
@@ -68,6 +73,7 @@ public class CompanyService {
      * @return Returns a ResponseEntity with the Company the User works at.
      */
     public ResponseEntity getCompanyOfLoggedInUser(User loggedInUser) {
+        logger.info("getCompanyOfLoggedInUser() called");
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))
                 && loggedInUser.getWorkplace() != null) {
             return ResponseEntity.ok(loggedInUser.getWorkplace());
@@ -87,6 +93,7 @@ public class CompanyService {
      * @return Returns a ResponseEntity of the updated Company.
      */
     public ResponseEntity putById(CompanyDTO companyDTO, User loggedInUser, Integer id) {
+        logger.info("putById() called");
         Company companyToUpdate = new Company(companyDTO);
         companyToUpdate.setId(id);
         Optional<Company> companyToCheck = companyRepository.findById(companyToUpdate.getId());
@@ -114,6 +121,7 @@ public class CompanyService {
      */
     //Add
     public ResponseEntity addCompany(CompanyDTO companyDTO, User loggedInUser) {
+        logger.info("addCompany() called");
         Company companyToSave = new Company(companyDTO);
         Optional<Company> otherCompany = companyRepository.findByName(companyToSave.getName());
         if (otherCompany.isPresent())
@@ -151,6 +159,7 @@ public class CompanyService {
      */
     //Remove
     public ResponseEntity deleteById(Integer id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<Company> companyToDelete = companyRepository.findById(id);
         if (companyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {

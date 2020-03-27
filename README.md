@@ -19,6 +19,7 @@ Témavezető: Dr. Szendrei Rudolf
 > például a Git és a Lombok.
 
 **Bővítési lehetőségek:**
+	-A megrendelések több terméket is tartalmazhatnak egységárral
     -Megrendelés megnyitási/zárolási ideje
     -HTTPS bevezetése
     

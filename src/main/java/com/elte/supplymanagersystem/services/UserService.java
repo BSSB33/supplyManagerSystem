@@ -38,6 +38,7 @@ public class UserService {
      * @return Returns a ResponseEntity with the list of Users.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findAll());
         } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
@@ -58,6 +59,7 @@ public class UserService {
      * @return Returns a ResponseEntity with the Requested User.
      */
     public ResponseEntity getById(User loggedInUser, Integer id) {
+        logger.info("getById() called");
         Optional<User> userToGet = userRepository.findById(id);
         if (userToGet.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
@@ -81,6 +83,7 @@ public class UserService {
      * @return Returns a ResponseEntity with the requested Users
      */
     public ResponseEntity getUnassignedDirectors(User loggedInUser) {
+        logger.info("getUnassignedDirectors() called");
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findUnassignedDirectors());
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -99,6 +102,7 @@ public class UserService {
      * @return Returns a ResponseEntity with the updated User.
      */
     public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Integer id) {
+        logger.info("putById() called");
         User userToUpdate = new User(userDTO);
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
@@ -147,6 +151,7 @@ public class UserService {
      * @return Returns a ResponseEntity of the saved User.
      */
     public ResponseEntity registerUser(UserDTO userDTO, User loggedInUser) {
+        logger.info("registerUser() called");
         User userToRegister = new User(userDTO);
         Optional<User> otherUser = Optional.ofNullable(userRepository.findByUsername(userToRegister.getUsername()));
         if (otherUser.isPresent()) {
@@ -176,6 +181,7 @@ public class UserService {
      * @return Returns an ArrayList of Users.
      */
     public Iterable<User> getEmployeesOfUser(User user) {
+        logger.info("getEmployeesOfUser() called");
         User director = userRepository.findByUsername(user.getUsername());
         if (userHasRole(director, Role.ROLE_DIRECTOR) && director.getCompany() != null && director.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getCompany().getManagers();
@@ -189,6 +195,7 @@ public class UserService {
      * @return Returns an ArrayList of Users.
      */
     public Iterable<User> getColleaguesOfUser(User user) {
+        logger.info("getColleaguesOfUser() called");
         User employee = userRepository.findByUsername(user.getUsername());
         if (employee.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
@@ -207,6 +214,7 @@ public class UserService {
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
     public ResponseEntity enableUser(Integer id, User loggedInUser) {
+        logger.info("enableUser() called");
         Optional<User> userToEnable = userRepository.findById(id);
         if (userToEnable.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -232,6 +240,7 @@ public class UserService {
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
     public ResponseEntity disableUser(Integer id, User loggedInUser) {
+        logger.info("disableUser() called");
         Optional<User> userToDisable = userRepository.findById(id);
         if (userToDisable.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -271,6 +280,7 @@ public class UserService {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     public ResponseEntity deleteById(Integer id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -315,7 +325,7 @@ public class UserService {
         @Nullable
         User loggedInUser = userRepository.findByUsername(username);
         if (loggedInUser != null && loggedInUser.isEnabled()) {
-            logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
+            logger.info("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
             return loggedInUser;
         }
         return null; //throws UNAUTHORIZED

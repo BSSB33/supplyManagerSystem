@@ -36,6 +36,9 @@ public class Company {
     @Column
     private String name;
 
+    @Column
+    private boolean active;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "workplace")//, cascade = CascadeType.ALL)
     @JsonIgnore

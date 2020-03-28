@@ -104,4 +104,17 @@ public class User {
     public boolean isColleague(User otherUser) {
         return this.workplace.getId().equals(otherUser.workplace.getId());
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", company=" + company +
+                ", workplace=" + workplace+
+                ", role=" + role +
+                '}';
+    }
 }

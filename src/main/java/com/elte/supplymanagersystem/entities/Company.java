@@ -72,4 +72,12 @@ public class Company {
         if (!CollectionUtils.isEmpty(companyDTO.getSales()))
             sales = companyDTO.getSales().stream().map(Order::new).collect(Collectors.toList());
     }
+
+    @Override
+    public String toString() {
+        return "Company{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

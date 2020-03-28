@@ -84,4 +84,18 @@ public class Order {
         if (!CollectionUtils.isEmpty(orderDTO.getHistory()))
             histories = orderDTO.getHistory().stream().map(History::new).collect(Collectors.toList());
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", price=" + price +
+                ", status=" + status +
+                ", buyer=" + buyer +
+                ", buyerManager=" + buyerManager +
+                ", seller=" + seller +
+                ", sellerManager=" + sellerManager +
+                '}';
+    }
 }

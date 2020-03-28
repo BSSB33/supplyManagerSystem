@@ -63,4 +63,16 @@ public class History {
         this.note = historyDTO.getNote();
         this.createdAt = historyDTO.getCreatedAt();
     }
+
+    @Override
+    public String toString() {
+        return "History{" +
+                "id=" + id +
+                ", creator=" + creator +
+                ", order=" + order +
+                ", historyType=" + historyType +
+                ", note='" + note + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

@@ -269,6 +269,7 @@ public class OrderService {
         logger.info("deleteById() called");
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
+            orderToDelete.get().setHistories(new ArrayList<>());
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 if (isDeletable(orderToDelete.get())) {
                     orderRepository.deleteById(id);

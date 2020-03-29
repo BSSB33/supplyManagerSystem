@@ -2,6 +2,7 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.enums.HistoryType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,7 @@ public class History {
 
     @Column(updatable = false)
     @CreationTimestamp
+    @JsonFormat(pattern="yyyy. MM. dd. - hh:mm:ss")
     private LocalDateTime createdAt;
 
     /**

@@ -48,7 +48,7 @@ public class Order {
     private Status status;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "order")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)//, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<History> histories;
 

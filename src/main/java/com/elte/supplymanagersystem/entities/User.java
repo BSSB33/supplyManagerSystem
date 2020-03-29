@@ -71,7 +71,7 @@ public class User {
     private Role role;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "creator")
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<History> histories;
 

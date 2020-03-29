@@ -256,7 +256,6 @@ public class OrderService {
      * Deletes an Order record by ID.
      * ADMIN: Can delete any Order without any regulations.
      * DIRECTOR, MANAGER:  Can only delete Order of the Company the user works at is a seller or a buyer in the Order.
-     * If Order has any histories then cannot be deleted: NOT_ACCEPTABLE is thrown, and the connected Histories returned.
      * ELSE: FORBIDDEN
      * Non existing Order: NOTFOUND
      *
@@ -269,12 +268,10 @@ public class OrderService {
         logger.info("deleteById() called");
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
-            orderToDelete.get().setHistories(new ArrayList<>());
+            //orderToDelete.get().setHistories(new ArrayList<>());
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                if (isDeletable(orderToDelete.get())) {
-                    orderRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
-                } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(orderToDelete.get().getHistories());
+                orderRepository.deleteById(id);
+                return ResponseEntity.ok().build();
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 return deleteByDirectorOrManager(id, loggedInUser, orderToDelete.get());
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -294,11 +291,8 @@ public class OrderService {
     private ResponseEntity deleteByDirectorOrManager(Integer id, User loggedInUser, Order orderToDelete) {
         Map<Integer, Order> map = getMap(loggedInUser);
         if (map.get(orderToDelete.getId()) != null) {
-            if (isDeletable(orderToDelete)) {
-                orderRepository.deleteById(id);
-                return ResponseEntity.ok().build();
-            } else return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
-                    "Record Cannot Be Deleted, because it is still relationally connected the following objects: " + orderToDelete.getHistories());
+            orderRepository.deleteById(id);
+            return ResponseEntity.ok().build();
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 

@@ -68,8 +68,6 @@ public class History {
     public String toString() {
         return "History{" +
                 "id=" + id +
-                ", creator=" + creator +
-                ", order=" + order +
                 ", historyType=" + historyType +
                 ", note='" + note + '\'' +
                 ", createdAt=" + createdAt +

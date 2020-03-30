@@ -28,7 +28,7 @@ insert into order_table (price, product_name, status, buyer_id, seller_id, buyer
 insert into order_table (price, product_name, status, buyer_id, seller_id, buyer_manager_id, seller_manager_id) values ('1000000', 'Development of a Warehouse management application', 'NEW', 1, 4, NULL, 1); -- 7
 
 insert into history_table (history_type, note, order_id, creator_id, created_at) values ('EMAIL_SENT', 'I sent out the specifications of requested Intel Core I5 processor', 1, 5, CURRENT_TIMESTAMP);
-insert into history_table (history_type, note, order_id, creator_id, created_at) values ('MADE_AND_OFFER', 'I made an offer for the Intel Core I5 processor', 1, 5, CURRENT_TIMESTAMP);
+insert into history_table (history_type, note, order_id, creator_id, created_at) values ('MADE_AN_OFFER', 'I made an offer for the Intel Core I5 processor', 1, 5, CURRENT_TIMESTAMP);
 insert into history_table (history_type, note, order_id, creator_id, created_at) values ('PHONE_CALL', 'I talked with the manager, they will probably accept our offer', 1, 5, CURRENT_TIMESTAMP);
 insert into history_table (history_type, note, order_id, creator_id, created_at) values ('NOTE', 'We are planning to accept the offer', 1, 6, CURRENT_TIMESTAMP);
 insert into history_table (history_type, note, order_id, creator_id, created_at) values ('NOTE', 'Stuff', 1, 6, CURRENT_TIMESTAMP);

@@ -50,7 +50,7 @@ public class History {
 
     @Column(updatable = false)
     @CreationTimestamp
-    @JsonFormat(pattern="yyyy. MM. dd. - hh:mm:ss")
+    @JsonFormat(pattern="yyyy. MM. dd. - HH:mm:ss")
     private LocalDateTime createdAt;
 
     /**

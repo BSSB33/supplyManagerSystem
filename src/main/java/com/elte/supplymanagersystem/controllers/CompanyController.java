@@ -113,6 +113,40 @@ public class CompanyController {
     }
 
     /**
+     * Disables a Company by ID.
+     * Calls disableCompany method from CompanyService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param id   The ID of the User to disable.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
+    @PutMapping("/{id}/disable")
+    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.disableCompany(id, loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Enables a User by ID.
+     * Calls enableUser method from UserService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param id   The ID of the User to disable.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
+    @PutMapping("/{id}/enable")
+    public ResponseEntity enable(@PathVariable Integer id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.enableCompany(id, loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
      * Deletes a record by ID.
      * Calls deleteById method from CompanyService.
      * Returns UNAUTHORIZED if the user is Invalid.

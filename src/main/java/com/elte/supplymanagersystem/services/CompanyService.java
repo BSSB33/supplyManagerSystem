@@ -133,6 +133,55 @@ public class CompanyService {
         }
     }
 
+    //TODO Disable "Disable button" in the case of logged in user - front end
+    /**
+     * Enables a Company by ID.
+     * ADMIN: Can enable any Company without any regulations.
+     * Non existing User: NOTFOUND
+     * ELSE: Forbidden
+     *
+     * @param id           The ID of the Company the admin wants to enable.
+     * @param loggedInUser The user logged in (admin).
+     * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
+     */
+    public ResponseEntity enableCompany(Integer id, User loggedInUser) {
+        logger.info("enableCompany() called");
+        Optional<Company> companyToEnable = companyRepository.findById(id);
+        if (companyToEnable.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                companyToEnable.get().setActive(true);
+                for (User employee : companyToEnable.get().getManagers()){
+                    employee.setEnabled(true);
+                }
+                return ResponseEntity.ok(companyRepository.save(companyToEnable.get()));
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+        } else return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Disables a Company by ID.
+     * ADMIN: Can disable any Company without any regulations.
+     * Non existing User: NOTFOUND
+     * ELSE: Forbidden
+     *
+     * @param id           The ID of the Company the admin wants to disable.
+     * @param loggedInUser The user logged in (admin).
+     * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
+     */
+    public ResponseEntity disableCompany(Integer id, User loggedInUser) {
+        logger.info("disableCompany() called");
+        Optional<Company> companyTodisable = companyRepository.findById(id);
+        if (companyTodisable.isPresent()) {
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                companyTodisable.get().setActive(false);
+                for (User employee : companyTodisable.get().getManagers()){
+                    employee.setEnabled(false);
+                }
+                return ResponseEntity.ok(companyRepository.save(companyTodisable.get()));
+            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+        } else return ResponseEntity.notFound().build();
+    }
+
     /**
      * Checks if the Company has any relations to other objects.
      *

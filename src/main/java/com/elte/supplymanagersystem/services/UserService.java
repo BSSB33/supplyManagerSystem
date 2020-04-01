@@ -317,6 +317,7 @@ public class UserService {
 
     /**
      * Checks if the Requested user is valid and Enabled.
+     * Also checks the activity of the company the user works at.
      *
      * @param username Name of the user to check
      * @return Returns a Valid user
@@ -324,8 +325,8 @@ public class UserService {
     public User getValidUser(String username) {
         @Nullable
         User loggedInUser = userRepository.findByUsername(username);
-        if (loggedInUser != null && loggedInUser.isEnabled()) {
-            logger.info("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
+        if (loggedInUser != null && loggedInUser.isEnabled() && loggedInUser.getWorkplace().isActive()) {
+            logger.info("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + " - " + loggedInUser.getWorkplace().getName() + "]");
             return loggedInUser;
         }
         return null; //throws UNAUTHORIZED

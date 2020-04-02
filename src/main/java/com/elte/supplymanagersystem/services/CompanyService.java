@@ -149,10 +149,10 @@ public class CompanyService {
         Optional<Company> companyToEnable = companyRepository.findById(id);
         if (companyToEnable.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                companyToEnable.get().setActive(true);
-                for (User employee : companyToEnable.get().getManagers()){
-                    employee.setEnabled(true);
+                for (User userToEnable : companyToEnable.get().getManagers()){
+                    userService.enableUserById(userToEnable.getId());
                 }
+                companyToEnable.get().setActive(true);
                 return ResponseEntity.ok(companyRepository.save(companyToEnable.get()));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
@@ -170,14 +170,14 @@ public class CompanyService {
      */
     public ResponseEntity disableCompany(Integer id, User loggedInUser) {
         logger.info("disableCompany() called");
-        Optional<Company> companyTodisable = companyRepository.findById(id);
-        if (companyTodisable.isPresent()) {
+        Optional<Company> companyToDisable = companyRepository.findById(id);
+        if (companyToDisable.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                companyTodisable.get().setActive(false);
-                for (User employee : companyTodisable.get().getManagers()){
-                    employee.setEnabled(false);
+                for (User userToEnable : companyToDisable.get().getManagers()){
+                    userService.disableUserById(userToEnable.getId());
                 }
-                return ResponseEntity.ok(companyRepository.save(companyTodisable.get()));
+                companyToDisable.get().setActive(false);
+                return ResponseEntity.ok(companyRepository.save(companyToDisable.get()));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
     }

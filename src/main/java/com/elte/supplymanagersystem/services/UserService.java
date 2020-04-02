@@ -203,6 +203,35 @@ public class UserService {
     }
 
     /**
+     * Disables a User by ID
+     *
+     * @param id The Id of the user we want to disable
+     */
+    public void disableUserById(Integer id){
+        logger.info("disableUserById() called");
+        Optional<User> userToDisable = userRepository.findById(id);
+        if(userToDisable.isPresent()){
+            userToDisable.get().setEnabled(false);
+            userRepository.save(userToDisable.get());
+        }
+    }
+
+    /**
+     * Enables a User by ID
+     *
+     * @param id The Id of the user we want to enable
+     */
+    public void enableUserById(Integer id){
+        logger.info("disableUserById() called");
+        Optional<User> userToEnable = userRepository.findById(id);
+        if(userToEnable.isPresent()){
+            userToEnable.get().setEnabled(true);
+            System.out.println(userToEnable.get().getUsername());
+            userRepository.save(userToEnable.get());
+        }
+    }
+
+    /**
      * Enables a User by ID.
      * ADMIN: Can enable any Users without any regulations.
      * DIRECTOR: Can enable only employees.

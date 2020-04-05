@@ -17,7 +17,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <start-class>com.elte.supplymanagersystem.SupplyManagerSystemApplication</start-class>
+        <start-class>com.elte.SupplyManagerSystemApplication</start-class>
     </properties>
 
     <distributionManagement>

@@ -96,6 +96,7 @@ public class CompanyService {
         logger.info("putById() called");
         Company companyToUpdate = new Company(companyDTO);
         companyToUpdate.setId(id);
+
         Optional<Company> companyToCheck = companyRepository.findById(companyToUpdate.getId());
         if (companyToCheck.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -127,13 +128,14 @@ public class CompanyService {
         if (otherCompany.isPresent())
             return ResponseEntity.badRequest().build();
         else {
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
+                companyToSave.setActive(true);
                 return ResponseEntity.ok(companyRepository.save(companyToSave));
+            }
             else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         }
     }
 
-    //TODO Disable "Disable button" in the case of logged in user - front end
     /**
      * Enables a Company by ID.
      * ADMIN: Can enable any Company without any regulations.

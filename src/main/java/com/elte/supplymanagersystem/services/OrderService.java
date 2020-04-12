@@ -227,19 +227,15 @@ public class OrderService {
     public ResponseEntity addOrder(OrderDTO orderDTO, User loggedInUser) {
         logger.info("addOrder() called");
         Order orderToSave = new Order(orderDTO);
-        Optional<Order> otherOrder = orderRepository.findByProductName(orderToSave.getProductName());
-        if (otherOrder.isPresent())
-            return ResponseEntity.badRequest().build();
-        else {
-            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
+            return ResponseEntity.ok(orderRepository.save(orderToSave));
+        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            //TODO throw bad request to null values
+            if (orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
+                    || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId())) {
                 return ResponseEntity.ok(orderRepository.save(orderToSave));
-            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                if (orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
-                        || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId())) {
-                    return ResponseEntity.ok(orderRepository.save(orderToSave));
-                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
-        }
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**

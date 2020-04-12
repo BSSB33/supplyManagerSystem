@@ -17,6 +17,8 @@ public class CompanyDTO {
 
     private String name;
 
+    private boolean active;
+
     private List<UserDTO> managers;
 
     private List<UserDTO> director;
@@ -32,6 +34,7 @@ public class CompanyDTO {
      */
     public CompanyDTO(Company company) {
         this.name = company.getName();
+        this.active = company.isActive();
         if (!CollectionUtils.isEmpty(company.getManagers()))
             managers = company.getManagers().stream().map(UserDTO::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(company.getDirector()))

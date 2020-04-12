@@ -66,6 +66,7 @@ public class Company {
      */
     public Company(CompanyDTO companyDTO) {
         this.name = companyDTO.getName();
+        this.active = companyDTO.isActive();
         if (!CollectionUtils.isEmpty(companyDTO.getManagers()))
             managers = companyDTO.getManagers().stream().map(User::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(companyDTO.getDirector()))

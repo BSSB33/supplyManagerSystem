@@ -107,6 +107,9 @@ public class UserService {
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
+            if(userToUpdate.getPassword() != null){
+                userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
+            }
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());

@@ -161,7 +161,6 @@ public class UserService {
             return ResponseEntity.badRequest().build();
         } else {
             userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
-            userToRegister.setEnabled(true);
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
                 if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
                     userToRegister.setRole(Role.ROLE_DIRECTOR);

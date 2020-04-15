@@ -174,11 +174,7 @@ public class UserController {
      * @return Returns an authenticatedUser with OK (200)
      */
     @PostMapping("login")
-    public ResponseEntity login(Authentication auth) {
-        User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) {
-            return ResponseEntity.ok(authenticatedUser.getUser());
-        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
-
+    public ResponseEntity login() {
+        return ResponseEntity.ok(authenticatedUser.getUser());
     }
 }

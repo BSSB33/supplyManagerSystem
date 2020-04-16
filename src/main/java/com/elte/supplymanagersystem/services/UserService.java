@@ -110,6 +110,8 @@ public class UserService {
             if(userToUpdate.getPassword() != null){
                 userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
             }
+            else userToUpdate.setPassword(userToCheck.get().getPassword());
+
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());

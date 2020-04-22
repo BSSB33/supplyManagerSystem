@@ -4,6 +4,7 @@ import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.services.OrderService;
+import com.elte.supplymanagersystem.services.StatisticsService;
 import com.elte.supplymanagersystem.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private StatisticsService statService;
 
     /**
      * Returns all the Orders from OrderService based on the Role of the logged in User.
@@ -74,6 +78,58 @@ public class OrderController {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Returns an array with the monthly active and closed sales of the company.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with 12 month of data.
+     */
+    @GetMapping("/stats/monthlyIncome")
+    public ResponseEntity getMonthlyApproximatedIncome(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return statService.getMonthlyIncome(loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Returns an array with the monthly active and closed expenses of the company.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with 12 month of data.
+     */
+    @GetMapping("/stats/monthlyExpense")
+    public ResponseEntity getMonthlyApproximatedExpense(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return statService.getMonthlyExpense(loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Returns an array with the monthly active and closed expenses of the company.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with 12 month of data.
+     */
+    @GetMapping("/stats/partnersStat")
+    public ResponseEntity getPartnerStatistics(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return statService.getPartnerStatistics(loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Returns an array with the amount of: active sales, closed sales, active purchases, closed purchases.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with the 4 long array.
+     */
+    @GetMapping("/stats/orderCount")
+    public ResponseEntity getOrderCountStatistics(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return statService.getOrderCountStatistics(loggedInUser);
         } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 

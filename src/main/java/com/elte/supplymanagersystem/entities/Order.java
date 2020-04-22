@@ -2,16 +2,19 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.enums.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,6 +70,12 @@ public class Order {
     @ManyToOne
     @JoinColumn
     private User sellerManager;
+
+    @Column(updatable = false)
+    @CreationTimestamp
+    @JsonFormat(pattern="yyyy. MM. dd. - HH:mm:ss")
+    private LocalDateTime createdAt;
+    //TODO add modification date too
 
     /**
      * Constructor for constructing Order object from DTO Object

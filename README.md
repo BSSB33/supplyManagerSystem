@@ -20,7 +20,9 @@ Témavezető: Dr. Szendrei Rudolf
 
 **Bővítési lehetőségek:**
 	-A megrendelések több terméket is tartalmazhatnak egységárral
+	-A több országban működő cégekneknek választható nyelv bevezetése felhasználónként.
     -Megrendelés megnyitási/zárolási ideje
+	-Megrendelés archiválása
     -HTTPS bevezetése
     
 **Változtatások a fejlesztés során:**
@@ -72,6 +74,7 @@ Témavezető: Dr. Szendrei Rudolf
     - [x] [POST] add history to order by order ID : `/orders/{id}/histories`
     - [x] [PUT] update order by ID : `/orders/{id}`
     - [x] [DELETE] delete order by ID : `/orders/{id}`
+	- TODO statistics endpoints
     
 - CompanyController:
     - [x] [GET] get all the companies : `/companies`

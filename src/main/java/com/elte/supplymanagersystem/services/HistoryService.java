@@ -99,7 +99,7 @@ public class HistoryService {
                 historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            historyToSave.setCreator(loggedInUser);
+            //historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }

@@ -6,6 +6,7 @@ import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
+import com.elte.supplymanagersystem.enums.Status;
 import com.elte.supplymanagersystem.repositories.HistoryRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import org.apache.log4j.Logger;
@@ -205,7 +206,7 @@ public class OrderService {
                 return ResponseEntity.ok(orderRepository.save(orderToUpdate));
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
                 Map<Integer, Order> map = getMap(loggedInUser);
-                if (map.get(orderToUpdate.getId()) != null) {
+                if (orderToUpdate.getStatus() != orderToCheck.get().getStatus() || map.get(orderToUpdate.getId()) != null) {
                     return ResponseEntity.ok(orderRepository.save(orderToUpdate));
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);

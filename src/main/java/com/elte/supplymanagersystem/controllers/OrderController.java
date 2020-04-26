@@ -134,6 +134,19 @@ public class OrderController {
     }
 
     /**
+     * Returns an array with the amount of registered user by role.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity with a map containing the 3 role.
+     */
+    @GetMapping("/stats/userCount")
+    public ResponseEntity getUserCountByRole(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return statService.getUserCountByRole(loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
      * Creates a new record of History.
      * Calls postHistoryForOrderById method from OrderService.
      * Returns UNAUTHORIZED if the user is Invalid.

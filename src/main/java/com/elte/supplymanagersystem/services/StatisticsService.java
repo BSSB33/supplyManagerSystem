@@ -7,15 +7,14 @@ import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.enums.Status;
 import com.elte.supplymanagersystem.repositories.CompanyRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
+import com.elte.supplymanagersystem.repositories.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
@@ -27,6 +26,9 @@ public class StatisticsService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -46,22 +48,21 @@ public class StatisticsService {
                 date = date.withMonth(currentMonth);
                 double closedSaleCost = 0;
                 double activeSaleCost = 0;
-                if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
-                    for(Company company : companyRepository.findAll()){
-                        for(Order order : orderRepository.findSalesByWorkplace(company)){
-                            if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                                    && order.getCreatedAt().getMonthValue() + 1== currentMonth){
-                                if(isClosed(order)) closedSaleCost += order.getPrice();
+                if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                    for (Company company : companyRepository.findAll()) {
+                        for (Order order : orderRepository.findSalesByWorkplace(company)) {
+                            if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                                    && order.getCreatedAt().getMonthValue() + 1 == currentMonth) {
+                                if (isClosed(order)) closedSaleCost += order.getPrice();
                                 else activeSaleCost += order.getPrice();
                             }
                         }
                     }
-                }
-                else if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
-                    for(Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())){
-                        if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                                && order.getCreatedAt().getMonthValue() + 1== currentMonth){
-                            if(isClosed(order)) closedSaleCost += order.getPrice();
+                } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                    for (Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())) {
+                        if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                                && order.getCreatedAt().getMonthValue() + 1 == currentMonth) {
+                            if (isClosed(order)) closedSaleCost += order.getPrice();
                             else activeSaleCost += order.getPrice();
                         }
                     }
@@ -88,22 +89,21 @@ public class StatisticsService {
                 date = date.withMonth(currentMonth);
                 double closedPurchaseCost = 0;
                 double activePurchaseCost = 0;
-                if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
-                    for(Company company : companyRepository.findAll()){
-                        for(Order order : orderRepository.findPurchasesByWorkplace(company)){
-                            if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                                    && order.getCreatedAt().getMonthValue() + 1== currentMonth){
-                                if(isClosed(order)) closedPurchaseCost += order.getPrice();
+                if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                    for (Company company : companyRepository.findAll()) {
+                        for (Order order : orderRepository.findPurchasesByWorkplace(company)) {
+                            if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                                    && order.getCreatedAt().getMonthValue() + 1 == currentMonth) {
+                                if (isClosed(order)) closedPurchaseCost += order.getPrice();
                                 else activePurchaseCost += order.getPrice();
                             }
                         }
                     }
-                }
-                else if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
-                    for(Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())){
-                        if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                                && order.getCreatedAt().getMonthValue() + 1== currentMonth){
-                            if(isClosed(order)) closedPurchaseCost += order.getPrice();
+                } else if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                    for (Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())) {
+                        if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                                && order.getCreatedAt().getMonthValue() + 1 == currentMonth) {
+                            if (isClosed(order)) closedPurchaseCost += order.getPrice();
                             else activePurchaseCost += order.getPrice();
                         }
                     }
@@ -123,26 +123,26 @@ public class StatisticsService {
         logger.info("getOrderCountStatistics() called");
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_ADMIN))) {
             Map<String, Integer> partnerCount = new HashMap<>();
-            for(Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())){
-                if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                        && order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                    if(!partnerCount.containsKey(order.getBuyer().getName()))
+            for (Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())) {
+                if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                        && order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                    if (!partnerCount.containsKey(order.getBuyer().getName()))
                         partnerCount.put(order.getBuyer().getName(), 1);
                     else partnerCount.put(order.getBuyer().getName(), partnerCount.get(order.getBuyer().getName()) + 1);
                 }
             }
-            for(Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())){
-                if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
-                        && order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                    if(!partnerCount.containsKey(order.getSeller().getName()))
+            for (Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())) {
+                if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR)
+                        && order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                    if (!partnerCount.containsKey(order.getSeller().getName()))
                         partnerCount.put(order.getSeller().getName(), 1);
-                    else partnerCount.put(order.getSeller().getName(), partnerCount.get(order.getSeller().getName()) + 1);
+                    else
+                        partnerCount.put(order.getSeller().getName(), partnerCount.get(order.getSeller().getName()) + 1);
                 }
             }
 
             return ResponseEntity.ok(partnerCount);
-        }
-        else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
 
     }
 
@@ -154,18 +154,18 @@ public class StatisticsService {
             int activeSales = 0;
             int closedPurchases = 0;
             int activePurchases = 0;
-            if(userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)){
-                for(Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())){
-                    if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
-                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                        if(isClosed(order)) closedSales++;
+            if (userService.userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                for (Order order : orderRepository.findSalesByWorkplace(loggedInUser.getWorkplace())) {
+                    if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
+                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                        if (isClosed(order)) closedSales++;
                         else activeSales++;
                     }
                 }
-                for(Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())){
-                    if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
-                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                        if(isClosed(order)) closedPurchases++;
+                for (Order order : orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace())) {
+                    if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
+                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                        if (isClosed(order)) closedPurchases++;
                         else activePurchases++;
                     }
                 }
@@ -173,18 +173,18 @@ public class StatisticsService {
                 counts.put("activeSales", activeSales);
                 counts.put("closedPurchases", closedPurchases);
                 counts.put("activePurchases", activePurchases);
-            } else if(userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)){
-                for(Order order : orderRepository.findAll()){
-                    if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
-                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                        if(isClosed(order)) closedSales++;
+            } else if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                for (Order order : orderRepository.findAll()) {
+                    if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
+                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                        if (isClosed(order)) closedSales++;
                         else activeSales++;
                     }
                 }
-                for(Order order : orderRepository.findAll()){
-                    if(order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
-                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1 ){
-                        if(isClosed(order)) closedPurchases++;
+                for (Order order : orderRepository.findAll()) {
+                    if (order.getCreatedAt().getYear() == Calendar.getInstance().get(Calendar.YEAR) &&
+                            order.getCreatedAt().getMonthValue() == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+                        if (isClosed(order)) closedPurchases++;
                         else activePurchases++;
                     }
                 }
@@ -197,7 +197,36 @@ public class StatisticsService {
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
-    private boolean isClosed(Order order){
+    public ResponseEntity getUserCountByRole(User loggedInUser) {
+        logger.info("getUserCountByRole() called");
+        Map<String, Integer> userCount = new HashMap<>();
+        int admin = 0;
+        int director = 0;
+        int manager = 0;
+
+        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+            for (User user : userRepository.findAll()) {
+                switch (user.getRole()) {
+                    case ROLE_ADMIN:
+                        admin++;
+                        break;
+                    case ROLE_DIRECTOR:
+                        director++;
+                        break;
+                    case ROLE_MANAGER:
+                        manager++;
+                        break;
+                }
+            }
+            userCount.put("admin", admin);
+            userCount.put("director", director);
+            userCount.put("manager", manager);
+            return ResponseEntity.ok(userCount);
+        }
+        else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+    }
+
+    private boolean isClosed(Order order) {
         return order.getStatus() == Status.CLOSED || order.getStatus() == Status.SUCCESSFULLY_COMPLETED;
     }
 

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor
 @Data
-public class UserDTO {
+public class UserDTO { //TODO validate fields
 
     private String username;
 

@@ -1,8 +1,8 @@
-insert into company_table (name, active) values ('TelnetWork Kft.', true);
-insert into company_table (name, active) values ('BAV Zrt.', true);
-insert into company_table (name, active) values ('TopTrade Kft.', true);
-insert into company_table (name, active) values ('ELTE-Soft Kft.', true);
-insert into company_table (name, active) values ('Unknown Kft.', true);
+insert into company_table (name, active, address, tax_number, bank_account_number) values ('TelnetWork Kft.', true, '1141 Budapest, Arnold utca 20', '1234567-89-0', 'HU42 1177 3058 0568 9984 3058 0000');
+insert into company_table (name, active, address, tax_number, bank_account_number) values ('BAV Zrt.', true, '1166 Budapest, Blog tér 8', '0987654-32-1', 'EN42 1177 3058 0568 9984 0000 9984');
+insert into company_table (name, active, address, tax_number, bank_account_number) values ('TopTrade Kft.', true, '1081 Budapest, Cecil út 44', '1234567-99-0', 'GB42 1177 0568 3058 9984 0568 0000');
+insert into company_table (name, active, address, tax_number, bank_account_number) values ('ELTE-Soft Kft.', true, '1131 Budapest, Dara utca 666', '0987654-66-0', 'HU42 1177 3058 0568 3058 0000 0568');
+insert into company_table (name, active, address, tax_number, bank_account_number) values ('Unknown Kft.', true, '1020 Budapest, Eledel utca 1-3', '1234567-33-3', 'EU42 1177 0568 9984 9984 3058 0000');
 
 insert into user_table (username, password, full_name, email, enabled, role, company_id, workplace_id) values ('Gabor', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', 'Kek Gabor', 'gabor@gmail.com', true, 'ROLE_ADMIN', 4, 4);
 insert into user_table (username, password, full_name, email, enabled, role, company_id, workplace_id) values ('Balazs', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', 'Piros Balazs','balazs@gmail.com', true, 'ROLE_DIRECTOR', 1, 1);

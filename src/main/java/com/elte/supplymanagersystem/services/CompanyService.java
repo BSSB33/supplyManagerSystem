@@ -39,6 +39,11 @@ public class CompanyService {
      */
     public ResponseEntity getAll(User loggedInUser) {
         logger.info("getAll() called");
+//        try {
+//            Thread.sleep(4000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
             return ResponseEntity.ok(companyRepository.findAll());
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);

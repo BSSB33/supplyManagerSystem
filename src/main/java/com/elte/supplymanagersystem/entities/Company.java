@@ -33,8 +33,17 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column
+    @Column (nullable = false)
     private String name;
+
+    @Column (nullable = false)
+    private String address;
+
+    @Column (nullable = false)
+    private String taxNumber;
+
+    @Column (nullable = false)
+    private String bankAccountNumber;
 
     @Column
     private boolean active;
@@ -66,6 +75,9 @@ public class Company {
      */
     public Company(CompanyDTO companyDTO) {
         this.name = companyDTO.getName();
+        this.address = companyDTO.getAddress();
+        this.taxNumber = companyDTO.getTaxNumber();
+        this.bankAccountNumber = companyDTO.getBankAccountNumber();
         this.active = companyDTO.isActive();
         if (!CollectionUtils.isEmpty(companyDTO.getManagers()))
             managers = companyDTO.getManagers().stream().map(User::new).collect(Collectors.toList());

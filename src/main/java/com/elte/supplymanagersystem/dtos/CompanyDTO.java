@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.persistence.Column;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,12 @@ import java.util.stream.Collectors;
 public class CompanyDTO {
 
     private String name;
+
+    private String address;
+
+    private String taxNumber;
+
+    private String bankAccountNumber;
 
     private boolean active;
 
@@ -34,6 +41,9 @@ public class CompanyDTO {
      */
     public CompanyDTO(Company company) {
         this.name = company.getName();
+        this.address = company.getAddress();
+        this.taxNumber = company.getTaxNumber();
+        this.bankAccountNumber = company.getBankAccountNumber();
         this.active = company.isActive();
         if (!CollectionUtils.isEmpty(company.getManagers()))
             managers = company.getManagers().stream().map(UserDTO::new).collect(Collectors.toList());

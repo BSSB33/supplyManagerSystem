@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,10 @@ public class UserDTO { //TODO validate fields
     private String username;
 
     private String password;
+
+    private String fullName;
+
+    private String email;
 
     private boolean enabled;
 
@@ -42,6 +48,8 @@ public class UserDTO { //TODO validate fields
      */
     public UserDTO(User user) {
         this.username = user.getUsername();
+        this.fullName = user.getFullName();
+        this.email = user.getEmail();
         this.password = user.getPassword();
         this.enabled = user.isEnabled();
         this.company = user.getCompany();

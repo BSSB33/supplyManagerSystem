@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,10 @@ public class OrderDTO {
 
     private User sellerManager;
 
+    private LocalDate createdAt;
+
+    private LocalDate modifiedAt;
+
     /**
      * Constructor for Order Data Transfer Object
      *
@@ -47,6 +53,8 @@ public class OrderDTO {
         this.buyerManager = order.getBuyerManager();
         this.seller = order.getSeller();
         this.sellerManager = order.getSellerManager();
+        this.createdAt = order.getCreatedAt();
+        this.modifiedAt = order.getModifiedAt();
         if (!CollectionUtils.isEmpty(order.getHistories()))
             history = order.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
     }

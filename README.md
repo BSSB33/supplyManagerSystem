@@ -21,9 +21,12 @@ Témavezető: Dr. Szendrei Rudolf
 **Bővítési lehetőségek:**
 	-A megrendelések több terméket is tartalmazhatnak egységárral
 	-A több országban működő cégekneknek választható nyelv bevezetése felhasználónként.
+	-Havi Jelentés generálása funkció implementálása
+	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.
     -Megrendelés megnyitási/zárolási ideje
 	-Megrendelés archiválása
     -HTTPS bevezetése
+    
     
 **Változtatások a fejlesztés során:**
     - Felhasználók csak a saját cégük által kibocsátott előzményeket tekinthetik meg ezért hozzárendelésre került a Creator (Készítő) mező minden előzményhez.

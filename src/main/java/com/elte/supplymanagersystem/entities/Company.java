@@ -40,22 +40,22 @@ public class Company {
     private boolean active;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "workplace")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workplace")
     @JsonIgnore
     private List<User> managers;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "company")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company")
     @JsonIgnore
     private List<User> director;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "buyer")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "buyer")
     @JsonIgnore
     private List<Order> purchases;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "seller")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "seller")
     @JsonIgnore
     private List<Order> sales;
 

@@ -2,16 +2,22 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.enums.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +44,15 @@ public class User {
     @Column(updatable = false, nullable = false)
     private Integer id;
 
-    //@Size(min = 4, max = 10, message = "Username Length Should Be 4-10 characters long")
+    //TODO dto validation: @Size(min = 4, max = 10, message = "Username Length Should Be 4-10 characters long")
     @Column(nullable = false)
     private String username;
+
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
     @JsonIgnore
@@ -83,6 +95,8 @@ public class User {
      */
     public User(UserDTO userDTO) {
         this.username = userDTO.getUsername();
+        this.fullName = userDTO.getFullName();
+        this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
         this.enabled = userDTO.isEnabled();
         this.company = userDTO.getCompany();

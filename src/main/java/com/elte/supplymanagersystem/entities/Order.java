@@ -12,9 +12,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +47,7 @@ public class Order {
     @Column(nullable = false)
     private String productName;
 
-    @Column //Should appear only when giving an offer (frontend)
+    @Column
     private Double price;
 
     @Column(nullable = false)
@@ -51,7 +55,7 @@ public class Order {
     private Status status;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<History> histories;
 
@@ -73,9 +77,15 @@ public class Order {
 
     @Column(updatable = false)
     @CreationTimestamp
-    @JsonFormat(pattern="yyyy. MM. dd. - HH:mm:ss")
-    private LocalDateTime createdAt;
-    //TODO add modification date too
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
+
+    @Column
+    @UpdateTimestamp
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate modifiedAt;
 
     /**
      * Constructor for constructing Order object from DTO Object
@@ -90,6 +100,8 @@ public class Order {
         this.buyerManager = orderDTO.getBuyerManager();
         this.seller = orderDTO.getSeller();
         this.sellerManager = orderDTO.getSellerManager();
+        this.createdAt = orderDTO.getCreatedAt();
+        this.modifiedAt = orderDTO.getModifiedAt();
         if (!CollectionUtils.isEmpty(orderDTO.getHistory()))
             histories = orderDTO.getHistory().stream().map(History::new).collect(Collectors.toList());
     }
@@ -105,6 +117,8 @@ public class Order {
                 ", buyerManager=" + buyerManager +
                 ", seller=" + seller +
                 ", sellerManager=" + sellerManager +
+                ", createdAt=" + createdAt +
+                ", modifiedAt=" + modifiedAt +
                 '}';
     }
 }

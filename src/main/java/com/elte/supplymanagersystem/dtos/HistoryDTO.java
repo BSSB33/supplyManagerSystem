@@ -25,7 +25,7 @@ public class HistoryDTO {
 
     private String note;
 
-    @JsonFormat(pattern="yyyy MM dd")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDateTime createdAt;
 
     /**

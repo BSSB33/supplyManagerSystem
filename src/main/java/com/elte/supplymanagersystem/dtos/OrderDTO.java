@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class OrderDTO {
 
+    @Size(min = 3, message = "Product Name length must contain at least 3 characters")
     private String productName;
 
+    @Size(min = 2, message = "Price length must contain at least 2 characters")
     private Double price;
 
     private Status status;

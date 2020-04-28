@@ -47,7 +47,7 @@ public class Order {
     @Column(nullable = false)
     private String productName;
 
-    @Column
+    @Column(nullable = false)
     private Double price;
 
     @Column(nullable = false)

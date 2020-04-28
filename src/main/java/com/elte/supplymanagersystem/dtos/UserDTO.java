@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,12 +18,15 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor
 @Data
-public class UserDTO { //TODO validate fields
+public class UserDTO {
 
+    @Size(min = 4, message = "Username length must contain at least 4 characters")
     private String username;
 
+    @Size(min = 8, message = "Password length must contain at least 8 characters")
     private String password;
 
+    @Size(min = 4, message = "Full Name length must contain at least 4 characters")
     private String fullName;
 
     private String email;

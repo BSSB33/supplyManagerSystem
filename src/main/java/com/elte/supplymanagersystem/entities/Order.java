@@ -54,6 +54,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column
+    private boolean isArchived;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     @JsonIgnore
@@ -87,6 +90,9 @@ public class Order {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate modifiedAt;
 
+    @Column
+    private String description;
+
     /**
      * Constructor for constructing Order object from DTO Object
      *
@@ -96,12 +102,14 @@ public class Order {
         this.productName = orderDTO.getProductName();
         this.price = orderDTO.getPrice();
         this.status = orderDTO.getStatus();
+        this.isArchived = orderDTO.isArchived();
         this.buyer = orderDTO.getBuyer();
         this.buyerManager = orderDTO.getBuyerManager();
         this.seller = orderDTO.getSeller();
         this.sellerManager = orderDTO.getSellerManager();
         this.createdAt = orderDTO.getCreatedAt();
         this.modifiedAt = orderDTO.getModifiedAt();
+        this.description = orderDTO.getDescription();
         if (!CollectionUtils.isEmpty(orderDTO.getHistory()))
             histories = orderDTO.getHistory().stream().map(History::new).collect(Collectors.toList());
     }

@@ -29,6 +29,8 @@ public class OrderDTO {
 
     private Status status;
 
+    private boolean isArchived;
+
     private List<HistoryDTO> history;
 
     private Company buyer;
@@ -43,6 +45,8 @@ public class OrderDTO {
 
     private LocalDate modifiedAt;
 
+    private String description;
+
     /**
      * Constructor for Order Data Transfer Object
      *
@@ -52,12 +56,14 @@ public class OrderDTO {
         this.productName = order.getProductName();
         this.price = order.getPrice();
         this.status = order.getStatus();
+        this.isArchived = order.isArchived();
         this.buyer = order.getBuyer();
         this.buyerManager = order.getBuyerManager();
         this.seller = order.getSeller();
         this.sellerManager = order.getSellerManager();
         this.createdAt = order.getCreatedAt();
         this.modifiedAt = order.getModifiedAt();
+        this.description = order.getDescription();
         if (!CollectionUtils.isEmpty(order.getHistories()))
             history = order.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
     }

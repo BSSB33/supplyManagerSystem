@@ -2,10 +2,7 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.CompanyDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -24,6 +21,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "COMPANY_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -33,16 +31,16 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String address;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String taxNumber;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String bankAccountNumber;
 
     @Column

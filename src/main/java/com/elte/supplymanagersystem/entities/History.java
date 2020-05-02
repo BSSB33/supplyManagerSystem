@@ -3,12 +3,8 @@ package com.elte.supplymanagersystem.entities;
 import com.elte.supplymanagersystem.dtos.HistoryDTO;
 import com.elte.supplymanagersystem.enums.HistoryType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -22,6 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "HISTORY_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -50,7 +47,7 @@ public class History {
 
     @Column(updatable = false)
     @CreationTimestamp
-    @JsonFormat(pattern="yyyy. MM. dd. - HH:mm:ss")
+    @JsonFormat(pattern = "yyyy. MM. dd. - HH:mm:ss")
     private LocalDateTime createdAt;
 
     /**

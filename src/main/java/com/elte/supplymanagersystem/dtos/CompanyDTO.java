@@ -39,6 +39,10 @@ public class CompanyDTO {
 
     private List<OrderDTO> sales;
 
+    private String lat;
+
+    private String lon;
+
     /**
      * Constructor for Company Data Transfer Object
      *
@@ -50,6 +54,8 @@ public class CompanyDTO {
         this.taxNumber = company.getTaxNumber();
         this.bankAccountNumber = company.getBankAccountNumber();
         this.active = company.isActive();
+        this.lat = company.getLat();
+        this.lon = company.getLon();
         if (!CollectionUtils.isEmpty(company.getManagers()))
             managers = company.getManagers().stream().map(UserDTO::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(company.getDirector()))

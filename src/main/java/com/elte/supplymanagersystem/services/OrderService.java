@@ -6,7 +6,6 @@ import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
-import com.elte.supplymanagersystem.enums.Status;
 import com.elte.supplymanagersystem.repositories.HistoryRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import org.apache.log4j.Logger;
@@ -304,4 +303,5 @@ public class OrderService {
         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
         return ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
     }
+
 }

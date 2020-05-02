@@ -68,6 +68,12 @@ public class Company {
     @JsonIgnore
     private List<Order> sales;
 
+    @Column
+    private String lat;
+
+    @Column
+    private String lon;
+
     /**
      * Constructor for constructing Company object from DTO Object
      *
@@ -79,6 +85,8 @@ public class Company {
         this.taxNumber = companyDTO.getTaxNumber();
         this.bankAccountNumber = companyDTO.getBankAccountNumber();
         this.active = companyDTO.isActive();
+        this.lat = companyDTO.getLat();
+        this.lon = companyDTO.getLon();
         if (!CollectionUtils.isEmpty(companyDTO.getManagers()))
             managers = companyDTO.getManagers().stream().map(User::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(companyDTO.getDirector()))

@@ -1,8 +1,8 @@
-insert into company_table (name, active, address, tax_number, bank_account_number) values ('TelnetWork Kft.', true, '1032 Budapest, Zapor utca 55', '1234567-89-0', 'HU42 1177 3058 0568 9984 3058 0000');
-insert into company_table (name, active, address, tax_number, bank_account_number) values ('BAV Zrt.', true, '1055 Budapest, Jaszai Mari ter', '0987654-32-1', 'EN42 1177 3058 0568 9984 0000 9984');
-insert into company_table (name, active, address, tax_number, bank_account_number) values ('TopTrade Kft.', true, '1142 Budapest, Erzsebet Kiralyne utja 2', '1234567-99-0', 'GB42 1177 0568 3058 9984 0568 0000');
-insert into company_table (name, active, address, tax_number, bank_account_number) values ('ELTE-Soft Kft.', true, '1117 Budapest, Pazmany Peter setany. 1/C', '0987654-66-0', 'HU42 1177 3058 0568 3058 0000 0568');
-insert into company_table (name, active, address, tax_number, bank_account_number) values ('Unknown Kft.', true, '1115 Budapest, Bartok Bela ut 152', '1234567-33-3', 'EU42 1177 0568 9984 9984 3058 0000');
+insert into company_table (name, active, address, tax_number, bank_account_number, lat, lon) values ('TelnetWork Kft.', true, '1032 Budapest, Zapor utca 55', '1234567-89-0', 'HU42 1177 3058 0568 9984 3058 0000', '47.539660', '19.035810');
+insert into company_table (name, active, address, tax_number, bank_account_number, lat, lon) values ('BAV Zrt.', true, '1055 Budapest, Jaszai Mari ter', '0987654-32-1', 'EN42 1177 3058 0568 9984 0000 9984', '47.512630', '19.046900');
+insert into company_table (name, active, address, tax_number, bank_account_number, lat, lon) values ('TopTrade Kft.', true, '1142 Budapest, Erzsebet Kiralyne utja 2', '1234567-99-0', 'GB42 1177 0568 3058 9984 0568 0000', '47.529140', '19.107530');
+insert into company_table (name, active, address, tax_number, bank_account_number, lat, lon) values ('ELTE-Soft Kft.', true, '1117 Budapest, Pazmany Peter setany. 1/C', '0987654-66-0', 'HU42 1177 3058 0568 3058 0000 0568', '47.472250', '19.062480');
+insert into company_table (name, active, address, tax_number, bank_account_number, lat, lon) values ('Unknown Kft.', true, '1115 Budapest, Bartok Bela ut 152', '1234567-33-3', 'EU42 1177 0568 9984 9984 3058 0000', '47.468560', '19.024810');
 
 insert into user_table (username, password, full_name, email, enabled, role, company_id, workplace_id) values ('Gabor', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', 'Kek Gabor', 'gabor@gmail.com', true, 'ROLE_ADMIN', 4, 4);
 insert into user_table (username, password, full_name, email, enabled, role, company_id, workplace_id) values ('Balazs', '$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..', 'Piros Balazs','balazs@gmail.com', true, 'ROLE_DIRECTOR', 1, 1);

@@ -36,7 +36,6 @@ public class HistoryService {
     /**
      * Returns All the Histories in the Database depending on the Role of the User.
      * ADMIN: Can get ALL the Users.
-     * DIRECTOR, MANAGER: Can get histories they created.
      * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
@@ -46,9 +45,7 @@ public class HistoryService {
         logger.info("getAll() called");
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
-        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            return ResponseEntity.ok(loggedInUser.getHistories());
-        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+        else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -99,7 +96,6 @@ public class HistoryService {
                 historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            //historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }

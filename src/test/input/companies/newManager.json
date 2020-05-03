@@ -1,7 +1,0 @@
-{
-  "username": "NewManager",
-  "password": "password",
-  "enabled": true,
-  "company": null,
-  "role": "ROLE_MANAGER"
-}

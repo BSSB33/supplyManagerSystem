@@ -4,6 +4,7 @@ import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.HistoryType;
+import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.enums.Status;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -29,6 +31,9 @@ class OrderControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     private String jsonToString(final Object obj) {
         try {
@@ -83,7 +88,7 @@ class OrderControllerTest {
     @Test
     void givenDirectorUser_whenGetSalesEndpointIsCalled_thenAllOrdersShouldBeReturned() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/orders/purchases").with(user("Balazs").password("password")))
+                .get("/orders/sales").with(user("Balazs").password("password")))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
@@ -217,9 +222,22 @@ class OrderControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_ifOrderDoesNotExists_thenNotFoundShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/10000/histories").with(user("Judit").password("password"))
+                .content(jsonToString(
+                        History.builder()
+                                .note("Test History Note")
+                                .historyType(HistoryType.NOTE)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
     //Post Order Endpoint
     @Test
-    //@Order(1)
     void givenAdminUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/").with(user("Gabor").password("password"))
@@ -293,6 +311,61 @@ class OrderControllerTest {
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void givenInvalidUser_whenPostOrderEndpointIsCalled_withNotExistingOrder_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/1000/history").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        History.builder()
+                                .note("Test Note")
+                                .historyType(HistoryType.NOTE)
+                                .order(com.elte.supplymanagersystem.entities.Order
+                                        .builder()
+                                        .id(1000)
+                                        .build()
+                                )
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenAdminUser_whenPostOrderEndpointIsCalled__withUserWorkingSomewhereElse_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("TestProduct")
+                                .isArchived(false)
+                                .price(3000d)
+                                .status(Status.CLOSED)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenAdminUser_whenPostOrderEndpointIsCalled__withSameSellerAndBuyer_thenBadRequestShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("TestProduct")
+                                .isArchived(false)
+                                .price(3000d)
+                                .status(Status.CLOSED)
+                                .buyer(Company.builder().id(1).build())
+                                .seller(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     //Put Order Endpoint
@@ -429,6 +502,20 @@ class OrderControllerTest {
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void givenInvalidUser_whenUpdateCompanyEndpointIsCalled__withNotExistingOrder_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/1000").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(4)
+                                .productName("Office Computer")
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     //Delete Order Endpoint

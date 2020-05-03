@@ -154,12 +154,14 @@ public class UserService {
         } else {
             //userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
-                if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
-                    userToRegister.setRole(Role.ROLE_DIRECTOR);
-                    userToRegister.setCompany(userToRegister.getWorkplace());
-                }
-                //Register Other Roles simply
-                return ResponseEntity.ok(userRepository.save(userToRegister));
+                if(userToRegister.getWorkplace() != null){
+                    if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
+                        userToRegister.setRole(Role.ROLE_DIRECTOR);
+                        userToRegister.setCompany(userToRegister.getWorkplace());
+                    }
+                    //Register Other Roles simply
+                    return ResponseEntity.ok(userRepository.save(userToRegister));
+                } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FORBIDDEN);
             } else if (loggedInUser.getWorkplace() != null && loggedInUser.getCompany() != null && userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //Director
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());

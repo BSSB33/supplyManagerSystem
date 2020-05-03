@@ -483,6 +483,26 @@ class UserControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void givenManagerUser_whenRegisterEndpointIsCalled_ifUserWorkplaceIsNull_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/register").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .username("New User")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_ADMIN)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(null)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     //Put By ID Endpoint
     @Test
     void givenAnyUser_whenPutByIdEndpointIsCalled_withNonExistingUser_thenNotFoundShouldBeThrown() throws Exception {

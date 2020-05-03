@@ -230,22 +230,13 @@ public class OrderService {
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(orderRepository.save(orderToSave));
         else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            //TODO throw bad request to null values
-            if (orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
-                    || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId())) {
-                return ResponseEntity.ok(orderRepository.save(orderToSave));
+            if ((orderToSave.getBuyer().getId().equals(loggedInUser.getWorkplace().getId())
+                    || orderToSave.getSeller().getId().equals(loggedInUser.getWorkplace().getId()))) {
+                if(!orderToSave.getSeller().getId().equals((orderToSave.getBuyer().getId()))){
+                    return ResponseEntity.ok(orderRepository.save(orderToSave));
+                } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FORBIDDEN);
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
-    }
-
-    /**
-     * Checks if the Order has any relations to other objects.
-     *
-     * @param orderToDelete The Order to check
-     * @return boolean
-     */
-    private boolean isDeletable(Order orderToDelete) {
-        return orderToDelete.getHistories().isEmpty();
     }
 
     /**

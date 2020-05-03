@@ -65,7 +65,7 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) { // Doesn't work anywhere
+                if (loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
@@ -194,35 +194,6 @@ public class UserService {
         if (employee.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
         } else return new ArrayList<>();
-    }
-
-    /**
-     * Disables a User by ID
-     *
-     * @param id The Id of the user we want to disable
-     */
-    public void disableUserById(Integer id){
-        logger.info("disableUserById() called");
-        Optional<User> userToDisable = userRepository.findById(id);
-        if(userToDisable.isPresent()){
-            userToDisable.get().setEnabled(false);
-            userRepository.save(userToDisable.get());
-        }
-    }
-
-    /**
-     * Enables a User by ID
-     *
-     * @param id The Id of the user we want to enable
-     */
-    public void enableUserById(Integer id){
-        logger.info("disableUserById() called");
-        Optional<User> userToEnable = userRepository.findById(id);
-        if(userToEnable.isPresent()){
-            userToEnable.get().setEnabled(true);
-            System.out.println(userToEnable.get().getUsername());
-            userRepository.save(userToEnable.get());
-        }
     }
 
     /**

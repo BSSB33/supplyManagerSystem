@@ -28,16 +28,4 @@ public class HistoryDTO {
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDateTime createdAt;
 
-    /**
-     * Constructor for History Data Transfer Object
-     *
-     * @param history The History object to construct the DTO of.
-     */
-    public HistoryDTO(History history) {
-        this.creator = history.getCreator();
-        this.order = history.getOrder();
-        this.historyType = history.getHistoryType();
-        this.note = history.getNote();
-        this.createdAt = history.getCreatedAt();
-    }
 }

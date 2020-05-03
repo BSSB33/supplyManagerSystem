@@ -44,26 +44,4 @@ public class UserDTO {
     private Role role;
 
     private List<HistoryDTO> histories;
-
-    /**
-     * Constructor for User Data Transfer Object
-     *
-     * @param user The User object to construct the DTO of.
-     */
-    public UserDTO(User user) {
-        this.username = user.getUsername();
-        this.fullName = user.getFullName();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
-        this.enabled = user.isEnabled();
-        this.company = user.getCompany();
-        this.workplace = user.getWorkplace();
-        this.role = user.getRole();
-        if (!CollectionUtils.isEmpty(user.getHistories()))
-            histories = user.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getPurchases()))
-            buyerManager = user.getPurchases().stream().map(OrderDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getSells()))
-            buyerManager = user.getSells().stream().map(OrderDTO::new).collect(Collectors.toList());
-    }
 }

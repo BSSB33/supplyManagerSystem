@@ -42,27 +42,4 @@ public class CompanyDTO {
     private String lat;
 
     private String lon;
-
-    /**
-     * Constructor for Company Data Transfer Object
-     *
-     * @param company The Company object to construct the DTO of.
-     */
-    public CompanyDTO(Company company) {
-        this.name = company.getName();
-        this.address = company.getAddress();
-        this.taxNumber = company.getTaxNumber();
-        this.bankAccountNumber = company.getBankAccountNumber();
-        this.active = company.isActive();
-        this.lat = company.getLat();
-        this.lon = company.getLon();
-        if (!CollectionUtils.isEmpty(company.getManagers()))
-            managers = company.getManagers().stream().map(UserDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(company.getDirector()))
-            director = company.getDirector().stream().map(UserDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(company.getPurchases()))
-            purchases = company.getPurchases().stream().map(OrderDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(company.getSales()))
-            sales = company.getSales().stream().map(OrderDTO::new).collect(Collectors.toList());
-    }
 }

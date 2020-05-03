@@ -143,6 +143,32 @@ class UserControllerTest {
     }
 
     @Test
+    void givenManagerUser_whenGetByIdEndpointIsCalledForItselfWithoutCompanyAndWorkplace_thenTheUserShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(5)
+                                .username("Emma")
+                                .password(encoder.encode("password"))
+                                .fullName("L. Emma")
+                                .email("emma@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/5").with(user("Emma").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
     void givenDirectorUser_whenGetByIdEndpointIsCalledForAnEmployee_thenTheRequestedUserShouldBeReturned() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/users/5").with(user("Balazs").password("password")))
@@ -202,13 +228,11 @@ class UserControllerTest {
     }
 
     @Test
-    void givenDisabledUser_whenGetByIdEndpointIsCalled_thenFOShouldBeThrown() throws Exception {
+    void givenDisabledUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/users/2").with(user("Old Student").password("password")))
                 .andExpect(status().isUnauthorized());
     }
-
-
 
     //Disable Endpoint
     @Test
@@ -230,7 +254,7 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
     }
-    //TODO enable endpoint test: disable, then forbidden/unauthorized upon enable call
+
     @Test
     void givenDirectorUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -264,6 +288,15 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(true));
+    }
+
+    @Test
+    void givenAnyUser_whenDisableEndpointIsCalled_withNonExistingUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/1000/disable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     //Enable Endpoint
@@ -335,6 +368,14 @@ class UserControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void givenAnyUser_whenEnableEndpointIsCalled_withNonExistingUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/1000/enable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
+    }
 
     //Login Endpoint
     @Test
@@ -422,6 +463,26 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void givenManagerUser_whenRegisterEndpointIsCalled_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/register").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .username("New User")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_ADMIN)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
     //Put By ID Endpoint
     @Test
     void givenAnyUser_whenPutByIdEndpointIsCalled_withNonExistingUser_thenNotFoundShouldBeThrown() throws Exception {
@@ -466,6 +527,29 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Anna"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_MANAGER"));
+    }
+
+    @Test
+    void givenAdminUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheRequestedUserShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/1").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(1)
+                                .username("Gabor1")
+                                .password(encoder.encode("password"))
+                                .fullName("Kek Gabor")
+                                .email("gabor@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .company(Company.builder().id(4).build())
+                                .workplace(Company.builder().id(4).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_ADMIN"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Gabor1"));
     }
 
     @Test
@@ -567,7 +651,7 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_DIRECTOR"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.company.id").value("1"));
     }
-//TODO jackson test
+
     @Test
     void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAManagerWhoWorksSomeWhereElse_thenForbiddenShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -675,6 +759,15 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenDirectorUser_whenDeleteEndpointIsCalled_withNonExistingUser_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/users/1000").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
 }

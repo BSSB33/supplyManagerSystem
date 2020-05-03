@@ -32,9 +32,6 @@ class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private BCryptPasswordEncoder encoder;
-
     private String jsonToString(final Object obj) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();

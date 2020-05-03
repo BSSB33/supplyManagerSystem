@@ -236,6 +236,116 @@ class CompanyControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
+    @Test
+    void givenAnyUser_whenRegisterCompanyEndpointIsCalled_ifAlreadyExistingCompany_thenBadRequestShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/companies/register").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .name("ELTE-Soft Kft.")
+                                .active(true)
+                                .address("Pázmány Péter Sétány 1/C")
+                                .bankAccountNumber("NA72317747374734")
+                                .taxNumber("064160131-5")
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    //Disable Company
+    @Test
+    void givenAdminUser_whenDisableCompanyEndpointIsCalled_thenTheCompanyShouldBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1/disable").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.active").value(false));
+    }
+
+    @Test
+    void givenDirectorUser_whenDisableCompanyEndpointIsCalled_thenTheCompanyShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1/disable").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    void givenDirectorUser_whenDisableCompanyEndpointIsCalled_ifCompanyNotExists_thenTheCompanyShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/10000/disable").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1000)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    //Enable Company
+    @Test
+    void givenAdminUser_whenEnableCompanyEndpointIsCalled_thenTheCompanyShouldBeDisabled() throws Exception {
+        //Disabling company
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1/disable").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.active").value(false));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1/enable").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.active").value(true));
+    }
+
+    @Test
+    void givenDirectorUser_whenEnableCompanyEndpointIsCalled_thenTheCompanyShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1/enable").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenDirectorUser_whenEnableCompanyEndpointIsCalled_ifCompanyNotExists_thenTheCompanyShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/10000/enable").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .id(1000)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
     //Put Company Endpoint
     @Test
     void givenAdminUser_whenUpdateCompanyEndpointIsCalled_thenTheCompanyShouldBeUpdated() throws Exception {
@@ -265,7 +375,7 @@ class CompanyControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("TelnetWork BT."));
     }
 
-    @Test //?
+    @Test
     void givenDirectorUser_whenUpdateCompanyEndpointIsCalled_ifTheCompanyIsNotHis_thenTheCompanyShouldNotBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/companies/2").with(user("Balazs").password("password"))
@@ -303,5 +413,18 @@ class CompanyControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenAnyUser_whenUpdateCompanyEndpointIsCalled_ifNonExistingCompany_thenTheCompanyShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/companies/1000").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        Company.builder()
+                                .name("BAV Kft.")
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

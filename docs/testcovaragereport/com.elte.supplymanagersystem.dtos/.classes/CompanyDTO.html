@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CompanyDTO</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.dtos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CompanyDTO (com.elte.supplymanagersystem.dtos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompanyDTO</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/ 13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.dtos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.entities.Company;
+<i>4</i>&nbsp;import lombok.Data;
+<i>5</i>&nbsp;import lombok.NoArgsConstructor;
+<i>6</i>&nbsp;import org.apache.commons.collections.CollectionUtils;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import javax.persistence.Column;
+<i>9</i>&nbsp;import javax.validation.constraints.Size;
+<i>10</i>&nbsp;import java.util.List;
+<i>11</i>&nbsp;import java.util.stream.Collectors;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * DTO Class so REST API doesn&#39;t have to send unused data
+<i>15</i>&nbsp; */
+<b class="fc"><i>16</i>&nbsp;@Data</b>
+<b class="fc"><i>17</i>&nbsp;@NoArgsConstructor</b>
+<i>18</i>&nbsp;public class CompanyDTO {
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    @Size(min = 4, message = &quot;Name length must contain at least 4 characters&quot;)
+<b class="fc"><i>21</i>&nbsp;    private String name;</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    @Size(min = 4, message = &quot;Address length must contain at least 4 characters&quot;)
+<b class="fc"><i>24</i>&nbsp;    private String address;</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Size(min = 10, message = &quot;Tax Number length must contain at least 10 characters&quot;)
+<b class="fc"><i>27</i>&nbsp;    private String taxNumber;</b>
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    @Size(min = 12, message = &quot;Bank Account Number length must contain at least 12 characters&quot;)
+<b class="fc"><i>30</i>&nbsp;    private String bankAccountNumber;</b>
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;    private boolean active;</b>
+<i>33</i>&nbsp;
+<b class="fc"><i>34</i>&nbsp;    private List&lt;UserDTO&gt; managers;</b>
+<i>35</i>&nbsp;
+<b class="fc"><i>36</i>&nbsp;    private List&lt;UserDTO&gt; director;</b>
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;    private List&lt;OrderDTO&gt; purchases;</b>
+<i>39</i>&nbsp;
+<b class="fc"><i>40</i>&nbsp;    private List&lt;OrderDTO&gt; sales;</b>
+<i>41</i>&nbsp;
+<b class="fc"><i>42</i>&nbsp;    private String lat;</b>
+<i>43</i>&nbsp;
+<b class="fc"><i>44</i>&nbsp;    private String lon;</b>
+<i>45</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

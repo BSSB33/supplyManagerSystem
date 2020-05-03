@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CompanyController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.controllers</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CompanyController (com.elte.supplymanagersystem.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompanyController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87,9%
+  </span>
+  <span class="absValue">
+    (29/ 33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.controllers;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.dtos.CompanyDTO;
+<i>4</i>&nbsp;import com.elte.supplymanagersystem.entities.User;
+<i>5</i>&nbsp;import com.elte.supplymanagersystem.services.CompanyService;
+<i>6</i>&nbsp;import com.elte.supplymanagersystem.services.UserService;
+<i>7</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>8</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>9</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>10</i>&nbsp;import org.springframework.security.core.Authentication;
+<i>11</i>&nbsp;import org.springframework.web.bind.annotation.*;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; * The Company Controller is responsible for: creating Endpoints and wiring User and Company Services
+<i>17</i>&nbsp; */
+<i>18</i>&nbsp;@CrossOrigin
+<i>19</i>&nbsp;@RestController
+<i>20</i>&nbsp;@RequestMapping(&quot;/companies&quot;)
+<b class="fc"><i>21</i>&nbsp;public class CompanyController {</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    @Autowired
+<i>24</i>&nbsp;    private CompanyService companyService;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Autowired
+<i>27</i>&nbsp;    private UserService userService;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    /**
+<i>30</i>&nbsp;     * Returns all the Companies from CompanyService based on the Role of the logged in User.
+<i>31</i>&nbsp;     * Calls getAll method from CompanyService.
+<i>32</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>33</i>&nbsp;     *
+<i>34</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>35</i>&nbsp;     * @return Returns a ResponseEntity with All the Companies in the Database.
+<i>36</i>&nbsp;     */
+<i>37</i>&nbsp;    @GetMapping(&quot;&quot;)
+<i>38</i>&nbsp;    public ResponseEntity getAll(Authentication auth) {
+<b class="fc"><i>39</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>40</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>41</i>&nbsp;            return companyService.getAll(loggedInUser);</b>
+<b class="fc"><i>42</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>43</i>&nbsp;    }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    /**
+<i>46</i>&nbsp;     * Returns the Company with the given ID from CompanyService based on the Role of the logged in User.
+<i>47</i>&nbsp;     * Calls getById method from CompanyService.
+<i>48</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>49</i>&nbsp;     *
+<i>50</i>&nbsp;     * @param id   The ID of the Company to get.
+<i>51</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>52</i>&nbsp;     * @return Returns a ResponseEntity of the Company with the given ID.
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    @GetMapping(&quot;/{id}&quot;)
+<i>55</i>&nbsp;    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>56</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>57</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>58</i>&nbsp;            return companyService.getById(loggedInUser, id);</b>
+<b class="fc"><i>59</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>60</i>&nbsp;    }
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * Returns the Workplace of the logged in User with the help of CompanyService.
+<i>64</i>&nbsp;     * Calls getCompanyOfLoggedInUser method from CompanyService.
+<i>65</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>66</i>&nbsp;     *
+<i>67</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>68</i>&nbsp;     * @return Returns a ResponseEntity with the Company of the user who logged in.
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    @GetMapping(&quot;/mycompany&quot;)
+<i>71</i>&nbsp;    public ResponseEntity getCompanyOfLoggedInUser(Authentication auth) {
+<b class="fc"><i>72</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>73</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>74</i>&nbsp;            return companyService.getCompanyOfLoggedInUser(loggedInUser);</b>
+<b class="nc"><i>75</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    /**
+<i>79</i>&nbsp;     * Updates a Company by ID based on User Role.
+<i>80</i>&nbsp;     * Calls putById method from CompanyService.
+<i>81</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>82</i>&nbsp;     *
+<i>83</i>&nbsp;     * @param companyDTO The Company with the updated information.
+<i>84</i>&nbsp;     * @param id         The ID of the Company to update.
+<i>85</i>&nbsp;     * @param auth       Authentication parameter for Security in order to get the User who logged in.
+<i>86</i>&nbsp;     * @return Returns a ResponseEntity with the updated record.
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    //Update
+<i>89</i>&nbsp;    @PutMapping(&quot;/{id}&quot;)
+<i>90</i>&nbsp;    public ResponseEntity put(@RequestBody CompanyDTO companyDTO, @PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>91</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>92</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>93</i>&nbsp;            return companyService.putById(companyDTO, loggedInUser, id);</b>
+<b class="fc"><i>94</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>95</i>&nbsp;    }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    /**
+<i>98</i>&nbsp;     * Creates a new record of Company.
+<i>99</i>&nbsp;     * Calls addCompany method from CompanyService.
+<i>100</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>101</i>&nbsp;     *
+<i>102</i>&nbsp;     * @param companyDTO The company with the information to save.
+<i>103</i>&nbsp;     * @param auth       Authentication parameter for Security in order to get the User who logged in.
+<i>104</i>&nbsp;     * @return Returns a ResponseEntity with the saved record.
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    //Add
+<i>107</i>&nbsp;    @PostMapping(&quot;register&quot;)
+<i>108</i>&nbsp;    public ResponseEntity post(@RequestBody CompanyDTO companyDTO, Authentication auth) {
+<b class="fc"><i>109</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>110</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>111</i>&nbsp;            return companyService.addCompany(companyDTO, loggedInUser);</b>
+<b class="fc"><i>112</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>113</i>&nbsp;    }
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * Disables a Company by ID.
+<i>117</i>&nbsp;     * Calls disableCompany method from CompanyService.
+<i>118</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>119</i>&nbsp;     *
+<i>120</i>&nbsp;     * @param id   The ID of the User to disable.
+<i>121</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>122</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>123</i>&nbsp;     */
+<i>124</i>&nbsp;    @PutMapping(&quot;/{id}/disable&quot;)
+<i>125</i>&nbsp;    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>126</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>127</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>128</i>&nbsp;            return companyService.disableCompany(id, loggedInUser);</b>
+<b class="nc"><i>129</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>130</i>&nbsp;    }
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;    /**
+<i>133</i>&nbsp;     * Enables a User by ID.
+<i>134</i>&nbsp;     * Calls enableUser method from UserService.
+<i>135</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>136</i>&nbsp;     *
+<i>137</i>&nbsp;     * @param id   The ID of the User to disable.
+<i>138</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>139</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>140</i>&nbsp;     */
+<i>141</i>&nbsp;    @PutMapping(&quot;/{id}/enable&quot;)
+<i>142</i>&nbsp;    public ResponseEntity enable(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>143</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>144</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>145</i>&nbsp;            return companyService.enableCompany(id, loggedInUser);</b>
+<b class="nc"><i>146</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>147</i>&nbsp;    }
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;    /**
+<i>150</i>&nbsp;     * Deletes a record by ID.
+<i>151</i>&nbsp;     * Calls deleteById method from CompanyService.
+<i>152</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>153</i>&nbsp;     *
+<i>154</i>&nbsp;     * @param id   The ID of the Company to delete.
+<i>155</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>156</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>157</i>&nbsp;     */
+<i>158</i>&nbsp;    //Delete
+<i>159</i>&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+<i>160</i>&nbsp;    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>161</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>162</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>163</i>&nbsp;            return companyService.deleteById(id, loggedInUser);</b>
+<b class="nc"><i>164</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>165</i>&nbsp;    }
+<i>166</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

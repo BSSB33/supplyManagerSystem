@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: WebSecurityConfig</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.security</a> ]
+</div>
+
+<h1>Coverage Summary for Class: WebSecurityConfig (com.elte.supplymanagersystem.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/ 21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebSecurityConfig$$EnhancerBySpringCGLIB$$db687546</td>
+  </tr>
+  <tr>
+    <td class="name">WebSecurityConfig$$EnhancerBySpringCGLIB$$db687546$$FastClassBySpringCGLIB$$f1a069e7</td>
+  </tr>
+  <tr>
+    <td class="name">WebSecurityConfig$$FastClassBySpringCGLIB$$27610e32</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/ 21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.security;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>5</i>&nbsp;import org.springframework.beans.factory.annotation.Qualifier;
+<i>6</i>&nbsp;import org.springframework.context.annotation.Bean;
+<i>7</i>&nbsp;import org.springframework.context.annotation.Configuration;
+<i>8</i>&nbsp;import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+<i>9</i>&nbsp;import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+<i>10</i>&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+<i>11</i>&nbsp;import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+<i>12</i>&nbsp;import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+<i>13</i>&nbsp;import org.springframework.security.core.userdetails.UserDetailsService;
+<i>14</i>&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * Configuration file for Web Security
+<i>19</i>&nbsp; */
+<i>20</i>&nbsp;@Configuration
+<i>21</i>&nbsp;@EnableWebSecurity
+<i>22</i>&nbsp;@EnableGlobalMethodSecurity(securedEnabled = true)
+<b class="fc"><i>23</i>&nbsp;public class WebSecurityConfig extends WebSecurityConfigurerAdapter {</b>
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    @Qualifier(&quot;myUserDetailsService&quot;)
+<i>26</i>&nbsp;    @Autowired
+<i>27</i>&nbsp;    private UserDetailsService userDetailsService;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    /**
+<i>30</i>&nbsp;     * Configuration method for the HTTP connection
+<i>31</i>&nbsp;     *
+<i>32</i>&nbsp;     * @param http HttpSecurity object
+<i>33</i>&nbsp;     * @throws Exception Exceptions in configuration process
+<i>34</i>&nbsp;     */
+<i>35</i>&nbsp;    @Override
+<i>36</i>&nbsp;    protected void configure(HttpSecurity http) throws Exception {
+<b class="fc"><i>37</i>&nbsp;        http</b>
+<b class="fc"><i>38</i>&nbsp;                .cors()</b>
+<b class="fc"><i>39</i>&nbsp;                .and()</b>
+<b class="fc"><i>40</i>&nbsp;                .csrf().disable()</b>
+<b class="fc"><i>41</i>&nbsp;                .authorizeRequests()</b>
+<b class="fc"><i>42</i>&nbsp;                .antMatchers(&quot;/h2/**&quot;, &quot;/&quot;).permitAll()</b>
+<i>43</i>&nbsp;                //.antMatchers(&quot;/users&quot;).access(&quot;hasRole(&#39;ROLE_ADMIN&#39;)&quot;)
+<b class="fc"><i>44</i>&nbsp;                .anyRequest().authenticated()</b>
+<b class="fc"><i>45</i>&nbsp;                .and()</b>
+<b class="fc"><i>46</i>&nbsp;                .httpBasic()</b>
+<b class="fc"><i>47</i>&nbsp;                .authenticationEntryPoint(getBasicAuthEntryPoint())</b>
+<b class="fc"><i>48</i>&nbsp;                .and()</b>
+<b class="fc"><i>49</i>&nbsp;                .headers()</b>
+<b class="fc"><i>50</i>&nbsp;                .frameOptions().disable();</b>
+<i>51</i>&nbsp;        //.and()
+<i>52</i>&nbsp;        //.sessionManagement()
+<i>53</i>&nbsp;        //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+<b class="fc"><i>54</i>&nbsp;    }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;    /**
+<i>57</i>&nbsp;     * Configures Authentication with the help of userDetailsService
+<i>58</i>&nbsp;     *
+<i>59</i>&nbsp;     * @param auth AuthenticationManagerBuilder Object for authentication
+<i>60</i>&nbsp;     * @throws Exception Exceptions inside userDetailsService
+<i>61</i>&nbsp;     */
+<i>62</i>&nbsp;    @Autowired
+<i>63</i>&nbsp;    protected void configureAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+<b class="fc"><i>64</i>&nbsp;        auth</b>
+<b class="fc"><i>65</i>&nbsp;                .userDetailsService(userDetailsService)</b>
+<b class="fc"><i>66</i>&nbsp;                .passwordEncoder(passwordEncoder());</b>
+<b class="fc"><i>67</i>&nbsp;    }</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;//    /**
+<i>70</i>&nbsp;//     * This case it is used for creating in memory users for testing.
+<i>71</i>&nbsp;//     *
+<i>72</i>&nbsp;//     * @param auth AuthenticationManagerBuilder Object for creating for example in memory users for testing.
+<i>73</i>&nbsp;//     * @throws Exception Exceptions in inMemoryAuthentication
+<i>74</i>&nbsp;//     */
+<i>75</i>&nbsp;//    @Autowired
+<i>76</i>&nbsp;//    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+<i>77</i>&nbsp;//        auth
+<i>78</i>&nbsp;//                .inMemoryAuthentication()
+<i>79</i>&nbsp;//                .withUser(&quot;user&quot;).password(&quot;$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..&quot;).roles(&quot;USER&quot;);
+<i>80</i>&nbsp;//    }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    /**
+<i>83</i>&nbsp;     * Makes a new passwordEncoder.
+<i>84</i>&nbsp;     *
+<i>85</i>&nbsp;     * @return Returns a new BCryptPasswordEncoder
+<i>86</i>&nbsp;     */
+<i>87</i>&nbsp;    @Bean
+<i>88</i>&nbsp;    public BCryptPasswordEncoder passwordEncoder() {
+<b class="fc"><i>89</i>&nbsp;        return new BCryptPasswordEncoder();</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;    /**
+<i>93</i>&nbsp;     * Makes a new BasicAuthEntryPoint.
+<i>94</i>&nbsp;     *
+<i>95</i>&nbsp;     * @return Returns a new CustomBasicAuthenticationEntryPoint
+<i>96</i>&nbsp;     */
+<i>97</i>&nbsp;    @Bean
+<i>98</i>&nbsp;    public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
+<b class="fc"><i>99</i>&nbsp;        return new CustomBasicAuthenticationEntryPoint();</b>
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

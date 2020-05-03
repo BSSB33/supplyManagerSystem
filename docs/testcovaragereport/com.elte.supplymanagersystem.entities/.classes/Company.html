@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Company</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.entities</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Company (com.elte.supplymanagersystem.entities)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Company</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/ 19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88,6%
+  </span>
+  <span class="absValue">
+    (31/ 35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Company$CompanyBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Company$HibernateProxy$6IFfBZn2</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88,9%
+  </span>
+  <span class="absValue">
+    (32/ 36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.entities;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.dtos.CompanyDTO;
+<i>4</i>&nbsp;import com.fasterxml.jackson.annotation.JsonIgnore;
+<i>5</i>&nbsp;import lombok.*;
+<i>6</i>&nbsp;import org.apache.commons.collections.CollectionUtils;
+<i>7</i>&nbsp;import org.hibernate.annotations.LazyCollection;
+<i>8</i>&nbsp;import org.hibernate.annotations.LazyCollectionOption;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import javax.persistence.*;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;import java.util.stream.Collectors;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * Companies have a Unique name.
+<i>16</i>&nbsp; * Companies can be registered by Admin only.
+<i>17</i>&nbsp; * Companies can trade between each other. (registration required)
+<i>18</i>&nbsp; * Every Company can have multiple directors, and can have more employees.
+<i>19</i>&nbsp; * Orders are assigned to companies too.
+<i>20</i>&nbsp; */
+<i>21</i>&nbsp;@Entity
+<i>22</i>&nbsp;@Table(name = &quot;COMPANY_TABLE&quot;)
+<b class="fc"><i>23</i>&nbsp;@Data</b>
+<b class="fc"><i>24</i>&nbsp;@Builder</b>
+<b class="fc"><i>25</i>&nbsp;@NoArgsConstructor</b>
+<b class="fc"><i>26</i>&nbsp;@AllArgsConstructor</b>
+<b class="fc"><i>27</i>&nbsp;@EqualsAndHashCode</b>
+<i>28</i>&nbsp;public class Company {
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    @Id
+<i>31</i>&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<b class="fc"><i>32</i>&nbsp;    private Integer id;</b>
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>35</i>&nbsp;    private String name;</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>38</i>&nbsp;    private String address;</b>
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>41</i>&nbsp;    private String taxNumber;</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>44</i>&nbsp;    private String bankAccountNumber;</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    @Column
+<b class="fc"><i>47</i>&nbsp;    private boolean active;</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>50</i>&nbsp;    @OneToMany(mappedBy = &quot;workplace&quot;)
+<i>51</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>52</i>&nbsp;    private List&lt;User&gt; managers;</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>55</i>&nbsp;    @OneToMany(mappedBy = &quot;company&quot;)
+<i>56</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>57</i>&nbsp;    private List&lt;User&gt; director;</b>
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>60</i>&nbsp;    @OneToMany(mappedBy = &quot;buyer&quot;)
+<i>61</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>62</i>&nbsp;    private List&lt;Order&gt; purchases;</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>65</i>&nbsp;    @OneToMany(mappedBy = &quot;seller&quot;)
+<i>66</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>67</i>&nbsp;    private List&lt;Order&gt; sales;</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    @Column
+<b class="fc"><i>70</i>&nbsp;    private String lat;</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    @Column
+<b class="fc"><i>73</i>&nbsp;    private String lon;</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * Constructor for constructing Company object from DTO Object
+<i>77</i>&nbsp;     *
+<i>78</i>&nbsp;     * @param companyDTO The DTO to construct from.
+<i>79</i>&nbsp;     */
+<b class="fc"><i>80</i>&nbsp;    public Company(CompanyDTO companyDTO) {</b>
+<b class="fc"><i>81</i>&nbsp;        this.name = companyDTO.getName();</b>
+<b class="fc"><i>82</i>&nbsp;        this.address = companyDTO.getAddress();</b>
+<b class="fc"><i>83</i>&nbsp;        this.taxNumber = companyDTO.getTaxNumber();</b>
+<b class="fc"><i>84</i>&nbsp;        this.bankAccountNumber = companyDTO.getBankAccountNumber();</b>
+<b class="fc"><i>85</i>&nbsp;        this.active = companyDTO.isActive();</b>
+<b class="fc"><i>86</i>&nbsp;        this.lat = companyDTO.getLat();</b>
+<b class="fc"><i>87</i>&nbsp;        this.lon = companyDTO.getLon();</b>
+<b class="fc"><i>88</i>&nbsp;        if (!CollectionUtils.isEmpty(companyDTO.getManagers()))</b>
+<b class="nc"><i>89</i>&nbsp;            managers = companyDTO.getManagers().stream().map(User::new).collect(Collectors.toList());</b>
+<b class="fc"><i>90</i>&nbsp;        if (!CollectionUtils.isEmpty(companyDTO.getDirector()))</b>
+<b class="nc"><i>91</i>&nbsp;            director = companyDTO.getDirector().stream().map(User::new).collect(Collectors.toList());</b>
+<b class="fc"><i>92</i>&nbsp;        if (!CollectionUtils.isEmpty(companyDTO.getPurchases()))</b>
+<b class="nc"><i>93</i>&nbsp;            purchases = companyDTO.getPurchases().stream().map(Order::new).collect(Collectors.toList());</b>
+<b class="fc"><i>94</i>&nbsp;        if (!CollectionUtils.isEmpty(companyDTO.getSales()))</b>
+<b class="nc"><i>95</i>&nbsp;            sales = companyDTO.getSales().stream().map(Order::new).collect(Collectors.toList());</b>
+<b class="fc"><i>96</i>&nbsp;    }</b>
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;    @Override
+<i>99</i>&nbsp;    public String toString() {
+<b class="fc"><i>100</i>&nbsp;        return &quot;Company{&quot; +</b>
+<i>101</i>&nbsp;                &quot;id=&quot; + id +
+<i>102</i>&nbsp;                &quot;, name=&#39;&quot; + name + &#39;\&#39;&#39; +
+<i>103</i>&nbsp;                &#39;}&#39;;
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

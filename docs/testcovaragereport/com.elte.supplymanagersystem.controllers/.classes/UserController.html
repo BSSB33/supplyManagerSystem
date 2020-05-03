@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.controllers</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserController (com.elte.supplymanagersystem.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83,3%
+  </span>
+  <span class="absValue">
+    (25/ 30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.controllers;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.dtos.UserDTO;
+<i>4</i>&nbsp;import com.elte.supplymanagersystem.entities.User;
+<i>5</i>&nbsp;import com.elte.supplymanagersystem.security.AuthenticatedUser;
+<i>6</i>&nbsp;import com.elte.supplymanagersystem.services.UserService;
+<i>7</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>8</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>9</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>10</i>&nbsp;import org.springframework.security.core.Authentication;
+<i>11</i>&nbsp;import org.springframework.web.bind.annotation.*;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import javax.validation.constraints.Min;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * The User Controller is responsible for: creating Endpoints and wiring the User Service
+<i>19</i>&nbsp; */
+<i>20</i>&nbsp;@CrossOrigin
+<i>21</i>&nbsp;@RestController
+<i>22</i>&nbsp;@RequestMapping(&quot;/users&quot;)
+<b class="fc"><i>23</i>&nbsp;public class UserController {</b>
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    @Autowired
+<i>26</i>&nbsp;    private UserService userService;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    @Autowired
+<i>29</i>&nbsp;    private AuthenticatedUser authenticatedUser;
+<i>30</i>&nbsp;    private static final String UNAUTHORIZED_USER = &quot;Invalid User!&quot;;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    /**
+<i>33</i>&nbsp;     * Returns all the Users from UserService based on the Role of the logged in User.
+<i>34</i>&nbsp;     * Calls getAll method from OrderService.
+<i>35</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>36</i>&nbsp;     *
+<i>37</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>38</i>&nbsp;     * @return Returns a ResponseEntity with All the Users in the Database.
+<i>39</i>&nbsp;     */
+<i>40</i>&nbsp;    //FindAll
+<i>41</i>&nbsp;    @GetMapping(&quot;&quot;)
+<i>42</i>&nbsp;    public ResponseEntity getAll(Authentication auth) {
+<b class="fc"><i>43</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>44</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>45</i>&nbsp;            return userService.getAll(loggedInUser);</b>
+<b class="fc"><i>46</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * Returns User by ID if the User is valid.
+<i>51</i>&nbsp;     * Calls getById method from OrderService.
+<i>52</i>&nbsp;     * Returns UNAUTHORIZED if the User is Invalid.
+<i>53</i>&nbsp;     *
+<i>54</i>&nbsp;     * @param id   The ID of the User to get.
+<i>55</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>56</i>&nbsp;     * @return Returns a ResponseEntity of the User with the given ID.
+<i>57</i>&nbsp;     */
+<i>58</i>&nbsp;    //Find
+<i>59</i>&nbsp;    @GetMapping(&quot;/{id}&quot;)
+<i>60</i>&nbsp;    public ResponseEntity get(@PathVariable @Min(1) Integer id, Authentication auth) {
+<b class="fc"><i>61</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>62</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>63</i>&nbsp;            return userService.getById(loggedInUser, id);</b>
+<b class="fc"><i>64</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * Updates a User by ID.
+<i>69</i>&nbsp;     * Calls putById method from UserService.
+<i>70</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>71</i>&nbsp;     *
+<i>72</i>&nbsp;     * @param userDTO The user Data Transfer Object with the updated information.
+<i>73</i>&nbsp;     * @param id      The ID of the User to update.
+<i>74</i>&nbsp;     * @param auth    Authentication parameter for Security in order to get the User who logged in.
+<i>75</i>&nbsp;     * @return Returns a ResponseEntity with the updated record.
+<i>76</i>&nbsp;     */
+<i>77</i>&nbsp;    //Save or Update
+<i>78</i>&nbsp;    @PutMapping(&quot;/{id}&quot;)
+<i>79</i>&nbsp;    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>80</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>81</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>82</i>&nbsp;            return userService.putById(userDTO, loggedInUser, id);</b>
+<b class="nc"><i>83</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>84</i>&nbsp;    }
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    /**
+<i>87</i>&nbsp;     * Creates a new record of User.
+<i>88</i>&nbsp;     * Calls registerUser method from OrderService.
+<i>89</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>90</i>&nbsp;     *
+<i>91</i>&nbsp;     * @param userDTO The User Data Transfer Object with the information to save.
+<i>92</i>&nbsp;     * @param auth    Authentication parameter for Security in order to get the User who logged in.
+<i>93</i>&nbsp;     * @return Returns a ResponseEntity with the saved record.
+<i>94</i>&nbsp;     */
+<i>95</i>&nbsp;    @PostMapping(&quot;register&quot;)
+<i>96</i>&nbsp;    public ResponseEntity register(@RequestBody UserDTO userDTO, Authentication auth) {
+<b class="fc"><i>97</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>98</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>99</i>&nbsp;            return userService.registerUser(userDTO, loggedInUser);</b>
+<b class="nc"><i>100</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Disables a User by ID.
+<i>105</i>&nbsp;     * Calls disableUser method from UserService.
+<i>106</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>107</i>&nbsp;     *
+<i>108</i>&nbsp;     * @param id   The ID of the User to disable.
+<i>109</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>110</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>111</i>&nbsp;     */
+<i>112</i>&nbsp;    @PutMapping(&quot;/{id}/disable&quot;)
+<i>113</i>&nbsp;    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>114</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>115</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>116</i>&nbsp;            return userService.disableUser(id, loggedInUser);</b>
+<b class="nc"><i>117</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>118</i>&nbsp;    }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;    /**
+<i>121</i>&nbsp;     * Enables a User by ID.
+<i>122</i>&nbsp;     * Calls enableUser method from UserService.
+<i>123</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>124</i>&nbsp;     *
+<i>125</i>&nbsp;     * @param id   The ID of the User to disable.
+<i>126</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>127</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>128</i>&nbsp;     */
+<i>129</i>&nbsp;    @PutMapping(&quot;/{id}/enable&quot;)
+<i>130</i>&nbsp;    public ResponseEntity enable(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>131</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>132</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>133</i>&nbsp;            return userService.enableUser(id, loggedInUser);</b>
+<b class="nc"><i>134</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>135</i>&nbsp;    }
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;    /**
+<i>138</i>&nbsp;     * Deletes a record by ID. - Deleting user is hard, it is recommended to Disable users! -
+<i>139</i>&nbsp;     * Calls deleteById method from UserService.
+<i>140</i>&nbsp;     * Returns UNAUTHORIZED if the user is Invalid.
+<i>141</i>&nbsp;     *
+<i>142</i>&nbsp;     * @param id   The ID of the User to delete.
+<i>143</i>&nbsp;     * @param auth Authentication parameter for Security in order to get the User who logged in.
+<i>144</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>145</i>&nbsp;     */
+<i>146</i>&nbsp;    //Delete
+<i>147</i>&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+<i>148</i>&nbsp;    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+<b class="fc"><i>149</i>&nbsp;        User loggedInUser = userService.getValidUser(auth.getName());</b>
+<b class="fc"><i>150</i>&nbsp;        if (loggedInUser != null) {</b>
+<b class="fc"><i>151</i>&nbsp;            return userService.deleteById(id, loggedInUser);</b>
+<b class="nc"><i>152</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    /**
+<i>156</i>&nbsp;     * Creates an authenticated User
+<i>157</i>&nbsp;     *
+<i>158</i>&nbsp;     * @return Returns an authenticatedUser with OK (200)
+<i>159</i>&nbsp;     */
+<i>160</i>&nbsp;    @PostMapping(&quot;login&quot;)
+<i>161</i>&nbsp;    public ResponseEntity login() {
+<b class="fc"><i>162</i>&nbsp;        return ResponseEntity.ok(authenticatedUser.getUser());</b>
+<i>163</i>&nbsp;    }
+<i>164</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

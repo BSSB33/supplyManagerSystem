@@ -2,6 +2,7 @@ package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
+import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.HistoryType;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.enums.Status;
@@ -233,101 +234,247 @@ class OrderControllerTest {
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("TestProduct"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("3000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("CLOSED"));
     }
 
-    /*@Test
+    @Test
     void givenDirectorOrManagerUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded()  throws Exception {
-        HttpResponse postRequest = testUtils.sendPostRequest("orders/", "Balazs:password",
-                testUtils.getContentOfFile(orderJSONPath + "newOrder2.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("TestProduct")
+                                .isArchived(false)
+                                .price(3000d)
+                                .status(Status.CLOSED)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("TestProduct"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("3000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("CLOSED"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("TestProduct2")
+                                .isArchived(false)
+                                .price(4000d)
+                                .status(Status.CLOSED)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("TestProduct2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("4000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("CLOSED"));
     }
 
     @Test
     void givenInvalidUser_whenPostOrderEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
-        HttpResponse postRequest = testUtils.sendPostRequest("orders/", "invalidUser:password",
-                testUtils.getContentOfFile(orderJSONPath + "newOrder2.json"));
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, postRequest.getStatusLine().getStatusCode());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/orders/").with(user("invalidUser").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("TestProduct3")
+                                .isArchived(false)
+                                .price(3000d)
+                                .status(Status.CLOSED)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     //Put Order Endpoint
     @Test
     @Order(2)
     void givenAdminUser_whenUpdateOrderEndpointIsCalled_thenTheOrderShouldBeUpdated()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("orders/7", "Gabor:password",
-                "{\"productName\":\"Old Order\",\"price\":50000,\"status\":\"IN_STOCK\"}");
-        assertEquals(HttpStatus.SC_OK, putRequest1.getStatusLine().getStatusCode());
-        //Rollback
-        HttpResponse putRequest2 = testUtils.sendPutRequest("orders/7", "Gabor:password",
-                "{\"productName\":\"New Order\",\"price\":50000,\"status\":\"IN_STOCK\"}");
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/7").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .productName("New Order")
+                                .isArchived(true)
+                                .price(2000d)
+                                .buyerManager(User.builder().id(2).build())
+                                .sellerManager(User.builder().id(1).build())
+                                .buyer(Company.builder().id(1).build())
+                                .seller(Company.builder().id(4).build())
+                                .status(Status.SUCCESSFULLY_COMPLETED)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("New Order"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("2000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("SUCCESSFULLY_COMPLETED"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.buyer.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.seller.id").value("4"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.buyerManager.id").value("2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.sellerManager.id").value("1"));
     }
 
     @Test
-    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheCompanyShouldBeUpdated()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("orders/6", "Balazs:password",
-                "{\"productName\":\"Old Order\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_OK, putRequest1.getStatusLine().getStatusCode());
-        //Rollback
-        HttpResponse putRequest2 = testUtils.sendPutRequest("orders/6", "Balazs:password",
-                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/6").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(6)
+                                .productName("Old Order")
+                                .isArchived(false)
+                                .price(110000d)
+                                .status(Status.NEW)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .buyerManager(User.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("Old Order"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("110000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("NEW"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.buyerManager.id").value("3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.sellerManager").doesNotExist());
     }
 
     @Test
-    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheCompanyShouldNotBeUpdated()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("companies/4", "Balazs:password",
-                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest1.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/4").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(4)
+                                .productName("Old Order")
+                                .isArchived(false)
+                                .price(110000d)
+                                .status(Status.NEW)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .buyerManager(User.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheCompanyShouldBeUpdated()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("orders/6", "Emma:password",
-                "{\"productName\":\"Old Order\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_OK, putRequest1.getStatusLine().getStatusCode());
-        //Rollback
-        HttpResponse putRequest2 = testUtils.sendPutRequest("orders/6", "Emma:password",
-                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/6").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(6)
+                                .productName("Old Order")
+                                .isArchived(false)
+                                .price(110000d)
+                                .status(Status.NEW)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .buyerManager(User.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productName").value("Old Order"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("110000.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("NEW"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.buyerManager.id").value("3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.sellerManager").doesNotExist());
     }
 
     @Test
-    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheCompanyShouldNotBeUpdated()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("companies/4", "Emma:password",
-                "{\"productName\":\"Office Computer\",\"price\":110000,\"status\":\"NEW\",\"buyer\"" +
-                        ":{\"id\":2},\"buyerManager\":{\"id\":3},\"seller\":{\"id\":1},\"sellerManager\":null}");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest1.getStatusLine().getStatusCode());
+    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/4").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(4)
+                                .productName("Office Computer")
+                                .isArchived(false)
+                                .price(110000d)
+                                .status(Status.NEW)
+                                .buyer(Company.builder().id(2).build())
+                                .seller(Company.builder().id(1).build())
+                                .buyerManager(User.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void givenInvalidUser_whenUpdateCompanyEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
-        HttpResponse putRequest1 = testUtils.sendPutRequest("companies/2", "invalidUser:password",
-                "");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, putRequest1.getStatusLine().getStatusCode());
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/orders/4").with(user("invalidUser").password("password"))
+                .content(jsonToString(
+                        com.elte.supplymanagersystem.entities.Order.builder()
+                                .id(4)
+                                .productName("Office Computer")
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     //Delete Order Endpoint
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsDeletable_thenTheRequestedCompanyShouldBeDeleted()  throws Exception {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("orders/8", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsDeletable_thenTheRequestedOrderShouldBeDeleted()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/orders/1").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheCompanyIsNotDeletable_thenNotAcceptableShouldBeThrown()  throws Exception {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("orders/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
+    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsAssignedToHisCompany_thenTheRequestedOrderShouldBeDeleted()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/orders/7").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingCompany_thenNotFoundShouldBeThrown()  throws Exception {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("orders/100", "Emma:password");
-        assertEquals(HttpStatus.SC_NOT_FOUND, deleteRequest.getStatusLine().getStatusCode());
-    }*/
+    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsNotAssignedToHisCompany_thenTheRequestedOrderShouldNotBeDeleted()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/orders/4").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingUser_thenUnauthorizedShouldBeThrown()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/orders/4").with(user("invalidUser").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingOrder_thenNotFoundShouldBeThrown()  throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/orders/1000").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
+    }
 }

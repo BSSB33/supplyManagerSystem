@@ -65,22 +65,6 @@ public class UserController {
     }
 
     /**
-     * Returns Users who are not directors.
-     * Calls getUnassignedDirectors method from OrderService.
-     * Returns UNAUTHORIZED if the User is Invalid.
-     *
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
-     * @return Returns a ResponseEntity with the requested Users
-     */
-    @GetMapping("/freeDirectors")
-    public ResponseEntity getUnassignedDirectors(Authentication auth) {
-        User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) {
-            return userService.getUnassignedDirectors(loggedInUser);
-        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
-    }
-
-    /**
      * Updates a User by ID.
      * Calls putById method from UserService.
      * Returns UNAUTHORIZED if the user is Invalid.

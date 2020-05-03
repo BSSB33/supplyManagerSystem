@@ -3,12 +3,14 @@ package com.elte.supplymanagersystem.controllers;
 import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -25,9 +27,14 @@ class CompanyControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private BCryptPasswordEncoder encoder;
+
     private String jsonToString(final Object obj) {
         try {
-            return new ObjectMapper().writeValueAsString(obj);
+            ObjectMapper objectMapper =new ObjectMapper();
+            objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
+            return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -91,7 +98,8 @@ class CompanyControllerTest {
     void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/companies/1").with(user("invalidUser").password("password")))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     //My Company Endpoint
@@ -110,7 +118,7 @@ class CompanyControllerTest {
                 .content(jsonToString(
                         User.builder()
                                 .username("newManager")
-                                .password("$2a$04$YDiv9c./ytEGZQopFfExoOgGlJL6/o0er0K.hiGb5TGKHUL8Ebn..")
+                                .password(encoder.encode("password"))
                                 .fullName("Test Manager")
                                 .email("newmanager@gmail.com")
                                 .role(Role.ROLE_MANAGER)
@@ -121,7 +129,7 @@ class CompanyControllerTest {
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("newManager"));
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/companies/mycompany").with(user("newManager").password("password")))
@@ -224,7 +232,8 @@ class CompanyControllerTest {
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     //Put Company Endpoint
@@ -292,6 +301,7 @@ class CompanyControllerTest {
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 }

@@ -1,6 +1,14 @@
 package com.elte.supplymanagersystem.controllers;
 
 import com.elte.supplymanagersystem.TestUtils;
+import com.elte.supplymanagersystem.entities.Company;
+import com.elte.supplymanagersystem.entities.History;
+import com.elte.supplymanagersystem.entities.User;
+import com.elte.supplymanagersystem.enums.HistoryType;
+import com.elte.supplymanagersystem.enums.Role;
+import com.elte.supplymanagersystem.enums.Status;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
@@ -11,489 +19,662 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@FixMethodOrder
+@Transactional
+@SpringBootTest
+@AutoConfigureMockMvc
 class UserControllerTest {
 
-    final static String userJSONPath = "src/test/input/users/";
-    private static TestUtils testUtils = new TestUtils();
+    @Autowired
+    private MockMvc mockMvc;
 
-    void assertEqualJSONUserToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
-        JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
-                new JSONObject(testUtils.getContentOfFile(userJSONPath + expectedJSONPath)).toString(),
-                testUtils.getUserComparator());
+    @Autowired
+    private BCryptPasswordEncoder encoder;
+
+    private String jsonToString(final Object obj) {
+        try {
+            ObjectMapper objectMapper =new ObjectMapper();
+            objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    void assertEqualJSONUserArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
-        JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
-                new JSONArray(testUtils.getContentOfFile(userJSONPath + expectedJSONPath)).toString(),
-                testUtils.getUserComparator());
-    }
-
     //Get All Endpoint
     @Test
-    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-
-        assertEqualJSONUserArrayToJSONArray(getRequest, "allUsers.json");
+    void givenAdminUser_whenGetAllEndpointIsCalled_thenAllUsersShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     @Test
-    void givenDirectorUser_whenGetAllEndpointIsCalled_thenAllEmployeesShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users", "Balazs:password");
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users", "Judit:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        assertEqualJSONUserArrayToJSONArray(getRequest1, "colleaguesOfBalazs.json");
-        assertEqualJSONUserArrayToJSONArray(getRequest2, "colleaguesOfJudit.json");
+    void givenDirectorUser_whenGetAllEndpointIsCalled_thenAllEmployeesShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Balazs").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Judit").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Gyuri").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
     }
 
     @Test
-    void givenManagerUser_whenGetAllEndpointIsCalled_thenAllColleaguesShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users", "Emma:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserArrayToJSONArray(getRequest, "colleaguesOfBalazs.json");
+    void givenManagerUser_whenGetAllEndpointIsCalled_thenAllColleaguesShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Emma").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("TTManager").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
     }
 
     @Test
-    void givenDisabledUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users", "Old Student:password");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    void givenDisabledUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("Old Student").password("password")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     @Test
-    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users", "invalidUser:password");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users").with(user("invalidUser").password("password")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     //Get By Id Endpoint
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Gabor:password");
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Gabor:password");
-        HttpResponse getRequest3 = testUtils.sendGetRequest("users/3", "Gabor:password");
-        HttpResponse getRequest4 = testUtils.sendGetRequest("users/5", "Gabor:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, getRequest3.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, getRequest4.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest1, "userGabor.json");
-        assertEqualJSONUserToJSONObject(getRequest2, "userBalazs.json");
-        assertEqualJSONUserToJSONObject(getRequest3, "userJudit.json");
-        assertEqualJSONUserToJSONObject(getRequest4, "userEmma.json");
+    void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedUserShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/1").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("2"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/3").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("3"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/4").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("4"));
     }
 
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalledForNonExistingUserId_thenTheNotFoundShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/10", "Gabor:password");
-
-        assertEquals(HttpStatus.SC_NOT_FOUND, getRequest.getStatusLine().getStatusCode());
+    void givenAdminUser_whenGetByIdEndpointIsCalledForNonExistingUserId_thenTheNotFoundShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/1000").with(user("Gabor").password("password")))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForAnEmployee_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/5", "Balazs:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest, "userEmma.json");
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAnEmployee_thenTheRequestedUserShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/5").with(user("Balazs").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"));
     }
 
     @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForItself_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/2", "Balazs:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest, "userBalazs.json");
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForItself_thenTheRequestedUserShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("Balazs").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("2"));
     }
 
     @Test
-    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws IOException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/1", "Balazs:password");
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/7", "Balazs:password");
-
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenGetByIdEndpointIsCalledForAUserFromAnOtherCompany_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/1").with(user("Balazs").password("password")))
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/7").with(user("Balazs").password("password")))
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     @Test
-    void givenManagerUser_whenGetByIdEndpointIsCalledForColleague_thenTheRequestedUserShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Emma:password");
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/4", "TTManager:password");
-
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest1, "userBalazs.json");
-        assertEqualJSONUserToJSONObject(getRequest2, "userGyuri.json");
+    void givenManagerUser_whenGetByIdEndpointIsCalledForColleague_thenTheRequestedUserShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("Emma").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("2"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/4").with(user("TTManager").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("4"));
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/2", "invalidUser:password");
-
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForExistingUser_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("invalidUser").password("password")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/20", "invalidUser:password");
-
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    void givenInvalidUser_whenGetByIdEndpointIsCalledForNonExistingUser_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/1000").with(user("invalidUser").password("password")))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void givenDisabledUser_whenGetByIdEndpointIsCalled_thenFOShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/2", "Old Student:password");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    void givenDisabledUser_whenGetByIdEndpointIsCalled_thenFOShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("Old Student").password("password")))
+                .andExpect(status().isUnauthorized());
     }
 
-    //Delete Endpoint
-    @Test
-    void givenAdminUser_whenDeleteEndpointIsCalled_thenUserShouldBeDeleted() throws IOException {
-        //Adds user
-        HttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile(userJSONPath + "userPeter.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-        //Deletes new user
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/8", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
-    }
 
-    @Test
-    void givenAdminUser_whenDeleteEndpointIsCalled_toDeleteANotDeletableUser_thenNotAcceptableShouldBeThrown() throws IOException {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
-    }
-
-    @Test
-    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnEmployeeUser_thenNotAcceptableShouldBeThrown() throws IOException {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/5", "Balazs:password");
-        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
-    }
-
-    @Test
-    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnNonEmployeeUser_thenForbiddenShouldBeThrown() throws IOException {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/3", "Balazs:password");
-        assertEquals(HttpStatus.SC_FORBIDDEN, deleteRequest.getStatusLine().getStatusCode());
-    }
 
     //Disable Endpoint
     @Test
-    void givenAdminUser_whenDisableEndpointIsCalled_toDisableAUser_thenTheUserShouldBeDisabled() throws IOException, JSONException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/3/disable", "Gabor:password", "");
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        assertEquals("false", testUtils.getJsonObjectField(putRequest, "enabled"));
-        testUtils.sendPutRequest("users/3/enable", "Gabor:password", "");
+    void givenAdminUser_whenDisableEndpointIsCalled_toDisableAUser_thenTheUserShouldBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/3/disable").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
     }
 
     @Test
-    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableAnEmployeeUser_thenTheUserShouldBeDisabled() throws IOException, JSONException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/5/disable", "Balazs:password", "");
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        assertEquals("false", testUtils.getJsonObjectField(putRequest, "enabled"));
-        testUtils.sendPutRequest("users/5/enable", "Balazs:password", "");
+    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableAnEmployeeUser_thenTheUserShouldBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5/disable").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
+    }
+    //TODO enable endpoint test: disable, then forbidden/unauthorized upon enable call
+    @Test
+    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/4/disable").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
     @Test
-    void givenDirectorUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/4/disable", "Balazs:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenDisableEndpointIsCalled_toDisableAnColleagueUser_thenTheUserShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6/disable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/6").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(true));
     }
 
     @Test
-    void givenManagerUser_whenDisableEndpointIsCalled_toDisableAnColleagueUser_thenTheUserShouldNotBeDisabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2/disable", "Emma:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
-    }
-
-    @Test
-    void givenManagerUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/6/disable", "Emma:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenDisableEndpointIsCalled_toDisableANonEmployeeUser_thenTheUserShouldNotBeDisabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6/disable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/6").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(true));
     }
 
     //Enable Endpoint
     @Test
-    void givenAdminUser_whenEnableEndpointIsCalled_toEnableAUser_thenTheUserShouldBeEnabled() throws IOException, JSONException {
+    void givenAdminUser_whenEnableEndpointIsCalled_thenTheUserShouldBeEnabled() throws Exception {
         //Prepare
-        testUtils.sendPutRequest("users/3/disable", "Gabor:password", "");
-        //Execute
-        HttpResponse putRequest = testUtils.sendPutRequest("users/3/enable", "Gabor:password", "");
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        assertEquals("true", testUtils.getJsonObjectField(putRequest, "enabled"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6/disable").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
+        //Enable
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6/enable").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(true));
     }
 
     @Test
-    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableAnEmployeeUser_thenTheUserShouldBeDEnabled() throws IOException, JSONException {
+    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableAnEmployeeUser_thenTheUserShouldBeEnabled() throws Exception {
         //Prepare
-        testUtils.sendPutRequest("users/5/disable", "Balazs:password", "");
-        //Execute
-        HttpResponse putRequest = testUtils.sendPutRequest("users/5/enable", "Balazs:password", "");
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        assertEquals("true", testUtils.getJsonObjectField(putRequest, "enabled"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5/disable").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5/enable").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(true));
     }
 
     @Test
-    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws IOException {
-        //Execute
-        HttpResponse putRequest = testUtils.sendPutRequest("users/4/enable", "Balazs:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/4/disable").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enabled").value(false));
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/4/enable").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenManagerUser_whenEnableEndpointIsCalled_toEnableABossUser_thenTheUserShouldNotBeEnabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2/enable", "Emma:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableABossUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/2/enable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenManagerUser_whenEnableEndpointIsCalled_toEnableAColleagueUser_thenTheUserShouldNotBeEnabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2/enable", "Emma:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableAColleagueUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/2/enable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenManagerUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/6/enable", "Emma:password", "");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenEnableEndpointIsCalled_toEnableANonEmployeeUser_thenTheUserShouldNotBeEnabled() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6/enable").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
-    //Get Unassigned Directors Endpoint
-    @Test
-    void givenAdminUser_whenGetUnassignedDirectorsEndpointIsCalled_thenTheUsersShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("users/freeDirectors", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserArrayToJSONArray(getRequest, "nonDirectorUsers.json");
-    }
-
-    @Test
-    void givenNonAdminUser_whenGetUnassignedDirectorsEndpointIsCalled_thenTheUsersShouldNotBeReturned() throws IOException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/freeDirectors", "Balazs:password");
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/freeDirectors", "Emma:password");
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
-    }
 
     //Login Endpoint
     @Test
-    void givenUser_whenLoginEndpointIsCalled_thenOkShouldBeReturned() throws IOException {
-        HttpResponse postRequest1 = testUtils.sendPostRequest("users/login", "Gabor:password", "");
-        HttpResponse postRequest2 = testUtils.sendPostRequest("users/login", "Balazs:password", "");
-        HttpResponse postRequest3 = testUtils.sendPostRequest("users/login", "Judit:password", "");
-        HttpResponse postRequest4 = testUtils.sendPostRequest("users/login", "Emma:password", "");
-        assertEquals(HttpStatus.SC_OK, postRequest1.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, postRequest2.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, postRequest3.getStatusLine().getStatusCode());
-        assertEquals(HttpStatus.SC_OK, postRequest4.getStatusLine().getStatusCode());
+    void givenUser_whenLoginEndpointIsCalled_thenOkShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/login").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/login").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/login").with(user("Judit").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/login").with(user("Emma").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     //Register Endpoint
     @Test
-    void givenAdminUser_whenRegisterEndpointIsCalled_withManagerUserToRegister_thenUserShouldBeRegistered() throws IOException, JSONException {
-        HttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile(userJSONPath + "userPeter.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-
-        HttpResponse getRequest = testUtils.sendGetRequest("users/9", "Gabor:password");
-        assertEqualJSONUserToJSONObject(getRequest, "userPeterRegistered.json");
-
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/9", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    void givenAdminUser_whenRegisterEndpointIsCalled_withManagerUserToRegister_thenUserShouldBeRegistered() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/register").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .username("newManager")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("newManager"));
     }
 
     @Test
-    void givenAdminUser_whenRegisterEndpointIsCalled_withDirectorUserToRegister_thenUserShouldBeRegistered_andCompanyShouldBeSet() throws IOException, JSONException {
-        HttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile(userJSONPath + "userNewDirector.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-
-        HttpResponse getRequest = testUtils.sendGetRequest("users/10", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
-        assertEqualJSONUserToJSONObject(getRequest, "userNewDirectorRegistered.json");
-
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/10", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    void givenAdminUser_whenRegisterEndpointIsCalled_withDirectorUserToRegister_thenUserShouldBeRegistered_andCompanyShouldBeSet() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/register").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .username("newManager")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_DIRECTOR)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("newManager"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.workplace.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.company.id").value("1"));
     }
 
     @Test
-    void givenAdminUser_whenRegisterEndpointIsCalled_withExistingUserToRegister_thenBadRequestShouldBeThrown() throws IOException, JSONException {
-        HttpResponse postRequest = testUtils.sendPostRequest("users/register", "Gabor:password",
-                testUtils.getContentOfFile(userJSONPath + "userBalazs.json"));
-        assertEquals(HttpStatus.SC_BAD_REQUEST, postRequest.getStatusLine().getStatusCode());
+    void givenAdminUser_whenRegisterEndpointIsCalled_withExistingUserToRegister_thenBadRequestShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/users/register").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .username("Emma")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_ADMIN)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     //Put By ID Endpoint
     @Test
-    void givenAnyUser_whenPutByIdEndpointIsCalled_withNonExistingUser_thenNotFoundShouldBeThrown() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/20", "Emma:password", "{\"id\":20}");
-        assertEquals(HttpStatus.SC_NOT_FOUND, putRequest.getStatusLine().getStatusCode());
+    void givenAnyUser_whenPutByIdEndpointIsCalled_withNonExistingUser_thenNotFoundShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/100").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(100)
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void givenAnyUser_whenPutByIdEndpointIsCalled_withEmptyUserBodey_thenBadRequestShouldBeThrown() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/20", "Emma:password", "");
-        assertEquals(HttpStatus.SC_BAD_REQUEST, putRequest.getStatusLine().getStatusCode());
+    void givenAnyUser_whenPutByIdEndpointIsCalled_withEmptyUserBody_thenBadRequestShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/2").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void givenAdminUser_whenPutByIdEndpointIsCalled_thenTheRequestedUserShouldBeUpdated() throws IOException, JSONException {
-        //Getting User by ID
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/3", "Gabor:password");
-        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
-        jsonObject.put("username", "Judit2");
-        //Execute
-        HttpResponse putRequest = testUtils.sendPutRequest("users/3", "Gabor:password", jsonObject.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //Check
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/3", "Gabor:password");
-        String nameOfUser = testUtils.getJsonObject(getRequest2).getString("username");
-        assertEquals("Judit2", nameOfUser);
-        //Restore
-        jsonObject.put("username", "Judit");
-        HttpResponse putRequest2 = testUtils.sendPutRequest("users/3", "Gabor:password", jsonObject.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenAdminUser_whenPutByIdEndpointIsCalled_thenTheRequestedUserShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(5)
+                                .username("Anna")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Anna"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_MANAGER"));
     }
 
     @Test
-    void givenAdminUser_whenPutByIdEndpointIsCalled_withADirectorWithoutWorkplace_thenTheRequestedUserShouldBeUpdatedAndCompanyShouldAppearAtWorkplaceField() throws IOException, JSONException {
-        //Getting User by ID
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
-        jsonObject.put("workplace", null);
-        //Execute
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2", "Gabor:password", jsonObject.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        String workplaceOfUser = testUtils.getJsonObject(getRequest2).getString("workplace");
-        JSONAssert.assertEquals("{\"id\": 1,\"name\": \"TelnetWork Kft.\"}", workplaceOfUser, JSONCompareMode.LENIENT);
+    void givenAdminUser_whenPutByIdEndpointIsCalled_withADirectorWithoutWorkplace_thenTheRequestedUserShouldBeUpdatedAndCompanyShouldAppearAtWorkplaceField() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(5)
+                                .username("Anna")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_DIRECTOR)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Anna"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_DIRECTOR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.workplace.id").value("1"));
     }
 
     @Test
-    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAnEmployeeFromItsCompany_thenTheRequestedUserShouldBeUpdated() throws IOException, JSONException {
-        //Get Employee
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/5", "Balazs:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        JSONObject employee = testUtils.getJsonObject(getRequest1);
-        employee.put("username", "Employee");
-        //Rename Employee
-        HttpResponse putRequest = testUtils.sendPutRequest("users/5", "Balazs:password", employee.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //GetEmployee again
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/5", "Balazs:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
-        assertEquals("Employee", modifiedEmployee.getString("username"));
-
-        //Restore original Object
-        employee.put("username", "Emma");
-        HttpResponse putRequest2 = testUtils.sendPutRequest("users/5", "Balazs:password", employee.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAnEmployeeFromItsCompany_thenTheRequestedUserShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6").with(user("Gyuri").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(6)
+                                .username("TopTradeManager")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("6"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("TopTradeManager"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_MANAGER"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.workplace.id").value("3"));
     }
 
     @Test
-    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws IOException, JSONException {
-        //Get Director
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/2", "Balazs:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        JSONObject director = testUtils.getJsonObject(getRequest1);
-        ;
-        director.put("username", "Balazs2");
-        //Rename Director
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2", "Balazs:password", director.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //GetDirector again
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/2", "Balazs2:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
-        assertEquals("Balazs2", modifiedEmployee.getString("username"));
-        //Restore original Object
-        director.put("username", "Balazs");
-        HttpResponse putRequest2 = testUtils.sendPutRequest("users/2", "Balazs2:password", director.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toMakeAdminOfManagerFromItsCompany_thenTheRequestedUserShouldNotBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6").with(user("Gyuri").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(6)
+                                .username("TopTradeManager")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_ADMIN)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(3).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("6"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("TopTradeManager"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_MANAGER"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.workplace.id").value("3"));
     }
 
     @Test
-    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAManagerWhoWorksSomeWhereElse_thenForbiddenShouldBeThrown() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/6", "Balazs:password", "{\"username\":\"OtherWorker\"}");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/2").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(5)
+                                .username("DirectorBalazs")
+                                .password(encoder.encode("password"))
+                                .fullName("Piros Balazs")
+                                .email("balazs@gmail.com")
+                                .role(Role.ROLE_DIRECTOR)
+                                .enabled(true)
+                                .company(Company.builder().id(1).build())
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("DirectorBalazs"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_DIRECTOR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.company.id").value("1"));
+    }
+//TODO jackson test
+    @Test
+    void givenDirectorUser_whenPutByIdEndpointIsCalled_toModifyAManagerWhoWorksSomeWhereElse_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/6").with(user("Balazs").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(6)
+                                .username("Anna")
+                                .password(encoder.encode("password"))
+                                .fullName("Test Manager")
+                                .email("newmanager@gmail.com")
+                                .role(Role.ROLE_MANAGER)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws IOException, JSONException {
-        //Get Director
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/5", "Emma:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        JSONObject director = testUtils.getJsonObject(getRequest1);
-        ;
-        director.put("username", "Emma2");
-        //Rename Director
-        HttpResponse putRequest = testUtils.sendPutRequest("users/5", "Emma:password", director.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //GetDirector again
-        HttpResponse getRequest2 = testUtils.sendGetRequest("users/5", "Emma2:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-        JSONObject modifiedEmployee = testUtils.getJsonObject(getRequest2);
-        assertEquals("Emma2", modifiedEmployee.getString("username"));
-        //Restore original Object
-        director.put("username", "Emma");
-        HttpResponse putRequest2 = testUtils.sendPutRequest("users/5", "Emma2:password", director.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
+    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyItself_thenTheUserShouldBeUpdated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/5").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(5)
+                                .username("ManagerEmma")
+                                .password(encoder.encode("password"))
+                                .fullName("Lila Emma")
+                                .email("emma@gmail.com")
+                                .role(Role.ROLE_DIRECTOR)
+                                .enabled(true)
+                                .company(null)
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("ManagerEmma"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_MANAGER")) //?
+                .andExpect(MockMvcResultMatchers.jsonPath("$.workplace.id").value("1"));
     }
 
     @Test
-    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyColleague_thenForbiddenShouldBeThrown() throws IOException {
-        HttpResponse putRequest = testUtils.sendPutRequest("users/2", "Emma:password", "{\"username\":\"OtherWorker\"}");
-        assertEquals(HttpStatus.SC_FORBIDDEN, putRequest.getStatusLine().getStatusCode());
+    void givenManagerUser_whenPutByIdEndpointIsCalled_toModifyColleague_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .put("/users/2").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        User.builder()
+                                .id(6)
+                                .username("Renamed User")
+                                .workplace(Company.builder().id(1).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+    //Delete Endpoint
+    @Test
+    void givenAdminUser_whenDeleteEndpointIsCalled_thenUserShouldBeDeleted() throws Exception {
+        //Check User
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/7").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Old Student"));
+        //Delete Empty User
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/users/7").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     @Test
-    @AfterAll
-    static void givenAdminUser_whenPutByIdEndpointIsCalled_withAUserConnectedWithOtherObjects_afterRemovingConnections_thenTheRequestedUserShouldBeDeleted() throws IOException, JSONException {
-        //Get User by ID
-        HttpResponse getRequest1 = testUtils.sendGetRequest("users/6", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        JSONObject jsonObject = testUtils.getJsonObject(getRequest1);
-        //Try To Delete
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("users/6", "Gabor:password");
-        assertEquals(HttpStatus.SC_NOT_ACCEPTABLE, deleteRequest.getStatusLine().getStatusCode());
-        //Remove all connections from user side
-        jsonObject.put("workplace", null);
-        HttpResponse putRequest = testUtils.sendPutRequest("users/6", "Gabor:password", jsonObject.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest.getStatusLine().getStatusCode());
-        //Put History
-        HttpResponse putRequest2 = testUtils.sendDeleteRequest("histories/9", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, putRequest2.getStatusLine().getStatusCode());
-        HttpResponse putRequest3 = testUtils.sendDeleteRequest("histories/5", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, putRequest3.getStatusLine().getStatusCode());
-        HttpResponse putRequest4 = testUtils.sendDeleteRequest("histories/4", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, putRequest4.getStatusLine().getStatusCode());
-        //Get Orders
-        HttpResponse getRequest6 = testUtils.sendGetRequest("orders/1", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest6.getStatusLine().getStatusCode());
-        JSONObject order1 = testUtils.getJsonObject(getRequest6);
-        order1.put("buyerManager", null);
-        HttpResponse getRequest5 = testUtils.sendGetRequest("orders/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest5.getStatusLine().getStatusCode());
-        JSONObject order2 = testUtils.getJsonObject(getRequest5);
-        order2.put("buyerManager", null);
-        //Put Orders
-        HttpResponse putRequest6 = testUtils.sendPutRequest("orders/1", "Gabor:password", order1.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest6.getStatusLine().getStatusCode());
-        HttpResponse putRequest5 = testUtils.sendPutRequest("orders/2", "Gabor:password", order2.toString());
-        assertEquals(HttpStatus.SC_OK, putRequest5.getStatusLine().getStatusCode());
-        //Remove User
-        HttpResponse deleteRequest2 = testUtils.sendDeleteRequest("users/6", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest2.getStatusLine().getStatusCode());
+    void givenAdminUser_whenDeleteEndpointIsCalled_toDeleteANotDeletableUser_thenNotAcceptableShouldBeThrown() throws Exception {
+        //Check User
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/users/2").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Balazs"));
+        //Delete Empty User
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/users/2").with(user("Gabor").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
+
+    @Test
+    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnEmployeeUser_thenNotAcceptableShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/users/5").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenDirectorUser_whenDeleteEndpointIsCalled_toDeleteAnNonEmployeeUser_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/users/3").with(user("Balazs").password("password"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
 }

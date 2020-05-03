@@ -4,11 +4,9 @@ import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.History;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.HistoryType;
-import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.enums.Status;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.elte.supplymanagersystem.controllers.HistoryControllerTest.historyJSONPath;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,13 +25,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class OrderControllerTest {
+    //TODO orders/histories
 
     @Autowired
     private MockMvc mockMvc;
 
     private String jsonToString(final Object obj) {
         try {
-            return new ObjectMapper().writeValueAsString(obj);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
+            return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,14 +50,14 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenNonAdminUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown()  throws Exception {
+    void givenNonAdminUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders").with(user("Emma").password("password")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders").with(user("invalidUser").password("password")))
                 .andExpect(status().isUnauthorized());
@@ -74,7 +73,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenGetPurchasesEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenGetPurchasesEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/purchases").with(user("invalidUser").password("password")))
                 .andExpect(status().isUnauthorized());
@@ -90,7 +89,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenGetSalesEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenGetSalesEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/sales").with(user("invalidUser").password("password")))
                 .andExpect(status().isUnauthorized());
@@ -121,14 +120,14 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/1").with(user("invalidUser").password("password")))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void givenAdminUser_whenGetByIdEndpointIsCalled_withANonExistingOrder_thenNotFoundShouldBeThrown()  throws Exception {
+    void givenAdminUser_whenGetByIdEndpointIsCalled_withANonExistingOrder_thenNotFoundShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/100").with(user("Gabor").password("password")))
                 .andExpect(status().isNotFound());
@@ -152,14 +151,14 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifOrderNotExists_thenNotFoundShouldBeThrown()  throws Exception {
+    void givenAdminUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifOrderNotExists_thenNotFoundShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/1000/histories").with(user("TTManager").password("password")))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenAllTheAuthorizedHistoriesOfTheOrderShouldBeReturned()  throws Exception {
+    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_thenAllTheAuthorizedHistoriesOfTheOrderShouldBeReturned() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/1/histories").with(user("Balazs").password("password")))
                 .andExpect(status().isOk())
@@ -167,7 +166,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifUserIsNotAuthorizedForOrder_thenForbiddenShouldBeThrown()  throws Exception {
+    void givenDirectorOrManagerUser_whenGetHistoriesByOrderIdEndpointIsCalled_ifUserIsNotAuthorizedForOrder_thenForbiddenShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/orders/1/histories").with(user("Judit").password("password")))
                 .andExpect(status().isForbidden());
@@ -175,7 +174,7 @@ class OrderControllerTest {
 
     //Post Histories For Order Endpoint
     @Test
-    void givenAdminUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded()  throws Exception {
+    void givenAdminUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/1/histories").with(user("Gabor").password("password"))
                 .content(jsonToString(
@@ -190,7 +189,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded_AndTheCreatorShouldBeSet()  throws Exception {
+    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_thenTheHistoryOfTheOrderShouldBeAdded_AndTheCreatorShouldBeSet() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/1/histories").with(user("Balazs").password("password"))
                 .content(jsonToString(
@@ -205,7 +204,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_ifUnauthorizedForOrder_thenForbiddenShouldBeThrown()  throws Exception {
+    void givenDirectorUser_whenPostHistoriesByOrderIdEndpointIsCalled_ifUnauthorizedForOrder_thenForbiddenShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/1/histories").with(user("Judit").password("password"))
                 .content(jsonToString(
@@ -221,7 +220,7 @@ class OrderControllerTest {
     //Post Order Endpoint
     @Test
     //@Order(1)
-    void givenAdminUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded()  throws Exception {
+    void givenAdminUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/").with(user("Gabor").password("password"))
                 .content(jsonToString(
@@ -241,7 +240,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded()  throws Exception {
+    void givenDirectorOrManagerUser_whenPostOrderEndpointIsCalled_thenTheOrderShouldBeAdded() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/").with(user("Balazs").password("password"))
                 .content(jsonToString(
@@ -281,7 +280,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenPostOrderEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenPostOrderEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/orders/").with(user("invalidUser").password("password"))
                 .content(jsonToString(
@@ -299,7 +298,7 @@ class OrderControllerTest {
     //Put Order Endpoint
     @Test
     @Order(2)
-    void givenAdminUser_whenUpdateOrderEndpointIsCalled_thenTheOrderShouldBeUpdated()  throws Exception {
+    void givenAdminUser_whenUpdateOrderEndpointIsCalled_thenTheOrderShouldBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/7").with(user("Gabor").password("password"))
                 .content(jsonToString(
@@ -327,7 +326,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated()  throws Exception {
+    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/6").with(user("Balazs").password("password"))
                 .content(jsonToString(
@@ -353,7 +352,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated()  throws Exception {
+    void givenDirectorUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/4").with(user("Balazs").password("password"))
                 .content(jsonToString(
@@ -373,7 +372,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated()  throws Exception {
+    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsIssuedForHisCompany_thenTheOrderShouldBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/6").with(user("Emma").password("password"))
                 .content(jsonToString(
@@ -399,7 +398,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated()  throws Exception {
+    void givenManagerUser_whenUpdateOrderEndpointIsCalled_ifTheOrderIsNotIssuedForHisCompany_thenTheOrderShouldNotBeUpdated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/4").with(user("Emma").password("password"))
                 .content(jsonToString(
@@ -419,7 +418,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenInvalidUser_whenUpdateCompanyEndpointIsCalled_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenInvalidUser_whenUpdateCompanyEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/orders/4").with(user("invalidUser").password("password"))
                 .content(jsonToString(
@@ -434,7 +433,7 @@ class OrderControllerTest {
 
     //Delete Order Endpoint
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsDeletable_thenTheRequestedOrderShouldBeDeleted()  throws Exception {
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsDeletable_thenTheRequestedOrderShouldBeDeleted() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .delete("/orders/1").with(user("Gabor").password("password"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -443,7 +442,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsAssignedToHisCompany_thenTheRequestedOrderShouldBeDeleted()  throws Exception {
+    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsAssignedToHisCompany_thenTheRequestedOrderShouldBeDeleted() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .delete("/orders/7").with(user("Balazs").password("password"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -452,7 +451,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsNotAssignedToHisCompany_thenTheRequestedOrderShouldNotBeDeleted()  throws Exception {
+    void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_ifTheOrderIsNotAssignedToHisCompany_thenTheRequestedOrderShouldNotBeDeleted() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .delete("/orders/4").with(user("Balazs").password("password"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -461,7 +460,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingUser_thenUnauthorizedShouldBeThrown()  throws Exception {
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingUser_thenUnauthorizedShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .delete("/orders/4").with(user("invalidUser").password("password"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -470,7 +469,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingOrder_thenNotFoundShouldBeThrown()  throws Exception {
+    void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingOrder_thenNotFoundShouldBeThrown() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                 .delete("/orders/1000").with(user("Gabor").password("password"))
                 .contentType(MediaType.APPLICATION_JSON))

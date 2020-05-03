@@ -75,21 +75,6 @@ public class UserService {
     }
 
     /**
-     * Returns Users who are not directors of any Companies.
-     * ADMIN: Can get all.
-     * ELSE: FORBIDDEN
-     *
-     * @param loggedInUser The user who logged in.
-     * @return Returns a ResponseEntity with the requested Users
-     */
-    public ResponseEntity getUnassignedDirectors(User loggedInUser) {
-        logger.info("getUnassignedDirectors() called");
-        if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
-    }
-
-    /**
      * Updates a User by ID.
      * ADMIN: Can Update all the users.
      * DIRECTOR: Can only Update itself and Employees.
@@ -107,18 +92,23 @@ public class UserService {
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
-            if(userToUpdate.getPassword() != null){
-                userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
-            }
-            else userToUpdate.setPassword(userToCheck.get().getPassword());
+            if(userToUpdate.getPassword() == null)
+                userToUpdate.setPassword(userToCheck.get().getPassword());
 
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_ADMIN);
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_DIRECTOR);
+                else userToUpdate.setRole(Role.ROLE_MANAGER);
+
                 return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
+                userToUpdate.setRole(Role.ROLE_MANAGER);
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();

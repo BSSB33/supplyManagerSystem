@@ -2,22 +2,13 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.enums.Role;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +25,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "USER_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -127,7 +119,7 @@ public class User {
                 ", password='" + password + '\'' +
                 ", enabled=" + enabled +
                 ", company=" + company +
-                ", workplace=" + workplace+
+                ", workplace=" + workplace +
                 ", role=" + role +
                 '}';
     }

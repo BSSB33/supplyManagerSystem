@@ -46,24 +46,4 @@ public class OrderDTO {
 
     private String description;
 
-    /**
-     * Constructor for Order Data Transfer Object
-     *
-     * @param order The Order object to construct the DTO of.
-     */
-    public OrderDTO(Order order) {
-        this.productName = order.getProductName();
-        this.price = order.getPrice();
-        this.status = order.getStatus();
-        this.isArchived = order.isArchived();
-        this.buyer = order.getBuyer();
-        this.buyerManager = order.getBuyerManager();
-        this.seller = order.getSeller();
-        this.sellerManager = order.getSellerManager();
-        this.createdAt = order.getCreatedAt();
-        this.modifiedAt = order.getModifiedAt();
-        this.description = order.getDescription();
-        if (!CollectionUtils.isEmpty(order.getHistories()))
-            history = order.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
-    }
 }

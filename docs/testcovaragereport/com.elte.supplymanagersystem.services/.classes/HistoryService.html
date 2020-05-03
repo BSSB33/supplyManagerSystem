@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HistoryService</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.services</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HistoryService (com.elte.supplymanagersystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HistoryService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93,3%
+  </span>
+  <span class="absValue">
+    (42/ 45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.services;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.dtos.HistoryDTO;
+<i>4</i>&nbsp;import com.elte.supplymanagersystem.entities.History;
+<i>5</i>&nbsp;import com.elte.supplymanagersystem.entities.Order;
+<i>6</i>&nbsp;import com.elte.supplymanagersystem.entities.User;
+<i>7</i>&nbsp;import com.elte.supplymanagersystem.enums.Role;
+<i>8</i>&nbsp;import com.elte.supplymanagersystem.repositories.HistoryRepository;
+<i>9</i>&nbsp;import org.apache.log4j.Logger;
+<i>10</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>11</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>12</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>13</i>&nbsp;import org.springframework.stereotype.Service;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import java.util.List;
+<i>16</i>&nbsp;import java.util.Map;
+<i>17</i>&nbsp;import java.util.Optional;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;@Service
+<b class="fc"><i>22</i>&nbsp;public class HistoryService {</b>
+<i>23</i>&nbsp;
+<b class="fc"><i>24</i>&nbsp;    static final Logger logger = Logger.getLogger(HistoryService.class);</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    @Autowired
+<i>27</i>&nbsp;    private UserService userService;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    @Autowired
+<i>30</i>&nbsp;    private OrderService orderService;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    @Autowired
+<i>33</i>&nbsp;    private HistoryRepository historyRepository;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    /**
+<i>37</i>&nbsp;     * Returns All the Histories in the Database depending on the Role of the User.
+<i>38</i>&nbsp;     * ADMIN: Can get ALL the Users.
+<i>39</i>&nbsp;     * ELSE: FORBIDDEN
+<i>40</i>&nbsp;     *
+<i>41</i>&nbsp;     * @param loggedInUser The user who logged in.
+<i>42</i>&nbsp;     * @return Returns a ResponseEntity with the list of Histories.
+<i>43</i>&nbsp;     */
+<i>44</i>&nbsp;    public ResponseEntity getAll(User loggedInUser) {
+<b class="fc"><i>45</i>&nbsp;        logger.info(&quot;getAll() called&quot;);</b>
+<b class="fc"><i>46</i>&nbsp;        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))</b>
+<b class="fc"><i>47</i>&nbsp;            return ResponseEntity.ok(historyRepository.findAll());</b>
+<b class="fc"><i>48</i>&nbsp;        else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<i>49</i>&nbsp;    }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * Returns the History with the requested ID filtered by Role.
+<i>53</i>&nbsp;     * Only those users can access the history who works in the same company as the Creator of the history,
+<i>54</i>&nbsp;     * and who works at one of the companies of the Order to which the History belongs to. (Plus ADMINS)
+<i>55</i>&nbsp;     * ADMIN: Can get ALL
+<i>56</i>&nbsp;     * DIRECTOR, MANAGER: Can get Data if works in the same company as the Creator of the history,
+<i>57</i>&nbsp;     * and also works at one of the companies of the Order to which the History belongs to.
+<i>58</i>&nbsp;     * ELSE: FORBIDDEN
+<i>59</i>&nbsp;     * Non existing History: NOTFOUND
+<i>60</i>&nbsp;     *
+<i>61</i>&nbsp;     * @param loggedInUser The user logged in
+<i>62</i>&nbsp;     * @param id           The ID of the History the user wants to GET
+<i>63</i>&nbsp;     * @return Returns a ResponseEntity of the History with the requested History filtered by Role.
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    public ResponseEntity getById(User loggedInUser, Integer id) {
+<b class="fc"><i>66</i>&nbsp;        logger.info(&quot;getById() called&quot;);</b>
+<b class="fc"><i>67</i>&nbsp;        Optional&lt;History&gt; historyToGet = historyRepository.findById(id);</b>
+<b class="fc"><i>68</i>&nbsp;        if (historyToGet.isPresent()) {</b>
+<b class="fc"><i>69</i>&nbsp;            Order orderToGet = historyToGet.get().getOrder();</b>
+<b class="fc"><i>70</i>&nbsp;            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))</b>
+<b class="fc"><i>71</i>&nbsp;                return ResponseEntity.ok(historyToGet.get());</b>
+<b class="fc"><i>72</i>&nbsp;            else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {</b>
+<b class="fc"><i>73</i>&nbsp;                if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToGet.get())) {</b>
+<b class="fc"><i>74</i>&nbsp;                    return ResponseEntity.ok(historyToGet.get());</b>
+<b class="fc"><i>75</i>&nbsp;                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<b class="nc"><i>76</i>&nbsp;            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<b class="fc"><i>77</i>&nbsp;        } else return ResponseEntity.notFound().build();</b>
+<i>78</i>&nbsp;    }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * Creates a new record of History.
+<i>82</i>&nbsp;     * ADMIN: Can add new Histories without any regulations.
+<i>83</i>&nbsp;     * DIRECTOR, MANAGER: Only can add History if the user works in the same company as the Creator of the history,
+<i>84</i>&nbsp;     * and also works at one of the companies of the Order to which the History belongs to.
+<i>85</i>&nbsp;     * ELSE: FORBIDDEN
+<i>86</i>&nbsp;     *
+<i>87</i>&nbsp;     * @param historyDTO   The history Data Transfer Object with the information to save.
+<i>88</i>&nbsp;     * @param loggedInUser The user logged in.
+<i>89</i>&nbsp;     * @return Returns a ResponseEntity of the saved History.
+<i>90</i>&nbsp;     */
+<i>91</i>&nbsp;    public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
+<b class="fc"><i>92</i>&nbsp;        logger.info(&quot;addHistory() called&quot;);</b>
+<b class="fc"><i>93</i>&nbsp;        History historyToSave = new History(historyDTO);</b>
+<b class="fc"><i>94</i>&nbsp;        if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {</b>
+<b class="fc"><i>95</i>&nbsp;            if (historyToSave.getCreator() == null)</b>
+<b class="fc"><i>96</i>&nbsp;                historyToSave.setCreator(loggedInUser);</b>
+<b class="fc"><i>97</i>&nbsp;            return ResponseEntity.ok(historyRepository.save(historyToSave));</b>
+<b class="fc"><i>98</i>&nbsp;        } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {</b>
+<b class="fc"><i>99</i>&nbsp;            return ResponseEntity.ok(historyRepository.save(historyToSave));</b>
+<b class="nc"><i>100</i>&nbsp;        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    /**
+<i>104</i>&nbsp;     * Deletes History record by ID.
+<i>105</i>&nbsp;     * ADMIN: Can delete any Histories without any regulations.
+<i>106</i>&nbsp;     * DIRECTOR, MANAGER: Only can delete History if the user works in the same company as the Creator of the history,
+<i>107</i>&nbsp;     * and also works at one of the companies of the Order to which the History belongs to.
+<i>108</i>&nbsp;     * ELSE: FORBIDDEN
+<i>109</i>&nbsp;     * Non existing History: NOTFOUND
+<i>110</i>&nbsp;     *
+<i>111</i>&nbsp;     * @param id           The ID of the History the user wants to DELETE.
+<i>112</i>&nbsp;     * @param loggedInUser The user logged in.
+<i>113</i>&nbsp;     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+<i>114</i>&nbsp;     */
+<i>115</i>&nbsp;    //Remove
+<i>116</i>&nbsp;    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+<b class="fc"><i>117</i>&nbsp;        logger.info(&quot;deleteById() called&quot;);</b>
+<b class="fc"><i>118</i>&nbsp;        Optional&lt;History&gt; historyToDelete = historyRepository.findById(id);</b>
+<b class="fc"><i>119</i>&nbsp;        if (historyToDelete.isPresent()) {</b>
+<b class="fc"><i>120</i>&nbsp;            if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {</b>
+<b class="fc"><i>121</i>&nbsp;                historyRepository.deleteById(id);</b>
+<b class="fc"><i>122</i>&nbsp;                return ResponseEntity.ok().build();</b>
+<b class="fc"><i>123</i>&nbsp;            } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {</b>
+<b class="fc"><i>124</i>&nbsp;                Order orderToGet = historyToDelete.get().getOrder();</b>
+<b class="fc"><i>125</i>&nbsp;                if (checkIfAuthorisedForHistory(loggedInUser, orderToGet, historyToDelete.get())) {</b>
+<b class="fc"><i>126</i>&nbsp;                    historyRepository.deleteById(id);</b>
+<b class="fc"><i>127</i>&nbsp;                    return ResponseEntity.ok().build();</b>
+<b class="fc"><i>128</i>&nbsp;                } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<b class="nc"><i>129</i>&nbsp;            } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);</b>
+<b class="fc"><i>130</i>&nbsp;        } else return ResponseEntity.notFound().build();</b>
+<i>131</i>&nbsp;    }
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    /**
+<i>134</i>&nbsp;     * Checks if the User who logged in is authorized to modify the History record.
+<i>135</i>&nbsp;     *
+<i>136</i>&nbsp;     * @param loggedInUser The user logged in.
+<i>137</i>&nbsp;     * @param orderToGet   The order which contains the History
+<i>138</i>&nbsp;     * @param historyToGet The History to check
+<i>139</i>&nbsp;     * @return boolean
+<i>140</i>&nbsp;     */
+<i>141</i>&nbsp;    private boolean checkIfAuthorisedForHistory(User loggedInUser, Order orderToGet, History historyToGet) {
+<b class="fc"><i>142</i>&nbsp;        Map&lt;Integer, Order&gt; map = orderService.getMap(loggedInUser);</b>
+<b class="fc"><i>143</i>&nbsp;        if (map.get(orderToGet.getId()) != null) {</b>
+<b class="fc"><i>144</i>&nbsp;            return historyToGet.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId());</b>
+<b class="fc"><i>145</i>&nbsp;        } else return false;</b>
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

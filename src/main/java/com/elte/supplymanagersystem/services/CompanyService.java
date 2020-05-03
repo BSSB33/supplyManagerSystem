@@ -157,7 +157,7 @@ public class CompanyService {
         if (companyToEnable.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 for (User userToEnable : companyToEnable.get().getManagers()){
-                    userService.enableUserById(userToEnable.getId());
+                    userService.enableUser(userToEnable.getId(), loggedInUser);
                 }
                 companyToEnable.get().setActive(true);
                 return ResponseEntity.ok(companyRepository.save(companyToEnable.get()));
@@ -181,7 +181,7 @@ public class CompanyService {
         if (companyToDisable.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 for (User userToEnable : companyToDisable.get().getManagers()){
-                    userService.disableUserById(userToEnable.getId());
+                    userService.disableUser(userToEnable.getId(), loggedInUser);
                 }
                 companyToDisable.get().setActive(false);
                 return ResponseEntity.ok(companyRepository.save(companyToDisable.get()));

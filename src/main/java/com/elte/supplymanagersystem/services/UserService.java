@@ -65,28 +65,13 @@ public class UserService {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) { // Doesn't work anywhere
+                if (loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * Returns Users who are not directors of any Companies.
-     * ADMIN: Can get all.
-     * ELSE: FORBIDDEN
-     *
-     * @param loggedInUser The user who logged in.
-     * @return Returns a ResponseEntity with the requested Users
-     */
-    public ResponseEntity getUnassignedDirectors(User loggedInUser) {
-        logger.info("getUnassignedDirectors() called");
-        if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -107,18 +92,23 @@ public class UserService {
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
-            if(userToUpdate.getPassword() != null){
-                userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
-            }
-            else userToUpdate.setPassword(userToCheck.get().getPassword());
+            if(userToUpdate.getPassword() == null)
+                userToUpdate.setPassword(userToCheck.get().getPassword());
 
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_ADMIN);
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_DIRECTOR);
+                else userToUpdate.setRole(Role.ROLE_MANAGER);
+
                 return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
+                userToUpdate.setRole(Role.ROLE_MANAGER);
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
@@ -164,12 +154,14 @@ public class UserService {
         } else {
             //userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
-                if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
-                    userToRegister.setRole(Role.ROLE_DIRECTOR);
-                    userToRegister.setCompany(userToRegister.getWorkplace());
-                }
-                //Register Other Roles simply
-                return ResponseEntity.ok(userRepository.save(userToRegister));
+                if(userToRegister.getWorkplace() != null){
+                    if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
+                        userToRegister.setRole(Role.ROLE_DIRECTOR);
+                        userToRegister.setCompany(userToRegister.getWorkplace());
+                    }
+                    //Register Other Roles simply
+                    return ResponseEntity.ok(userRepository.save(userToRegister));
+                } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FORBIDDEN);
             } else if (loggedInUser.getWorkplace() != null && loggedInUser.getCompany() != null && userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //Director
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());
@@ -204,35 +196,6 @@ public class UserService {
         if (employee.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
         } else return new ArrayList<>();
-    }
-
-    /**
-     * Disables a User by ID
-     *
-     * @param id The Id of the user we want to disable
-     */
-    public void disableUserById(Integer id){
-        logger.info("disableUserById() called");
-        Optional<User> userToDisable = userRepository.findById(id);
-        if(userToDisable.isPresent()){
-            userToDisable.get().setEnabled(false);
-            userRepository.save(userToDisable.get());
-        }
-    }
-
-    /**
-     * Enables a User by ID
-     *
-     * @param id The Id of the user we want to enable
-     */
-    public void enableUserById(Integer id){
-        logger.info("disableUserById() called");
-        Optional<User> userToEnable = userRepository.findById(id);
-        if(userToEnable.isPresent()){
-            userToEnable.get().setEnabled(true);
-            System.out.println(userToEnable.get().getUsername());
-            userRepository.save(userToEnable.get());
-        }
     }
 
     /**

@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: User</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.entities</a> ]
+</div>
+
+<h1>Coverage Summary for Class: User (com.elte.supplymanagersystem.entities)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">User</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91,4%
+  </span>
+  <span class="absValue">
+    (32/ 35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">User$HibernateProxy$RviBXHYN</td>
+  </tr>
+  <tr>
+    <td class="name">User$UserBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91,7%
+  </span>
+  <span class="absValue">
+    (33/ 36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.entities;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.dtos.UserDTO;
+<i>4</i>&nbsp;import com.elte.supplymanagersystem.enums.Role;
+<i>5</i>&nbsp;import com.fasterxml.jackson.annotation.JsonIgnore;
+<i>6</i>&nbsp;import lombok.*;
+<i>7</i>&nbsp;import org.apache.commons.collections.CollectionUtils;
+<i>8</i>&nbsp;import org.hibernate.annotations.LazyCollection;
+<i>9</i>&nbsp;import org.hibernate.annotations.LazyCollectionOption;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import javax.persistence.*;
+<i>12</i>&nbsp;import java.util.List;
+<i>13</i>&nbsp;import java.util.stream.Collectors;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;/**
+<i>17</i>&nbsp; * User Entity
+<i>18</i>&nbsp; * Users are used for login and order management
+<i>19</i>&nbsp; * A user have: Username, Password, Enabled/Disabled Status
+<i>20</i>&nbsp; * A Company: If the User is the director of a Company
+<i>21</i>&nbsp; * A User also can have connections with Orders, if the User is assigned to Orders
+<i>22</i>&nbsp; * Workplace: Users are assigned to their workplace
+<i>23</i>&nbsp; * Users are can be also creators of histories
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;@Entity
+<i>26</i>&nbsp;@Table(name = &quot;USER_TABLE&quot;)
+<b class="fc"><i>27</i>&nbsp;@Data</b>
+<b class="fc"><i>28</i>&nbsp;@Builder</b>
+<b class="fc"><i>29</i>&nbsp;@NoArgsConstructor</b>
+<b class="fc"><i>30</i>&nbsp;@AllArgsConstructor</b>
+<b class="fc"><i>31</i>&nbsp;@EqualsAndHashCode</b>
+<i>32</i>&nbsp;public class User {
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    @Id
+<i>35</i>&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<i>36</i>&nbsp;    @Column(updatable = false, nullable = false)
+<b class="fc"><i>37</i>&nbsp;    private Integer id;</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>40</i>&nbsp;    private String username;</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>43</i>&nbsp;    private String fullName;</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>46</i>&nbsp;    private String email;</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    @Column(nullable = false)
+<i>49</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>50</i>&nbsp;    private String password;</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    @Column(nullable = false)
+<b class="fc"><i>53</i>&nbsp;    private boolean enabled;</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    @ManyToOne
+<i>56</i>&nbsp;    @JoinColumn
+<b class="fc"><i>57</i>&nbsp;    private Company company;</b>
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>60</i>&nbsp;    @OneToMany(mappedBy = &quot;buyerManager&quot;)
+<i>61</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>62</i>&nbsp;    private List&lt;Order&gt; purchases;</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>65</i>&nbsp;    @OneToMany(mappedBy = &quot;sellerManager&quot;)
+<i>66</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>67</i>&nbsp;    private List&lt;Order&gt; sells;</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    @ManyToOne
+<i>70</i>&nbsp;    @JoinColumn
+<b class="fc"><i>71</i>&nbsp;    private Company workplace;</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    @Column(nullable = false)
+<i>74</i>&nbsp;    @Enumerated(EnumType.STRING)
+<b class="fc"><i>75</i>&nbsp;    private Role role;</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    @LazyCollection(LazyCollectionOption.FALSE)
+<i>78</i>&nbsp;    @OneToMany(mappedBy = &quot;creator&quot;, cascade = CascadeType.REMOVE)
+<i>79</i>&nbsp;    @JsonIgnore
+<b class="fc"><i>80</i>&nbsp;    private List&lt;History&gt; histories;</b>
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    /**
+<i>83</i>&nbsp;     * Constructor for constructing User object from DTO Object
+<i>84</i>&nbsp;     *
+<i>85</i>&nbsp;     * @param userDTO The DTO to construct from.
+<i>86</i>&nbsp;     */
+<b class="fc"><i>87</i>&nbsp;    public User(UserDTO userDTO) {</b>
+<b class="fc"><i>88</i>&nbsp;        this.username = userDTO.getUsername();</b>
+<b class="fc"><i>89</i>&nbsp;        this.fullName = userDTO.getFullName();</b>
+<b class="fc"><i>90</i>&nbsp;        this.email = userDTO.getEmail();</b>
+<b class="fc"><i>91</i>&nbsp;        this.password = userDTO.getPassword();</b>
+<b class="fc"><i>92</i>&nbsp;        this.enabled = userDTO.isEnabled();</b>
+<b class="fc"><i>93</i>&nbsp;        this.company = userDTO.getCompany();</b>
+<b class="fc"><i>94</i>&nbsp;        this.workplace = userDTO.getWorkplace();</b>
+<b class="fc"><i>95</i>&nbsp;        this.role = userDTO.getRole();</b>
+<b class="fc"><i>96</i>&nbsp;        if (!CollectionUtils.isEmpty(userDTO.getHistories()))</b>
+<b class="nc"><i>97</i>&nbsp;            histories = userDTO.getHistories().stream().map(History::new).collect(Collectors.toList());</b>
+<b class="fc"><i>98</i>&nbsp;        if (!CollectionUtils.isEmpty(userDTO.getBuyerManager()))</b>
+<b class="nc"><i>99</i>&nbsp;            purchases = userDTO.getBuyerManager().stream().map(Order::new).collect(Collectors.toList());</b>
+<b class="fc"><i>100</i>&nbsp;        if (!CollectionUtils.isEmpty(userDTO.getSellerManager()))</b>
+<b class="nc"><i>101</i>&nbsp;            purchases = userDTO.getSellerManager().stream().map(Order::new).collect(Collectors.toList());</b>
+<b class="fc"><i>102</i>&nbsp;    }</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;    /**
+<i>105</i>&nbsp;     * Checks if the two users are colleagues or not
+<i>106</i>&nbsp;     *
+<i>107</i>&nbsp;     * @param otherUser possible colleague
+<i>108</i>&nbsp;     * @return true/false
+<i>109</i>&nbsp;     */
+<i>110</i>&nbsp;    public boolean isColleague(User otherUser) {
+<b class="fc"><i>111</i>&nbsp;        return this.workplace.getId().equals(otherUser.workplace.getId());</b>
+<i>112</i>&nbsp;    }
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;    @Override
+<i>115</i>&nbsp;    public String toString() {
+<b class="fc"><i>116</i>&nbsp;        return &quot;User{&quot; +</b>
+<i>117</i>&nbsp;                &quot;id=&quot; + id +
+<i>118</i>&nbsp;                &quot;, username=&#39;&quot; + username + &#39;\&#39;&#39; +
+<i>119</i>&nbsp;                &quot;, password=&#39;&quot; + password + &#39;\&#39;&#39; +
+<i>120</i>&nbsp;                &quot;, enabled=&quot; + enabled +
+<i>121</i>&nbsp;                &quot;, company=&quot; + company +
+<i>122</i>&nbsp;                &quot;, workplace=&quot; + workplace +
+<i>123</i>&nbsp;                &quot;, role=&quot; + role +
+<i>124</i>&nbsp;                &#39;}&#39;;
+<i>125</i>&nbsp;    }
+<i>126</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

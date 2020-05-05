@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 
+import java.util.ArrayList;
+
 import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
 
 /**
@@ -152,13 +154,35 @@ public class UserController {
         } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
+    ArrayList<Integer> loggedInUsersId = new ArrayList<>();
     /**
      * Creates an authenticated User
+     * Adds the user from the loggedInUsersId List
      *
      * @return Returns an authenticatedUser with OK (200)
      */
     @PostMapping("login")
     public ResponseEntity login() {
-        return ResponseEntity.ok(authenticatedUser.getUser());
+        if(!loggedInUsersId.contains(authenticatedUser.getUser().getId())){
+            System.out.println("User added logged in: " + authenticatedUser.getUser().getUsername());
+            loggedInUsersId.add(authenticatedUser.getUser().getId());
+            return ResponseEntity.ok(authenticatedUser.getUser());
+        }
+        else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User already logged in!");
+    }
+
+    /**
+     * Removes the user from the loggedInUsersId List
+     *
+     * @return Returns an authenticatedUser with OK (200)
+     */
+    @PostMapping("logout")
+    public ResponseEntity logout() {
+        if(loggedInUsersId.contains(authenticatedUser.getUser().getId())){
+            System.out.println("User logged out: " + authenticatedUser.getUser().getUsername());
+            loggedInUsersId.remove(authenticatedUser.getUser().getId());
+            return ResponseEntity.ok(authenticatedUser.getUser());
+        }
+        else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User wasn't logged in!");
     }
 }

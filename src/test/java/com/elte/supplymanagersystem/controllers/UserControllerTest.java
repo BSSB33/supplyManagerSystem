@@ -377,27 +377,6 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
-    //Login Endpoint
-    @Test
-    void givenUser_whenLoginEndpointIsCalled_thenOkShouldBeReturned() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users/login").with(user("Gabor").password("password"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users/login").with(user("Balazs").password("password"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users/login").with(user("Judit").password("password"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users/login").with(user("Emma").password("password"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
     //Register Endpoint
     @Test
     void givenAdminUser_whenRegisterEndpointIsCalled_withManagerUserToRegister_thenUserShouldBeRegistered() throws Exception {

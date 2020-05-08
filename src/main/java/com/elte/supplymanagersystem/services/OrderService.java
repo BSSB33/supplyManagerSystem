@@ -10,14 +10,12 @@ import com.elte.supplymanagersystem.repositories.HistoryRepository;
 import com.elte.supplymanagersystem.repositories.OrderRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
@@ -179,6 +177,27 @@ public class OrderService {
             if (loggedInUser.getWorkplace() != null) {
                 List<Order> currentCompany = orderRepository.findPurchasesByWorkplace(loggedInUser.getWorkplace());
                 return ResponseEntity.ok(currentCompany);
+            } else return ResponseEntity.badRequest().build();
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+    }
+
+    /**
+     * Returns the Orders assigned to the user.
+     * ADMIN, DIRECTOR, MANAGER: Get orders if handled by the user.
+     * ELSE - FORBIDDEN
+     * ID NOT FOUND - NOT FOUND
+     * Unemployed user - BAD REQUEST
+     *
+     * @param loggedInUser The user who logged in.
+     * @return Returns a ResponseEntity with the Orders where the user's company is a buyer.
+     */
+    public ResponseEntity getOrdersOfUser(User loggedInUser) {
+        logger.info("getOrdersOfUser() called");
+        if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
+            if (loggedInUser.getWorkplace() != null) {
+                ArrayList<Order> ordersOfUser = new ArrayList<>(orderRepository.findAllOrderOfUserByUser(loggedInUser));
+                System.out.println(ordersOfUser);
+                return ResponseEntity.ok(ordersOfUser);
             } else return ResponseEntity.badRequest().build();
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }

@@ -197,6 +197,22 @@ public class OrderController {
     }
 
     /**
+     * Returns Company Orders where the User who logged in is a seller or buyer manager.
+     * Calls getOrdersOfUser method from OrderService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity of Orders.
+     */
+    @GetMapping("/myorders")
+    public ResponseEntity getMyOrders(Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return orderService.getOrdersOfUser(loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
      * Updates an Order by ID based on User Role.
      * Calls putById method from OrderService.
      * Returns UNAUTHORIZED if the user is Invalid.

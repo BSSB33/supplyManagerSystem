@@ -5,6 +5,7 @@ import com.elte.supplymanagersystem.entities.Company;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.CompanyRepository;
+import com.elte.supplymanagersystem.repositories.OrderRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,9 @@ public class CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     /**
      * Returns All the Companies in the Database.
@@ -180,9 +184,17 @@ public class CompanyService {
         Optional<Company> companyToDisable = companyRepository.findById(id);
         if (companyToDisable.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-                for (User userToEnable : companyToDisable.get().getManagers()){
-                    userService.disableUser(userToEnable.getId(), loggedInUser);
+                for (User userToDisable : companyToDisable.get().getManagers()){
+                    userService.disableUser(userToDisable.getId(), loggedInUser);
                 }
+                companyToDisable.get().getSales().forEach(sale -> {
+                    sale.setArchived(true);
+                    orderRepository.save(sale);
+                });
+                companyToDisable.get().getPurchases().forEach(purchase -> {
+                    purchase.setArchived(true);
+                    orderRepository.save(purchase);
+                });
                 companyToDisable.get().setActive(false);
                 return ResponseEntity.ok(companyRepository.save(companyToDisable.get()));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);

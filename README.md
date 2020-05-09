@@ -22,6 +22,7 @@ Témavezető: Dr. Szendrei Rudolf
 	-A megrendelések több terméket is tartalmazhatnak egységárral
 	-A több országban működő cégekneknek választható nyelv bevezetése felhasználónként. (EUR/HUF valuták bevezetése megrendelésekre)
 	-Értesítések bevezetése
+	-Útvonaltervezés implementálása
 	-Képek, egyéb dokumentumok csatolása megrendelésekhez, előzményekhez.
 	-Havi Jelentés generálása funkció implementálása
 	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.

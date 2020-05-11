@@ -60,14 +60,14 @@ public class OrderService {
      * @param id           The ID of the Order to return.
      * @return Returns a ResponseEntity of the Order.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
         logger.info("getById() called");
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(orderToGet.get());
             else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                Map<Integer, Order> map = getMap(loggedInUser);
+                Map<Long, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     return ResponseEntity.ok(map.get(orderToGet.get().getId()));
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -89,14 +89,14 @@ public class OrderService {
      * @param id           The ID of the Order to get the Histories of.
      * @return Returns a ResponseEntity of the Histories.
      */
-    public ResponseEntity getHistoriesByOrderId(User loggedInUser, Integer id) {
+    public ResponseEntity getHistoriesByOrderId(User loggedInUser, Long id) {
         logger.info("getHistoriesByOrderId() called");
         Optional<Order> orderToGet = orderRepository.findById(id);
         if (orderToGet.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(orderToGet.get().getHistories());
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                Map<Integer, Order> map = getMap(loggedInUser);
+                Map<Long, Order> map = getMap(loggedInUser);
                 if (map.get(orderToGet.get().getId()) != null) {
                     ArrayList<History> authorizedHistories = new ArrayList<>();
                     orderToGet.get().getHistories().stream().filter(history ->
@@ -120,7 +120,7 @@ public class OrderService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity of the saved History.
      */
-    public ResponseEntity postHistoryForOrderById(HistoryDTO historyDTO, User loggedInUser, Integer idOfOrder) {
+    public ResponseEntity postHistoryForOrderById(HistoryDTO historyDTO, User loggedInUser, Long idOfOrder) {
         logger.info("postHistoryForOrderById() called");
         Optional<Order> orderToGet = orderRepository.findById(idOfOrder);
         if (orderToGet.isPresent()) {
@@ -214,7 +214,7 @@ public class OrderService {
      * @param id           The ID of the Order the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Order.
      */
-    public ResponseEntity putById(OrderDTO orderDTO, User loggedInUser, Integer id) {
+    public ResponseEntity putById(OrderDTO orderDTO, User loggedInUser, Long id) {
         logger.info("putById() called");
         Order orderToUpdate = new Order(orderDTO);
         orderToUpdate.setId(id);
@@ -223,7 +223,7 @@ public class OrderService {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
                 return ResponseEntity.ok(orderRepository.save(orderToUpdate));
             } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-                Map<Integer, Order> map = getMap(loggedInUser);
+                Map<Long, Order> map = getMap(loggedInUser);
                 if (orderToUpdate.getStatus() != orderToCheck.get().getStatus() || map.get(orderToUpdate.getId()) != null) {
                     return ResponseEntity.ok(orderRepository.save(orderToUpdate));
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
@@ -270,7 +270,7 @@ public class OrderService {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
         logger.info("deleteById() called");
         Optional<Order> orderToDelete = orderRepository.findById(id);
         if (orderToDelete.isPresent()) {
@@ -294,8 +294,8 @@ public class OrderService {
      * @param orderToDelete Order to delete
      * @return Returns a ResponseEntity
      */
-    private ResponseEntity deleteByDirectorOrManager(Integer id, User loggedInUser, Order orderToDelete) {
-        Map<Integer, Order> map = getMap(loggedInUser);
+    private ResponseEntity deleteByDirectorOrManager(Long id, User loggedInUser, Order orderToDelete) {
+        Map<Long, Order> map = getMap(loggedInUser);
         if (map.get(orderToDelete.getId()) != null) {
             orderRepository.deleteById(id);
             return ResponseEntity.ok().build();
@@ -309,7 +309,7 @@ public class OrderService {
      * @param loggedInUser The user who logged in.
      * @return Returns a Map[Integer, Order] with the ID-s of the Orders are the keys.
      */
-    public Map<Integer, Order> getMap(User loggedInUser) {
+    public Map<Long, Order> getMap(User loggedInUser) {
         List<Order> ordersOfCompany = orderRepository.findAllOrderByWorkplace(loggedInUser.getWorkplace());
         return ordersOfCompany.stream().collect(Collectors.toMap(Order::getId, order -> order));
     }

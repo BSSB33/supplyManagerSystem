@@ -124,7 +124,7 @@ class CompanyControllerTest {
                                 .role(Role.ROLE_MANAGER)
                                 .enabled(true)
                                 .company(null)
-                                .workplace(Company.builder().id(1).build())
+                                .workplace(Company.builder().id(1L).build())
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -260,7 +260,7 @@ class CompanyControllerTest {
                 .put("/companies/1/disable").with(user("Gabor").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1)
+                                .id(1L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -274,7 +274,7 @@ class CompanyControllerTest {
                 .put("/companies/1/disable").with(user("Balazs").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1)
+                                .id(1L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -286,7 +286,7 @@ class CompanyControllerTest {
                 .put("/companies/10000/disable").with(user("Balazs").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1000)
+                                .id(1000L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -301,7 +301,7 @@ class CompanyControllerTest {
                 .put("/companies/1/disable").with(user("Gabor").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1)
+                                .id(1L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -312,7 +312,7 @@ class CompanyControllerTest {
                 .put("/companies/1/enable").with(user("Gabor").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1)
+                                .id(1L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -326,7 +326,7 @@ class CompanyControllerTest {
                 .put("/companies/1/enable").with(user("Balazs").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1)
+                                .id(1L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -339,7 +339,7 @@ class CompanyControllerTest {
                 .put("/companies/10000/enable").with(user("Balazs").password("password"))
                 .content(jsonToString(
                         Company.builder()
-                                .id(1000)
+                                .id(1000L)
                                 .build()
                 ))
                 .contentType(MediaType.APPLICATION_JSON))

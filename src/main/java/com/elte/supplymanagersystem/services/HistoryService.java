@@ -62,7 +62,7 @@ public class HistoryService {
      * @param id           The ID of the History the user wants to GET
      * @return Returns a ResponseEntity of the History with the requested History filtered by Role.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
         logger.info("getById() called");
         Optional<History> historyToGet = historyRepository.findById(id);
         if (historyToGet.isPresent()) {
@@ -113,7 +113,7 @@ public class HistoryService {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
         logger.info("deleteById() called");
         Optional<History> historyToDelete = historyRepository.findById(id);
         if (historyToDelete.isPresent()) {
@@ -139,7 +139,7 @@ public class HistoryService {
      * @return boolean
      */
     private boolean checkIfAuthorisedForHistory(User loggedInUser, Order orderToGet, History historyToGet) {
-        Map<Integer, Order> map = orderService.getMap(loggedInUser);
+        Map<Long, Order> map = orderService.getMap(loggedInUser);
         if (map.get(orderToGet.getId()) != null) {
             return historyToGet.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId());
         } else return false;

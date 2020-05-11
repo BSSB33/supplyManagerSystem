@@ -16,7 +16,7 @@ import java.util.Optional;
  * Repository interface for Orders: Type, ID
  */
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByProductName(String productName);
 
     @Query("SELECT o FROM Order o WHERE o.seller = :workplace")

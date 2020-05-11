@@ -63,7 +63,7 @@ public class CompanyService {
      * @param id           The ID of the Company the user wants to GET
      * @return Returns a ResponseEntity of the Company.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
         logger.info("getById() called");
         Optional<Company> companyToGet = companyRepository.findById(id);
         if (companyToGet.isPresent()) {
@@ -101,7 +101,7 @@ public class CompanyService {
      * @param id           The ID of the Company the user wants to PUT (Update).
      * @return Returns a ResponseEntity of the updated Company.
      */
-    public ResponseEntity putById(CompanyDTO companyDTO, User loggedInUser, Integer id) {
+    public ResponseEntity putById(CompanyDTO companyDTO, User loggedInUser, Long id) {
         logger.info("putById() called");
         Company companyToUpdate = new Company(companyDTO);
         companyToUpdate.setId(id);
@@ -155,7 +155,7 @@ public class CompanyService {
      * @param loggedInUser The user logged in (admin).
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity enableCompany(Integer id, User loggedInUser) {
+    public ResponseEntity enableCompany(Long id, User loggedInUser) {
         logger.info("enableCompany() called");
         Optional<Company> companyToEnable = companyRepository.findById(id);
         if (companyToEnable.isPresent()) {
@@ -179,7 +179,7 @@ public class CompanyService {
      * @param loggedInUser The user logged in (admin).
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity disableCompany(Integer id, User loggedInUser) {
+    public ResponseEntity disableCompany(Long id, User loggedInUser) {
         logger.info("disableCompany() called");
         Optional<Company> companyToDisable = companyRepository.findById(id);
         if (companyToDisable.isPresent()) {
@@ -226,7 +226,7 @@ public class CompanyService {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
         logger.info("deleteById() called");
         Optional<Company> companyToDelete = companyRepository.findById(id);
         if (companyToDelete.isPresent()) {

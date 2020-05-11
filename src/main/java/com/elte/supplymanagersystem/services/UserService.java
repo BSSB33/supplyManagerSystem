@@ -58,7 +58,7 @@ public class UserService {
      * @param id           The ID of the User to GET.
      * @return Returns a ResponseEntity with the Requested User.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
         logger.info("getById() called");
         Optional<User> userToGet = userRepository.findById(id);
         if (userToGet.isPresent()) {
@@ -86,7 +86,7 @@ public class UserService {
      * @param id           The ID of the User to Update.
      * @return Returns a ResponseEntity with the updated User.
      */
-    public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Integer id) {
+    public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Long id) {
         logger.info("putById() called");
         User userToUpdate = new User(userDTO);
         userToUpdate.setId(id);
@@ -209,7 +209,7 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity enableUser(Integer id, User loggedInUser) {
+    public ResponseEntity enableUser(Long id, User loggedInUser) {
         logger.info("enableUser() called");
         Optional<User> userToEnable = userRepository.findById(id);
         if (userToEnable.isPresent()) {
@@ -235,7 +235,7 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity disableUser(Integer id, User loggedInUser) {
+    public ResponseEntity disableUser(Long id, User loggedInUser) {
         logger.info("disableUser() called");
         Optional<User> userToDisable = userRepository.findById(id);
         if (userToDisable.isPresent()) {
@@ -275,7 +275,7 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
         logger.info("deleteById() called");
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
@@ -296,7 +296,7 @@ public class UserService {
      * @param userToDelete The User To delete. (for returning components)
      * @return ResponseEntity
      */
-    private ResponseEntity testAndDeleteUser(Integer id, User userToDelete) {
+    private ResponseEntity testAndDeleteUser(Long id, User userToDelete) {
         if (isDeletable(userToDelete)) {
             userRepository.deleteById(id);
             return ResponseEntity.ok().build();

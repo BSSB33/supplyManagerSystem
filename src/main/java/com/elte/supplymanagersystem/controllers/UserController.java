@@ -59,7 +59,7 @@ public class UserController {
      */
     //Find
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable @Min(1) Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable @Min(1) Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getById(loggedInUser, id);
@@ -78,7 +78,7 @@ public class UserController {
      */
     //Save or Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.putById(userDTO, loggedInUser, id);
@@ -112,7 +112,7 @@ public class UserController {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     @PutMapping("/{id}/disable")
-    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity disable(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.disableUser(id, loggedInUser);
@@ -129,7 +129,7 @@ public class UserController {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     @PutMapping("/{id}/enable")
-    public ResponseEntity enable(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity enable(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.enableUser(id, loggedInUser);
@@ -147,14 +147,14 @@ public class UserController {
      */
     //Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity delete(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.deleteById(id, loggedInUser);
         } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
-    ArrayList<Integer> loggedInUsersId = new ArrayList<>();
+    ArrayList<Long> loggedInUsersId = new ArrayList<>();
     /**
      * Creates an authenticated User
      * Adds the user from the loggedInUsersId List

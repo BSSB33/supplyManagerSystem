@@ -57,7 +57,7 @@ public class OrderController {
      * @return Returns a ResponseEntity of the Order with the given ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getById(loggedInUser, id);
@@ -74,7 +74,7 @@ public class OrderController {
      * @return Returns a ResponseEntity with the history of the requested Order to which the user is authorized.
      */
     @GetMapping("/{id}/histories")
-    public ResponseEntity getHistoriesByOrderId(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity getHistoriesByOrderId(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.getHistoriesByOrderId(loggedInUser, id);
@@ -157,7 +157,7 @@ public class OrderController {
      * @return Returns a ResponseEntity with the saved record.
      */
     @PostMapping("/{id}/histories")
-    public ResponseEntity postHistoryForOrderById(@RequestBody HistoryDTO historyDTO, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity postHistoryForOrderById(@RequestBody HistoryDTO historyDTO, @PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.postHistoryForOrderById(historyDTO, loggedInUser, id);
@@ -224,7 +224,7 @@ public class OrderController {
      */
     //Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody OrderDTO orderDTO, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody OrderDTO orderDTO, @PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.putById(orderDTO, loggedInUser, id);
@@ -260,7 +260,7 @@ public class OrderController {
      */
     //Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity delete(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return orderService.deleteById(id, loggedInUser);

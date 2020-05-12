@@ -25,8 +25,7 @@ Témavezető: Dr. Szendrei Rudolf
 	-Útvonaltervezés implementálása
 	-Képek, egyéb dokumentumok csatolása megrendelésekhez, előzményekhez.
 	-Havi Jelentés generálása funkció implementálása
-	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.
-    -Megrendelés megnyitási/zárolási ideje
+	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.    
     -HTTPS bevezetése
     
     

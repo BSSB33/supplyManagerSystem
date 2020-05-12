@@ -196,7 +196,6 @@ public class OrderService {
         if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
             if (loggedInUser.getWorkplace() != null) {
                 ArrayList<Order> ordersOfUser = new ArrayList<>(orderRepository.findAllOrderOfUserByUser(loggedInUser));
-                System.out.println(ordersOfUser);
                 return ResponseEntity.ok(ordersOfUser);
             } else return ResponseEntity.badRequest().build();
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);

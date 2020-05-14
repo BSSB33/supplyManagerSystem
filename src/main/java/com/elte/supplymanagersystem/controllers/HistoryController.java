@@ -52,7 +52,7 @@ public class HistoryController {
      * @return Returns a ResponseEntity of the History with the given ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.getById(loggedInUser, id);
@@ -88,7 +88,7 @@ public class HistoryController {
      */
     //Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity delete(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return historyService.deleteById(id, loggedInUser);

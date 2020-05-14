@@ -52,7 +52,7 @@ public class CompanyController {
      * @return Returns a ResponseEntity of the Company with the given ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.getById(loggedInUser, id);
@@ -87,7 +87,7 @@ public class CompanyController {
      */
     //Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody CompanyDTO companyDTO, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody CompanyDTO companyDTO, @PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.putById(companyDTO, loggedInUser, id);
@@ -113,6 +113,40 @@ public class CompanyController {
     }
 
     /**
+     * Disables a Company by ID.
+     * Calls disableCompany method from CompanyService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param id   The ID of the User to disable.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
+    @PutMapping("/{id}/disable")
+    public ResponseEntity disable(@PathVariable Long id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.disableCompany(id, loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
+     * Enables a User by ID.
+     * Calls enableUser method from UserService.
+     * Returns UNAUTHORIZED if the user is Invalid.
+     *
+     * @param id   The ID of the User to disable.
+     * @param auth Authentication parameter for Security in order to get the User who logged in.
+     * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
+     */
+    @PutMapping("/{id}/enable")
+    public ResponseEntity enable(@PathVariable Long id, Authentication auth) {
+        User loggedInUser = userService.getValidUser(auth.getName());
+        if (loggedInUser != null) {
+            return companyService.enableCompany(id, loggedInUser);
+        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
+    }
+
+    /**
      * Deletes a record by ID.
      * Calls deleteById method from CompanyService.
      * Returns UNAUTHORIZED if the user is Invalid.
@@ -123,7 +157,7 @@ public class CompanyController {
      */
     //Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity delete(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return companyService.deleteById(id, loggedInUser);

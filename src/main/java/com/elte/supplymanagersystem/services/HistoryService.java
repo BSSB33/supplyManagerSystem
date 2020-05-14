@@ -6,6 +6,7 @@ import com.elte.supplymanagersystem.entities.Order;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.enums.Role;
 import com.elte.supplymanagersystem.repositories.HistoryRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ import static com.elte.supplymanagersystem.enums.ErrorMessages.FORBIDDEN;
 @Service
 public class HistoryService {
 
+    static final Logger logger = Logger.getLogger(HistoryService.class);
+
     @Autowired
     private UserService userService;
 
@@ -33,18 +36,16 @@ public class HistoryService {
     /**
      * Returns All the Histories in the Database depending on the Role of the User.
      * ADMIN: Can get ALL the Users.
-     * DIRECTOR, MANAGER: Can get histories they created.
      * ELSE: FORBIDDEN
      *
      * @param loggedInUser The user who logged in.
      * @return Returns a ResponseEntity with the list of Histories.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN))
             return ResponseEntity.ok(historyRepository.findAll());
-        else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            return ResponseEntity.ok(loggedInUser.getHistories());
-        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
+        else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -61,7 +62,8 @@ public class HistoryService {
      * @param id           The ID of the History the user wants to GET
      * @return Returns a ResponseEntity of the History with the requested History filtered by Role.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
+        logger.info("getById() called");
         Optional<History> historyToGet = historyRepository.findById(id);
         if (historyToGet.isPresent()) {
             Order orderToGet = historyToGet.get().getOrder();
@@ -87,13 +89,13 @@ public class HistoryService {
      * @return Returns a ResponseEntity of the saved History.
      */
     public ResponseEntity addHistory(HistoryDTO historyDTO, User loggedInUser) {
+        logger.info("addHistory() called");
         History historyToSave = new History(historyDTO);
         if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             if (historyToSave.getCreator() == null)
                 historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else if (userService.userHasRole(loggedInUser, List.of(Role.ROLE_DIRECTOR, Role.ROLE_MANAGER))) {
-            historyToSave.setCreator(loggedInUser);
             return ResponseEntity.ok(historyRepository.save(historyToSave));
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
@@ -111,7 +113,8 @@ public class HistoryService {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     //Remove
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<History> historyToDelete = historyRepository.findById(id);
         if (historyToDelete.isPresent()) {
             if (userService.userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -136,7 +139,7 @@ public class HistoryService {
      * @return boolean
      */
     private boolean checkIfAuthorisedForHistory(User loggedInUser, Order orderToGet, History historyToGet) {
-        Map<Integer, Order> map = orderService.getMap(loggedInUser);
+        Map<Long, Order> map = orderService.getMap(loggedInUser);
         if (map.get(orderToGet.getId()) != null) {
             return historyToGet.getCreator().getWorkplace().getId().equals(loggedInUser.getWorkplace().getId());
         } else return false;

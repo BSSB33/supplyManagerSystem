@@ -29,7 +29,7 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
 
     @Override
     public void afterPropertiesSet() {
-        setRealmName("MY REALM");
+        setRealmName("SMSClient");
         super.afterPropertiesSet();
     }
 }

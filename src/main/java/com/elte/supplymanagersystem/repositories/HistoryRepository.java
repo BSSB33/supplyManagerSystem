@@ -13,7 +13,7 @@ import java.util.List;
  * Repository interface for Histories: Type, ID
  */
 @Repository
-public interface HistoryRepository extends JpaRepository<History, Integer> {
+public interface HistoryRepository extends JpaRepository<History, Long> {
 
     @Query("SELECT h FROM History h WHERE h.order = :order")
     List<History> findHistoriesByOrder(@Param("order") Order order);

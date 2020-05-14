@@ -1,0 +1,8 @@
+thymeleaf?
+Moskito tests
+Normal User registration form
+Orders can have products
+Order status can be set on the detail page
+Full screen light themed look
+Authtoken authorization (V. Balazs repo)
+wather + image API integration

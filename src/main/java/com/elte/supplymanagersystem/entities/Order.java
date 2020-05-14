@@ -2,16 +2,18 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.OrderDTO;
 import com.elte.supplymanagersystem.enums.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "ORDER_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -35,20 +38,23 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
     private String productName;
 
-    @Column //Should appear only when giving an offer (frontend)
+    @Column(nullable = false)
     private Double price;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column
+    private boolean isArchived;
+
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "order")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<History> histories;
 
@@ -68,6 +74,21 @@ public class Order {
     @JoinColumn
     private User sellerManager;
 
+    @Column(updatable = false)
+    @CreationTimestamp
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
+
+    @Column
+    @UpdateTimestamp
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate modifiedAt;
+
+    @Column
+    private String description;
+
     /**
      * Constructor for constructing Order object from DTO Object
      *
@@ -77,11 +98,31 @@ public class Order {
         this.productName = orderDTO.getProductName();
         this.price = orderDTO.getPrice();
         this.status = orderDTO.getStatus();
+        this.isArchived = orderDTO.isArchived();
         this.buyer = orderDTO.getBuyer();
         this.buyerManager = orderDTO.getBuyerManager();
         this.seller = orderDTO.getSeller();
         this.sellerManager = orderDTO.getSellerManager();
+        this.createdAt = orderDTO.getCreatedAt();
+        this.modifiedAt = orderDTO.getModifiedAt();
+        this.description = orderDTO.getDescription();
         if (!CollectionUtils.isEmpty(orderDTO.getHistory()))
             histories = orderDTO.getHistory().stream().map(History::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", price=" + price +
+                ", status=" + status +
+                ", buyer=" + buyer +
+                ", buyerManager=" + buyerManager +
+                ", seller=" + seller +
+                ", sellerManager=" + sellerManager +
+                ", createdAt=" + createdAt +
+                ", modifiedAt=" + modifiedAt +
+                '}';
     }
 }

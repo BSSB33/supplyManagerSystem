@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,11 +20,15 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class OrderDTO {
 
+    @Size(min = 3, message = "Product Name length must contain at least 3 characters")
     private String productName;
 
+    @Size(min = 2, message = "Price length must contain at least 2 characters")
     private Double price;
 
     private Status status;
+
+    private boolean isArchived;
 
     private List<HistoryDTO> history;
 
@@ -34,20 +40,10 @@ public class OrderDTO {
 
     private User sellerManager;
 
-    /**
-     * Constructor for Order Data Transfer Object
-     *
-     * @param order The Order object to construct the DTO of.
-     */
-    public OrderDTO(Order order) {
-        this.productName = order.getProductName();
-        this.price = order.getPrice();
-        this.status = order.getStatus();
-        this.buyer = order.getBuyer();
-        this.buyerManager = order.getBuyerManager();
-        this.seller = order.getSeller();
-        this.sellerManager = order.getSellerManager();
-        if (!CollectionUtils.isEmpty(order.getHistories()))
-            history = order.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
-    }
+    private LocalDate createdAt;
+
+    private LocalDate modifiedAt;
+
+    private String description;
+
 }

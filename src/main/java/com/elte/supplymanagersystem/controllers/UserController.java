@@ -3,7 +3,9 @@ package com.elte.supplymanagersystem.controllers;
 import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;
+import com.elte.supplymanagersystem.services.StatisticsService;
 import com.elte.supplymanagersystem.services.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+
+import java.util.ArrayList;
 
 import static com.elte.supplymanagersystem.enums.ErrorMessages.UNAUTHORIZED;
 
@@ -29,6 +33,7 @@ public class UserController {
     private AuthenticatedUser authenticatedUser;
     private static final String UNAUTHORIZED_USER = "Invalid User!";
 
+    static final Logger logger = Logger.getLogger(UserController.class);
     /**
      * Returns all the Users from UserService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
@@ -57,26 +62,10 @@ public class UserController {
      */
     //Find
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable @Min(1) Integer id, Authentication auth) {
+    public ResponseEntity get(@PathVariable @Min(1) Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.getById(loggedInUser, id);
-        } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
-    }
-
-    /**
-     * Returns Users who are not directors.
-     * Calls getUnassignedDirectors method from OrderService.
-     * Returns UNAUTHORIZED if the User is Invalid.
-     *
-     * @param auth Authentication parameter for Security in order to get the User who logged in.
-     * @return Returns a ResponseEntity with the requested Users
-     */
-    @GetMapping("/freeDirectors")
-    public ResponseEntity getUnassignedDirectors(Authentication auth) {
-        User loggedInUser = userService.getValidUser(auth.getName());
-        if (loggedInUser != null) {
-            return userService.getUnassignedDirectors(loggedInUser);
         } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
@@ -92,7 +81,7 @@ public class UserController {
      */
     //Save or Update
     @PutMapping("/{id}")
-    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Integer id, Authentication auth) {
+    public ResponseEntity put(@RequestBody UserDTO userDTO, @PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.putById(userDTO, loggedInUser, id);
@@ -126,7 +115,7 @@ public class UserController {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     @PutMapping("/{id}/disable")
-    public ResponseEntity disable(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity disable(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.disableUser(id, loggedInUser);
@@ -143,7 +132,7 @@ public class UserController {
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
     @PutMapping("/{id}/enable")
-    public ResponseEntity enable(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity enable(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.enableUser(id, loggedInUser);
@@ -161,20 +150,44 @@ public class UserController {
      */
     //Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Integer id, Authentication auth) {
+    public ResponseEntity delete(@PathVariable Long id, Authentication auth) {
         User loggedInUser = userService.getValidUser(auth.getName());
         if (loggedInUser != null) {
             return userService.deleteById(id, loggedInUser);
         } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UNAUTHORIZED);
     }
 
+    ArrayList<Long> loggedInUsersId = new ArrayList<>();
     /**
      * Creates an authenticated User
+     * Adds the user from the loggedInUsersId List
      *
      * @return Returns an authenticatedUser with OK (200)
      */
     @PostMapping("login")
     public ResponseEntity login() {
-        return ResponseEntity.ok(authenticatedUser.getUser());
+        if(!loggedInUsersId.contains(authenticatedUser.getUser().getId())){
+            //System.out.println("User added logged in: " + authenticatedUser.getUser().getUsername());
+            logger.info("User added logged in: " + authenticatedUser.getUser().getUsername());
+            loggedInUsersId.add(authenticatedUser.getUser().getId());
+            return ResponseEntity.ok(authenticatedUser.getUser());
+        }
+        else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User already logged in!");
+    }
+
+    /**
+     * Removes the user from the loggedInUsersId List
+     *
+     * @return Returns an authenticatedUser with OK (200)
+     */
+    @PostMapping("logout")
+    public ResponseEntity logout() {
+        if(loggedInUsersId.contains(authenticatedUser.getUser().getId())){
+            //System.out.println("User logged out: " + authenticatedUser.getUser().getUsername());
+            logger.info("User logged out: " + authenticatedUser.getUser().getUsername());
+            loggedInUsersId.remove(authenticatedUser.getUser().getId());
+            return ResponseEntity.ok(authenticatedUser.getUser());
+        }
+        else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User wasn't logged in!");
     }
 }

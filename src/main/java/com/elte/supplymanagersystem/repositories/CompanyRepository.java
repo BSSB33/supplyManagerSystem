@@ -10,7 +10,7 @@ import java.util.Optional;
  * Repository interface for Companies: Type, ID
  */
 @Repository
-public interface CompanyRepository extends JpaRepository<Company, Integer> {
+public interface CompanyRepository extends JpaRepository<Company, Long> {
     Optional<Company> findByName(String name);
 
     Optional<Company> findById(Integer id);

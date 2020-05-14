@@ -2,10 +2,7 @@ package com.elte.supplymanagersystem.entities;
 
 import com.elte.supplymanagersystem.dtos.CompanyDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -24,6 +21,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "COMPANY_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -31,30 +29,48 @@ public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private String taxNumber;
+
+    @Column(nullable = false)
+    private String bankAccountNumber;
+
+    @Column
+    private boolean active;
+
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "workplace")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workplace")
     @JsonIgnore
     private List<User> managers;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "company")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company")
     @JsonIgnore
     private List<User> director;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "buyer")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "buyer")
     @JsonIgnore
     private List<Order> purchases;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "seller")//, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "seller")
     @JsonIgnore
     private List<Order> sales;
+
+    @Column
+    private String lat;
+
+    @Column
+    private String lon;
 
     /**
      * Constructor for constructing Company object from DTO Object
@@ -63,6 +79,12 @@ public class Company {
      */
     public Company(CompanyDTO companyDTO) {
         this.name = companyDTO.getName();
+        this.address = companyDTO.getAddress();
+        this.taxNumber = companyDTO.getTaxNumber();
+        this.bankAccountNumber = companyDTO.getBankAccountNumber();
+        this.active = companyDTO.isActive();
+        this.lat = companyDTO.getLat();
+        this.lon = companyDTO.getLon();
         if (!CollectionUtils.isEmpty(companyDTO.getManagers()))
             managers = companyDTO.getManagers().stream().map(User::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(companyDTO.getDirector()))
@@ -71,5 +93,13 @@ public class Company {
             purchases = companyDTO.getPurchases().stream().map(Order::new).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(companyDTO.getSales()))
             sales = companyDTO.getSales().stream().map(Order::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return "Company{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

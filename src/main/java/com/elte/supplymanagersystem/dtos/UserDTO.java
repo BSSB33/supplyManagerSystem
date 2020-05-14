@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +20,16 @@ import java.util.stream.Collectors;
 @Data
 public class UserDTO {
 
+    @Size(min = 4, message = "Username length must contain at least 4 characters")
     private String username;
 
+    @Size(min = 8, message = "Password length must contain at least 8 characters")
     private String password;
+
+    @Size(min = 4, message = "Full Name length must contain at least 4 characters")
+    private String fullName;
+
+    private String email;
 
     private boolean enabled;
 
@@ -34,24 +44,4 @@ public class UserDTO {
     private Role role;
 
     private List<HistoryDTO> histories;
-
-    /**
-     * Constructor for User Data Transfer Object
-     *
-     * @param user The User object to construct the DTO of.
-     */
-    public UserDTO(User user) {
-        this.username = user.getUsername();
-        this.password = user.getPassword();
-        this.enabled = user.isEnabled();
-        this.company = user.getCompany();
-        this.workplace = user.getWorkplace();
-        this.role = user.getRole();
-        if (!CollectionUtils.isEmpty(user.getHistories()))
-            histories = user.getHistories().stream().map(HistoryDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getPurchases()))
-            buyerManager = user.getPurchases().stream().map(OrderDTO::new).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(user.getSells()))
-            buyerManager = user.getSells().stream().map(OrderDTO::new).collect(Collectors.toList());
-    }
 }

@@ -1,0 +1,72 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserRepository</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.repositories</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserRepository (com.elte.supplymanagersystem.repositories)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.repositories;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.entities.User;
+<i>4</i>&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+<i>5</i>&nbsp;import org.springframework.data.jpa.repository.Modifying;
+<i>6</i>&nbsp;import org.springframework.data.jpa.repository.Query;
+<i>7</i>&nbsp;import org.springframework.data.repository.query.Param;
+<i>8</i>&nbsp;import org.springframework.stereotype.Repository;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.util.List;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;/**
+<i>13</i>&nbsp; * Repository interface for Users: Type, ID
+<i>14</i>&nbsp; */
+<i>15</i>&nbsp;@Repository
+<i>16</i>&nbsp;public interface UserRepository extends JpaRepository&lt;User, Integer&gt; {
+<i>17</i>&nbsp;    User findByUsername(String username);
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    @Query(&quot;SELECT u FROM User u WHERE u.company is empty&quot;)
+<i>20</i>&nbsp;    List&lt;User&gt; findUnassignedDirectors();
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    @Modifying
+<i>23</i>&nbsp;    @Query(&quot;DELETE FROM User u WHERE u.id = :id&quot;)
+<i>24</i>&nbsp;    void deleteById(@Param(&quot;id&quot;) Integer id);
+<i>25</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

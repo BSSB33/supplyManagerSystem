@@ -1,0 +1,2 @@
+Selenium - egér kattintás emulálása
+Frontend + Backend- rendszer teszt

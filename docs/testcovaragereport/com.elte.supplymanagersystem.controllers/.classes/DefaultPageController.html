@@ -1,0 +1,103 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DefaultPageController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.controllers</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DefaultPageController (com.elte.supplymanagersystem.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultPageController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.controllers;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>4</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>5</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>6</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;@RestController
+<b class="fc"><i>9</i>&nbsp;public class DefaultPageController {</b>
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;    /**
+<i>12</i>&nbsp;     * Returns SupplyManagerSystemApplication Is Running string for feedback
+<i>13</i>&nbsp;     * @return Returns a Response entity with the content: SupplyManagerSystemApplication Is Running
+<i>14</i>&nbsp;     */
+<i>15</i>&nbsp;    @RequestMapping(&quot;/&quot;)
+<i>16</i>&nbsp;    ResponseEntity hello() {
+<b class="fc"><i>17</i>&nbsp;        return ResponseEntity.status(HttpStatus.OK).body(&quot;SupplyManagerSystemApplication Is Running&quot;);</b>
+<i>18</i>&nbsp;    }
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

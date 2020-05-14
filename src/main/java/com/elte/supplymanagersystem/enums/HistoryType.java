@@ -5,5 +5,5 @@ package com.elte.supplymanagersystem.enums;
  * These are realistic events in the life of an Order
  */
 public enum HistoryType {
-    PHONE_CALL, EMAIL_SENT, MADE_AND_OFFER, DISCUSSION, STARTED_SHIPPING, PAID, ORDER, OFFER, NOTE, SHIPPED
+    PHONE_CALL, EMAIL_SENT, STATUS_MODIFIED, MADE_AN_OFFER, DISCUSSION, STARTED_SHIPPING, PAID, ORDER, OFFER, NOTE, SHIPPED
 }

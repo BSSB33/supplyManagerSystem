@@ -38,6 +38,7 @@ public class UserService {
      * @return Returns a ResponseEntity with the list of Users.
      */
     public ResponseEntity getAll(User loggedInUser) {
+        logger.info("getAll() called");
         if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
             return ResponseEntity.ok(userRepository.findAll());
         } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
@@ -57,33 +58,20 @@ public class UserService {
      * @param id           The ID of the User to GET.
      * @return Returns a ResponseEntity with the Requested User.
      */
-    public ResponseEntity getById(User loggedInUser, Integer id) {
+    public ResponseEntity getById(User loggedInUser, Long id) {
+        logger.info("getById() called");
         Optional<User> userToGet = userRepository.findById(id);
         if (userToGet.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN))
                 return ResponseEntity.ok(userToGet);
             else if (userHasRole(loggedInUser, List.of(Role.ROLE_MANAGER, Role.ROLE_DIRECTOR))) {
-                if (loggedInUser.getWorkplace() == null && loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) { // Doesn't work anywhere
+                if (loggedInUser.getCompany() == null && loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(loggedInUser);
                 } else if (loggedInUser.isColleague(userToGet.get()) || loggedInUser.getId().equals(id)) {
                     return ResponseEntity.ok(userToGet);
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * Returns Users who are not directors of any Companies.
-     * ADMIN: Can get all.
-     * ELSE: FORBIDDEN
-     *
-     * @param loggedInUser The user who logged in.
-     * @return Returns a ResponseEntity with the requested Users
-     */
-    public ResponseEntity getUnassignedDirectors(User loggedInUser) {
-        if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
-            return ResponseEntity.ok(userRepository.findUnassignedDirectors());
-        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
     }
 
     /**
@@ -98,18 +86,29 @@ public class UserService {
      * @param id           The ID of the User to Update.
      * @return Returns a ResponseEntity with the updated User.
      */
-    public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Integer id) {
+    public ResponseEntity putById(UserDTO userDTO, User loggedInUser, Long id) {
+        logger.info("putById() called");
         User userToUpdate = new User(userDTO);
         userToUpdate.setId(id);
         Optional<User> userToCheck = userRepository.findById(userToUpdate.getId());
         if (userToCheck.isPresent()) {
+            if(userToUpdate.getPassword() == null)
+                userToUpdate.setPassword(userToCheck.get().getPassword());
+
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_ADMIN);
                 if (userHasRole(userToUpdate, Role.ROLE_DIRECTOR) && userToUpdate.getWorkplace() == null)
                     userToUpdate.setWorkplace(userToUpdate.getCompany());
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else if (userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) {
+                if(userToUpdate.getId().equals(loggedInUser.getId()))
+                    userToUpdate.setRole(Role.ROLE_DIRECTOR);
+                else userToUpdate.setRole(Role.ROLE_MANAGER);
+
                 return putByDirector(userToUpdate, loggedInUser, userToCheck.get());
             } else if (userHasRole(loggedInUser, Role.ROLE_MANAGER) && userToUpdate.getId().equals(loggedInUser.getId())) {
+                userToUpdate.setRole(Role.ROLE_MANAGER);
                 return ResponseEntity.ok(userRepository.save(userToUpdate));
             } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FORBIDDEN);
         } else return ResponseEntity.notFound().build();
@@ -147,20 +146,22 @@ public class UserService {
      * @return Returns a ResponseEntity of the saved User.
      */
     public ResponseEntity registerUser(UserDTO userDTO, User loggedInUser) {
+        logger.info("registerUser() called");
         User userToRegister = new User(userDTO);
         Optional<User> otherUser = Optional.ofNullable(userRepository.findByUsername(userToRegister.getUsername()));
         if (otherUser.isPresent()) {
             return ResponseEntity.badRequest().build();
         } else {
-            userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
-            userToRegister.setEnabled(true);
+            //userToRegister.setPassword(passwordEncoder.encode(userToRegister.getPassword()));
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) { //Admin
-                if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
-                    userToRegister.setRole(Role.ROLE_DIRECTOR);
-                    userToRegister.setCompany(userToRegister.getWorkplace());
-                }
-                //Register Other Roles simply
-                return ResponseEntity.ok(userRepository.save(userToRegister));
+                if(userToRegister.getWorkplace() != null){
+                    if (userHasRole(userToRegister, Role.ROLE_DIRECTOR)) {
+                        userToRegister.setRole(Role.ROLE_DIRECTOR);
+                        userToRegister.setCompany(userToRegister.getWorkplace());
+                    }
+                    //Register Other Roles simply
+                    return ResponseEntity.ok(userRepository.save(userToRegister));
+                } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(FORBIDDEN);
             } else if (loggedInUser.getWorkplace() != null && loggedInUser.getCompany() != null && userHasRole(loggedInUser, Role.ROLE_DIRECTOR)) { //Director
                 userToRegister.setRole(Role.ROLE_MANAGER);
                 userToRegister.setWorkplace(loggedInUser.getCompany());
@@ -176,6 +177,7 @@ public class UserService {
      * @return Returns an ArrayList of Users.
      */
     public Iterable<User> getEmployeesOfUser(User user) {
+        logger.info("getEmployeesOfUser() called");
         User director = userRepository.findByUsername(user.getUsername());
         if (userHasRole(director, Role.ROLE_DIRECTOR) && director.getCompany() != null && director.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getCompany().getManagers();
@@ -189,6 +191,7 @@ public class UserService {
      * @return Returns an ArrayList of Users.
      */
     public Iterable<User> getColleaguesOfUser(User user) {
+        logger.info("getColleaguesOfUser() called");
         User employee = userRepository.findByUsername(user.getUsername());
         if (employee.getWorkplace() != null) {
             return userRepository.findByUsername(user.getUsername()).getWorkplace().getManagers();
@@ -206,7 +209,8 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity enableUser(Integer id, User loggedInUser) {
+    public ResponseEntity enableUser(Long id, User loggedInUser) {
+        logger.info("enableUser() called");
         Optional<User> userToEnable = userRepository.findById(id);
         if (userToEnable.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -231,7 +235,8 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the operation was successful and NotFound if the record was not found.
      */
-    public ResponseEntity disableUser(Integer id, User loggedInUser) {
+    public ResponseEntity disableUser(Long id, User loggedInUser) {
+        logger.info("disableUser() called");
         Optional<User> userToDisable = userRepository.findById(id);
         if (userToDisable.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -270,7 +275,8 @@ public class UserService {
      * @param loggedInUser The user logged in.
      * @return Returns a ResponseEntity: OK if the deletion was successful and NotFound if the record was not found.
      */
-    public ResponseEntity deleteById(Integer id, User loggedInUser) {
+    public ResponseEntity deleteById(Long id, User loggedInUser) {
+        logger.info("deleteById() called");
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             if (userHasRole(loggedInUser, Role.ROLE_ADMIN)) {
@@ -290,7 +296,7 @@ public class UserService {
      * @param userToDelete The User To delete. (for returning components)
      * @return ResponseEntity
      */
-    private ResponseEntity testAndDeleteUser(Integer id, User userToDelete) {
+    private ResponseEntity testAndDeleteUser(Long id, User userToDelete) {
         if (isDeletable(userToDelete)) {
             userRepository.deleteById(id);
             return ResponseEntity.ok().build();
@@ -307,6 +313,7 @@ public class UserService {
 
     /**
      * Checks if the Requested user is valid and Enabled.
+     * Also checks the activity of the company the user works at.
      *
      * @param username Name of the user to check
      * @return Returns a Valid user
@@ -314,8 +321,8 @@ public class UserService {
     public User getValidUser(String username) {
         @Nullable
         User loggedInUser = userRepository.findByUsername(username);
-        if (loggedInUser != null && loggedInUser.isEnabled()) {
-            logger.debug("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + "]");
+        if (loggedInUser != null && loggedInUser.isEnabled() && loggedInUser.getWorkplace().isActive()) {
+            logger.info("UserService: User has authorities: " + loggedInUser.getUsername() + " [" + loggedInUser.getRole() + " - " + loggedInUser.getWorkplace().getName() + "]");
             return loggedInUser;
         }
         return null; //throws UNAUTHORIZED

@@ -3,10 +3,7 @@ package com.elte.supplymanagersystem.entities;
 import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -28,6 +25,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "USER_TABLE")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -36,13 +34,19 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private Integer id;
+    private Long id;
 
-    //@Size(min = 4, max = 10, message = "Username Length Should Be 4-10 characters long")
     @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)
@@ -71,7 +75,7 @@ public class User {
     private Role role;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "creator")
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<History> histories;
 
@@ -82,6 +86,8 @@ public class User {
      */
     public User(UserDTO userDTO) {
         this.username = userDTO.getUsername();
+        this.fullName = userDTO.getFullName();
+        this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
         this.enabled = userDTO.isEnabled();
         this.company = userDTO.getCompany();
@@ -103,5 +109,18 @@ public class User {
      */
     public boolean isColleague(User otherUser) {
         return this.workplace.getId().equals(otherUser.workplace.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", company=" + company +
+                ", workplace=" + workplace +
+                ", role=" + role +
+                '}';
     }
 }

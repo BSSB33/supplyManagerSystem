@@ -19,8 +19,15 @@ Témavezető: Dr. Szendrei Rudolf
 > például a Git és a Lombok.
 
 **Bővítési lehetőségek:**
-    -Megrendelés megnyitási/zárolási ideje
+	-A megrendelések több terméket is tartalmazhatnak egységárral
+	-A több országban működő cégekneknek választható nyelv bevezetése felhasználónként. (EUR/HUF valuták bevezetése megrendelésekre)
+	-Értesítések bevezetése
+	-Útvonaltervezés implementálása
+	-Képek, egyéb dokumentumok csatolása megrendelésekhez, előzményekhez.
+	-Havi Jelentés generálása funkció implementálása
+	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.    
     -HTTPS bevezetése
+    
     
 **Változtatások a fejlesztés során:**
     - Felhasználók csak a saját cégük által kibocsátott előzményeket tekinthetik meg ezért hozzárendelésre került a Creator (Készítő) mező minden előzményhez.
@@ -71,6 +78,7 @@ Témavezető: Dr. Szendrei Rudolf
     - [x] [POST] add history to order by order ID : `/orders/{id}/histories`
     - [x] [PUT] update order by ID : `/orders/{id}`
     - [x] [DELETE] delete order by ID : `/orders/{id}`
+	- TODO statistics endpoints
     
 - CompanyController:
     - [x] [GET] get all the companies : `/companies`

@@ -1,0 +1,76 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: OrderRepository</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.elte.supplymanagersystem.repositories</a> ]
+</div>
+
+<h1>Coverage Summary for Class: OrderRepository (com.elte.supplymanagersystem.repositories)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">OrderRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.elte.supplymanagersystem.repositories;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.elte.supplymanagersystem.entities.Company;
+<i>4</i>&nbsp;import com.elte.supplymanagersystem.entities.Order;
+<i>5</i>&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+<i>6</i>&nbsp;import org.springframework.data.jpa.repository.Query;
+<i>7</i>&nbsp;import org.springframework.data.repository.query.Param;
+<i>8</i>&nbsp;import org.springframework.stereotype.Repository;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.util.List;
+<i>11</i>&nbsp;import java.util.Optional;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * Repository interface for Orders: Type, ID
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;@Repository
+<i>18</i>&nbsp;public interface OrderRepository extends JpaRepository&lt;Order, Integer&gt; {
+<i>19</i>&nbsp;    Optional&lt;Order&gt; findByProductName(String productName);
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @Query(&quot;SELECT o FROM Order o WHERE o.seller = :workplace&quot;)
+<i>22</i>&nbsp;    List&lt;Order&gt; findSalesByWorkplace(@Param(&quot;workplace&quot;) Company workplace);
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    @Query(&quot;SELECT o FROM Order o WHERE o.buyer = :workplace&quot;)
+<i>25</i>&nbsp;    List&lt;Order&gt; findPurchasesByWorkplace(@Param(&quot;workplace&quot;) Company workplace);
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    @Query(&quot;SELECT o FROM Order o WHERE o.buyer = :workplace OR o.seller = :workplace&quot;)
+<i>28</i>&nbsp;    List&lt;Order&gt; findAllOrderByWorkplace(@Param(&quot;workplace&quot;) Company workplace);
+<i>29</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-05-04 01:17</div>
+</div>
+</body>
+</html>

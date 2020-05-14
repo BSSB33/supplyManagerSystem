@@ -13,7 +13,7 @@ import java.util.List;
  * Repository interface for Users: Type, ID
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
     @Query("SELECT u FROM User u WHERE u.company is empty")
@@ -21,5 +21,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Modifying
     @Query("DELETE FROM User u WHERE u.id = :id")
-    void deleteById(@Param("id") Integer id);
+    void deleteById(@Param("id") Long id);
 }

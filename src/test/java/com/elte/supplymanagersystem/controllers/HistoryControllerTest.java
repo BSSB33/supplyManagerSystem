@@ -1,142 +1,201 @@
 package com.elte.supplymanagersystem.controllers;
 
-import com.elte.supplymanagersystem.TestUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.FixMethodOrder;
+import com.elte.supplymanagersystem.entities.History;
+import com.elte.supplymanagersystem.entities.Order;
+import com.elte.supplymanagersystem.enums.HistoryType;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-@FixMethodOrder
+@Transactional
+@SpringBootTest
+@AutoConfigureMockMvc
 public class HistoryControllerTest {
 
-    final static String historyJSONPath = "src/test/input/histories/";
-    private static TestUtils testUtils = new TestUtils();
+    @Autowired
+    private MockMvc mockMvc;
 
-    void assertEqualJSONHistoryToJSONObject(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
-        JSONAssert.assertEquals(testUtils.getJsonObject(request).toString(),
-                new JSONObject(testUtils.getContentOfFile(historyJSONPath + expectedJSONPath)).toString(),
-                testUtils.getHistoryComparator());
-    }
-
-    void assertEqualJSONHistoryArrayToJSONArray(HttpResponse request, String expectedJSONPath) throws IOException, JSONException {
-        JSONAssert.assertEquals(testUtils.getJsonArray(request).toString(),
-                new JSONArray(testUtils.getContentOfFile(historyJSONPath + expectedJSONPath)).toString(),
-                testUtils.getHistoryComparator());
+    private String jsonToString(final Object obj) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //Get All Endpoint
     @Test
-    @Order(1)
-    public void givenAdminUser_whenGetAllEndpointIsCalled_thenAllTheHistoriesShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("histories", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+    public void givenAdminUser_whenGetAllEndpointIsCalled_thenAllTheHistoriesShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(15)));
     }
 
     @Test
-    @Order(2)
-    public void givenDirectorOrManagerUser_whenGetAllEndpointIsCalled_thenAllTheHistoriesCreatedByTheUserShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest = testUtils.sendGetRequest("histories", "Balazs:password");
-        assertEquals(HttpStatus.SC_OK, getRequest.getStatusLine().getStatusCode());
+    public void givenDirectorUser_whenGetAllEndpointIsCalled_thenForbiddenShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories").with(user("Balazs").password("password")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    @Order(3)
-    public void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("histories", "invalisUser:password");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    public void givenInvalidUser_whenGetAllEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories").with(user("invalidUser").password("password")))
+                .andExpect(status().isUnauthorized());
     }
 
     //Get By Id Endpoint
     @Test
-    @Order(4)
-    public void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("histories/1", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        HttpResponse getRequest2 = testUtils.sendGetRequest("histories/2", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-
-        assertEqualJSONHistoryToJSONObject(getRequest1, "history1.json");
-        assertEqualJSONHistoryToJSONObject(getRequest2, "history2.json");
+    public void givenAdminUser_whenGetByIdEndpointIsCalled_thenTheRequestedHistoryShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/1").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/5").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("5"));
     }
 
     @Test
-    @Order(5)
-    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("histories/1", "Balazs:password");
-        assertEquals(HttpStatus.SC_OK, getRequest1.getStatusLine().getStatusCode());
-        HttpResponse getRequest2 = testUtils.sendGetRequest("histories/2", "Emma:password");
-        assertEquals(HttpStatus.SC_OK, getRequest2.getStatusLine().getStatusCode());
-
-        assertEqualJSONHistoryToJSONObject(getRequest1, "history1.json");
-        assertEqualJSONHistoryToJSONObject(getRequest2, "history2.json");
+    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/1").with(user("Balazs").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/2").with(user("Emma").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("2"));
     }
 
     @Test
-    @Order(5)
-    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorDoNotWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws IOException, JSONException {
-        HttpResponse getRequest1 = testUtils.sendGetRequest("histories/12", "Balazs:password");
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest1.getStatusLine().getStatusCode());
-        HttpResponse getRequest2 = testUtils.sendGetRequest("histories/13", "Emma:password");
-        assertEquals(HttpStatus.SC_FORBIDDEN, getRequest2.getStatusLine().getStatusCode());
+    public void givenDirectorOrManagerUser_whenGetByIdEndpointIsCalled_ifTheCreatorDoNotWorksAtTheSameCompany_thenTheRequestedHistoryShouldBeReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/12").with(user("Balazs").password("password")))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/12").with(user("Emma").password("password")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    @Order(6)
-    public void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse getRequest = testUtils.sendGetRequest("histories/1", "invalisUser:password");
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, getRequest.getStatusLine().getStatusCode());
+    public void givenInvalidUser_whenGetByIdEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/1").with(user("invalidUser").password("password")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenExistingUser_whenGetByIdEndpointIsCalled_withNonExistingHistroy_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/histories/1000").with(user("Gabor").password("password")))
+                .andExpect(status().isNotFound());
     }
 
     //Delete History Endpoint
     @Test
-    @Order(7)
-    public void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheHistoryIsDeletable_thenTheRequestedHistoryShouldBeDeleted() throws IOException {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("histories/8", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    public void givenAdminUser_whenDeleteByIdEndpointIsCalled_ifTheHistoryIsDeletable_thenTheRequestedHistoryShouldBeDeleted() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/histories/8").with(user("Gabor").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
     }
 
     @Test
-    @Order(8)
-    public void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingHistory_thenNotFoundShouldBeThrown() throws IOException {
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("histories/100", "Emma:password");
-        assertEquals(HttpStatus.SC_NOT_FOUND, deleteRequest.getStatusLine().getStatusCode());
+    public void givenAdminUser_whenDeleteByIdEndpointIsCalled_withNonExistingHistory_thenNotFoundShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/histories/10000").with(user("Gabor").password("password")))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
+    }
+
+    @Test
+    public void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_withHistoryTheyCreated_thenTheRequestedHistoryShouldBeDeleted() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/histories/10").with(user("Balazs").password("password")))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist());
+    }
+
+    @Test
+    public void givenDirectorOrManagerUser_whenDeleteByIdEndpointIsCalled_withHistoryTheyDoesntCreated_thenTheRequestedHistoryShouldBeDeleted() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/histories/8").with(user("Gyuri").password("password")))
+                .andExpect(status().isForbidden());
     }
 
     //Add History Endpoint
     @Test
-    @Order(9)
-    public void givenAdminUser_whenAddHistoryEndpointIsCalled_thenTheHistoryShouldBeAdded() throws IOException {
-        HttpResponse postRequest = testUtils.sendPostRequest("histories", "Gabor:password",
-                testUtils.getContentOfFile(historyJSONPath + "newHistory.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("histories/16", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    public void givenAdminUser_whenAddHistoryEndpointIsCalled_thenTheHistoryShouldBeAdded() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/histories/").with(user("Gabor").password("password"))
+                .content(jsonToString(
+                        History.builder()
+                                .note("Test Note")
+                                .historyType(HistoryType.NOTE)
+                                .order(Order.builder().id(1L).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.note").value("Test Note"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.order.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.historyType").value("NOTE"));
     }
 
     @Test
-    @Order(10)
-    public void givenManagerUser_whenAddHistoryEndpointIsCalled_thenTheHistoryShouldBeAdded() throws IOException {
-        HttpResponse postRequest = testUtils.sendPostRequest("histories", "Emma:password",
-                testUtils.getContentOfFile(historyJSONPath + "newHistoryByManager.json"));
-        assertEquals(HttpStatus.SC_OK, postRequest.getStatusLine().getStatusCode());
-        HttpResponse deleteRequest = testUtils.sendDeleteRequest("histories/1", "Gabor:password");
-        assertEquals(HttpStatus.SC_OK, deleteRequest.getStatusLine().getStatusCode());
+    public void givenManagerUser_whenAddHistoryEndpointIsCalled_thenTheHistoryShouldBeAdded() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/histories/").with(user("Emma").password("password"))
+                .content(jsonToString(
+                        History.builder()
+                                .note("Test Note2")
+                                .historyType(HistoryType.NOTE)
+                                .order(Order.builder().id(1L).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.note").value("Test Note2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.order.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.historyType").value("NOTE"));
     }
 
     @Test
-    @Order(11)
-    public void givenInvalidUser_whenRegisterHistoryEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws IOException {
-        HttpResponse postRequest = testUtils.sendPostRequest("histories", "invalidUser:password",
-                testUtils.getContentOfFile(historyJSONPath + "newHistory.json"));
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, postRequest.getStatusLine().getStatusCode());
+    public void givenInvalidUser_whenRegisterHistoryEndpointIsCalled_thenUnauthorizedShouldBeThrown() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/histories/").with(user("invalidUser").password("password"))
+                .content(jsonToString(
+                        History.builder()
+                                .note("Test Note2")
+                                .historyType(HistoryType.NOTE)
+                                .order(Order.builder().id(1L).build())
+                                .build()
+                ))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 }

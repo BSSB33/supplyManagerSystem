@@ -16,8 +16,10 @@
     <packaging>war</packaging>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>1.8</java.version>
         <start-class>com.elte.SupplyManagerSystemApplication</start-class>
+        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>9</maven.compiler.target>
     </properties>
 
     <distributionManagement>
@@ -75,7 +77,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.skyscreamer</groupId>
@@ -124,10 +126,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>9</source>
+                    <target>9</target>
                 </configuration>
             </plugin>
             <plugin>

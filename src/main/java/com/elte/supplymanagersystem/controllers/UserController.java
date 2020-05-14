@@ -3,7 +3,9 @@ package com.elte.supplymanagersystem.controllers;
 import com.elte.supplymanagersystem.dtos.UserDTO;
 import com.elte.supplymanagersystem.entities.User;
 import com.elte.supplymanagersystem.security.AuthenticatedUser;
+import com.elte.supplymanagersystem.services.StatisticsService;
 import com.elte.supplymanagersystem.services.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,7 @@ public class UserController {
     private AuthenticatedUser authenticatedUser;
     private static final String UNAUTHORIZED_USER = "Invalid User!";
 
+    static final Logger logger = Logger.getLogger(UserController.class);
     /**
      * Returns all the Users from UserService based on the Role of the logged in User.
      * Calls getAll method from OrderService.
@@ -164,7 +167,8 @@ public class UserController {
     @PostMapping("login")
     public ResponseEntity login() {
         if(!loggedInUsersId.contains(authenticatedUser.getUser().getId())){
-            System.out.println("User added logged in: " + authenticatedUser.getUser().getUsername());
+            //System.out.println("User added logged in: " + authenticatedUser.getUser().getUsername());
+            logger.info("User added logged in: " + authenticatedUser.getUser().getUsername());
             loggedInUsersId.add(authenticatedUser.getUser().getId());
             return ResponseEntity.ok(authenticatedUser.getUser());
         }
@@ -179,7 +183,8 @@ public class UserController {
     @PostMapping("logout")
     public ResponseEntity logout() {
         if(loggedInUsersId.contains(authenticatedUser.getUser().getId())){
-            System.out.println("User logged out: " + authenticatedUser.getUser().getUsername());
+            //System.out.println("User logged out: " + authenticatedUser.getUser().getUsername());
+            logger.info("User logged out: " + authenticatedUser.getUser().getUsername());
             loggedInUsersId.remove(authenticatedUser.getUser().getId());
             return ResponseEntity.ok(authenticatedUser.getUser());
         }

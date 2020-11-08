@@ -1,5 +1,5 @@
-# SupplyManagerSystem - SMS - BackEnd - 1.0.0
-A Projekt az ELTE IK - PTI BSc képzéshez készült szakdolgozatnak.
+# SupplyManagerSystem - SMS - BackEnd - 1.1.0
+A Projekt az ELTE IK - PTI BSc képzéshez készült szakdolgozatnak (BACKEND).
 
 ```
 Hallgató: Vitrai Gábor
@@ -19,42 +19,73 @@ Témavezető: Dr. Szendrei Rudolf
 > például a Git és a Lombok.
 
 **Bővítési lehetőségek:**
-	-A megrendelések több terméket is tartalmazhatnak egységárral
-	-A több országban működő cégekneknek választható nyelv bevezetése felhasználónként. (EUR/HUF valuták bevezetése megrendelésekre)
-	-Értesítések bevezetése
-	-Útvonaltervezés implementálása
-	-Képek, egyéb dokumentumok csatolása megrendelésekhez, előzményekhez.
-	-Havi Jelentés generálása funkció implementálása
-	-Email hitelesítés implementálása majd email címmel való belépés engedélyezése.    
-    -HTTPS bevezetése
+
+	- A megrendelések több terméket is tartalmazhatnak egységárral.
+	- A több országban működő cégekneknek választható nyelv bevezetése felhasználónként. (EUR/HUF valuták bevezetése megrendelésekre)
+	- Értesítések bevezetése
+	- Útvonaltervezés implementálása
+	- Képek, egyéb dokumentumok csatolása megrendelésekhez, előzményekhez.
+	- Havi Jelentés generálása funkció implementálása
+	- Email hitelesítés implementálása majd email címmel való belépés engedélyezése.    
+    - HTTPS bevezetése
     
     
 **Változtatások a fejlesztés során:**
+
     - Felhasználók csak a saját cégük által kibocsátott előzményeket tekinthetik meg ezért hozzárendelésre került a Creator (Készítő) mező minden előzményhez.
     - History endpointokat át kellett gondolni, így javarészt az OrderControlleren keresztül már módosíthatóak kényelmesen.
     - SQL lekérdezéseket kellett bevezetni + PostgreSQL adatbázist választottam a tervezett H2 helyett, az adatok perzisztálásáház
     - DTO-kat (Data Transfer Object) bevezettem a rendszer megkímélésének céljából.
     - Entitások kapcsolatai minimálisan megváltoztak a kezdeti tervekhez képest.
     
-## More - ENG:
-
+## Others - ENG:
 ### Usage:
- The Application is a REST API, there is no UI to use. To use you will need to use the Dedicated Client or a REST client like ARC or POSTMAN. 
- Client: [SupplyManagerSystemClient](https://github.com/BSSB33/supplyManagerSystemClient)
+ The Application is a REST API, there is no UI to use. To use, you will need to use the Dedicated Client or a REST client like ARC or POSTMAN. 
+
+### Documentation + Client:
+ The official 73 pages long documentation can be requested at me if required.
+ Official Client: [SupplyManagerSystemClient](https://github.com/BSSB33/supplyManagerSystemClient)
 
 ### Compile and Running
+ Spring application!
  Use Intellij IDEA for opening and developing this `MAVEN` project. Run the main method inside the package com.elte.SupplyManagerSystemApplication file
- Generate a WAR file with `Java 11` via IntelliJ or run the following code form the console: `mvn deploy -DskipTests`
+ Generate a WAR file with `Java 11` via IntelliJ or run the following code from the console: `mvn deploy -DskipTests`
  Deployment: Install and Run Tomcat server with `Java 11`, place the WAR file inside the `webapps` folder and use the endpoints given below.
  Generate JavaDOC with this command: `mvn javadoc:javadoc`
  
-### JSON examples for PUT and POST endpoints:
-> TODO
+### JSON example for POST order endpoint:
+```json
+{
+    "id": 1,
+    "productName": "Intel Core I5 6550 Processor",
+    "price": 50000.0,
+    "status": "IN_STOCK",
+    "buyer": {
+        "id": 3
+    },
+    "buyerManager": {
+        "id": 6
+    },
+    "seller": {
+        "id": 1
+    },
+    "sellerManager": {
+        "id": 5
+    },
+    "createdAt": "2020-11-08",
+    "modifiedAt": "2020-11-08",
+    "description": "A new processor for the Office computer.",
+    "archived": false
+}
+```
 
 ### Database:
 >PostgreSQL DB:
 > dbName = supplydb
 > tables: USER_TABLE, ORDER_TABLE, COMPANY_TABLE, HISTORY_TABLE 
+
+### Create test users:
+>Edit import.sql file or preupload db, with bcrypt encoded passwords
 
 ### Endpoints:
 - UserController:
@@ -78,13 +109,19 @@ Témavezető: Dr. Szendrei Rudolf
     - [x] [POST] add history to order by order ID : `/orders/{id}/histories`
     - [x] [PUT] update order by ID : `/orders/{id}`
     - [x] [DELETE] delete order by ID : `/orders/{id}`
-	- TODO statistics endpoints
+    - [x] [GET] get monthly income of the company of the logged in user : `/stats/monthlyIncome`
+    - [x] [GET] get monthly expanse of the company of the logged in user : `/stats/monthlyExpense`
+    - [x] [GET] get partner related stats of the company of the logged in user : `/stats/partnersStat`
+    - [x] [GET] get order counts in the data base : `/stats/orderCount`
+    - [x] [GET] get user counts by role in the data base : `/stats/userCount`
     
 - CompanyController:
     - [x] [GET] get all the companies : `/companies`
     - [x] [GET] get company by ID : `/companies/{id}`
     - [x] [GET] get company of the User : `/companies/mycompany`
     - [x] [PUT] update company by ID : `/companies/{id}`
+    - [x] [PUT] enable company by ID : `/companies/{id}/enable`
+    - [x] [PUT] disable company by ID : `/companies/{id}/disable`
     - [x] [POST] register new company : `/companies/register`
     - [x] [DELETE] delete company by ID : `/companies/{id}`
     
@@ -95,7 +132,7 @@ Témavezető: Dr. Szendrei Rudolf
     - [x] [DELETE] delete history by ID : `/histories/{id}`
     
 - DefaultPageController:
-    - [x] [GET] get feedback of running : `/`
+    - [x] [GET] get feedback by running : `/`
     
     
 ### Additional Data:
@@ -106,8 +143,7 @@ Témavezető: Dr. Szendrei Rudolf
  
 ![UMLDiagram](https://github.com/BSSB33/supplyManagerSystem/blob/release/RELEASE-1.0.0/docs/UML/EntitiesUML.png "UML with Entities")
 
-
-
 ### Test Descriptions:
-> TODO
+> Tests were created with MockMVC.
+> The given tests work with the provided example database set. (import.sql)
     

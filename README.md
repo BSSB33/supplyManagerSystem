@@ -18,6 +18,15 @@ Témavezető: Dr. Szendrei Rudolf
 > kívánom építeni Spring segítségével. Ezen felül más, az iparban is használt fejlesztői eszközöket is igénybe tervezek venni, mint
 > például a Git és a Lombok.
 
+#### The topic of the Thesis
+> In my BSc thesis, I aim to create software that is essential in the life of companies, which is close to reality and provides an opportunity
+> for small and medium-sized enterprises to monitor their affairs, orders, partners, and data. The aim is to set up a management system in which 
+> registered companies can track their purchases and receive detailed information on them next to convenient tools for tracking them. (Mini CRM system) 
+> I wrote the essential part of the program in Java, with the help of the Spring framework, and I created a web frontend, 
+> where logged-in users can manage the data and orders in the database. 
+> Employees from each company will have the opportunity to order from other companies, and as communication with the partner company progresses, 
+> managers can easily record the status between each step. I have built my thesis around the tools provided by REST with the help of Spring.
+
 **Bővítési lehetőségek:**
 
 	- A megrendelések több terméket is tartalmazhatnak egységárral.
